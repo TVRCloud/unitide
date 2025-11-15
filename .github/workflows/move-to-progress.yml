@@ -42,7 +42,8 @@ jobs:
 
       # Step 3: Update the "Status" field of that project item
       - name: Update project item status
-        uses: nipe0324/update-project-v2-item-field@v2.0.2
+        # This line is CHANGED from @v2.0.2 to @v3
+        uses: nipe0324/update-project-v2-item-field@v3
         if: steps.get-item-id.outputs.project-item-id != ''
         with:
           # REQUIRED: The same Personal Access Token (PAT)
@@ -54,5 +55,5 @@ jobs:
           # REQUIRED: Change 'Status' if your column has a different name
           field-name: "Status"
 
-          # REQUIRED: Change 'In Progress' if your status is named differently
+          # REQUIRED: Change 'In progress' if your status is named differently
           field-value: "In progress"
