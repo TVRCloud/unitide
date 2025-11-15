@@ -1,0 +1,58 @@
+# .github/workflows/move-to-progress.yml
+name: "Move Issue to In Progress on Branch Create"
+
+on:
+  # Trigger the workflow when a new branch is created
+  create:
+
+jobs:
+  move_issue_to_progress:
+    runs-on: ubuntu-latest
+
+    # Only run this job if the created item is a branch (not a tag)
+    if: github.event.ref_type == 'branch'
+
+    steps:
+      # Step 1: Extract the issue number from the branch name
+      - name: Extract issue number
+        run: |
+          ISSUE_NUMBER=$(echo "${{ github.ref }}" | sed 's|refs/heads/||' | cut -d'-' -f1)
+          echo "ISSUE_NUMBER=${ISSUE_NUMBER}" >> $GITHUB_ENV
+        id: extract
+
+      # Step 2: Get the Project Item ID from the issue number
+      - name: Get project item id
+        uses: monry/actions-get-project-item-id@v2
+        id: get-item-id
+        with:
+          # REQUIRED: A Personal Access Token (PAT)
+          github-token: ${{ secrets.PROJECT_PAT }}
+
+          # UPDATED: Set to your organization name
+          project-owner: "TVRCloud"
+
+          # UPDATED: Set to your project number from the URL
+          project-number: 7
+
+          # This automatically gets the repo this action is in
+          issue-repository: ${{ github.repository }}
+
+          # The issue number from step 1
+          issue-number: ${{ env.ISSUE_NUMBER }}
+
+      # Step 3: Update the "Status" field of that project item
+      - name: Update project item status
+        uses: nipe0324/update-project-v2-item-field@v2.0.2
+        if: steps.get-item-id.outputs.project-item-id != ''
+        with:
+          # REQUIRED: The same Personal Access Token (PAT)
+          github-token: ${{ secrets.PROJECT_PAT }}
+
+          # The project item ID from step 2
+          item-id: ${{ steps.get-item-id.outputs.project-item-id }}
+
+          # REQUIRED: Change 'Status' if your column has a different name
+          field-name: "Status"
+
+          # REQUIRED: Change 'In Progress' if your status is named differently
+          field-value: "In Progress"
