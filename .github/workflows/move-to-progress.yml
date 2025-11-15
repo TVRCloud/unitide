@@ -25,35 +25,25 @@ jobs:
         uses: monry/actions-get-project-item-id@v2
         id: get-item-id
         with:
-          # REQUIRED: A Personal Access Token (PAT)
           github-token: ${{ secrets.PROJECT_PAT }}
-
-          # UPDATED: Set to your organization name
           project-owner: "TVRCloud"
-
-          # UPDATED: Set to your project number from the URL
           project-number: 7
-
-          # This automatically gets the repo this action is in
           issue-repository: ${{ github.repository }}
-
-          # The issue number from step 1
           issue-number: ${{ env.ISSUE_NUMBER }}
 
+      # --- THIS IS THE CORRECTED STEP ---
       # Step 3: Update the "Status" field of that project item
       - name: Update project item status
-        # This line is CHANGED from @v2.0.2 to @v3
-        uses: nipe0324/update-project-v2-item-field@v3
+        uses: titoportas/update-project-fields@v2
         if: steps.get-item-id.outputs.project-item-id != ''
         with:
-          # REQUIRED: The same Personal Access Token (PAT)
           github-token: ${{ secrets.PROJECT_PAT }}
 
-          # The project item ID from step 2
+          # The ID of the card you want to move
           item-id: ${{ steps.get-item-id.outputs.project-item-id }}
 
-          # REQUIRED: Change 'Status' if your column has a different name
-          field-name: "Status"
+          # The name of the column
+          field-keys: "Status"
 
-          # REQUIRED: Change 'In progress' if your status is named differently
-          field-value: "In progress"
+          # The name of the status option
+          field-values: "In progress"
