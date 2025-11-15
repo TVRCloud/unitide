@@ -34,7 +34,8 @@ jobs:
       # --- THIS IS THE CORRECTED STEP ---
       # Step 3: Update the "Status" field of that project item
       - name: Update project item status
-        uses: titoportas/update-project-fields@v2
+        # This line is CHANGED to the correct version
+        uses: titoportas/update-project-fields@v0.1.0
         if: steps.get-item-id.outputs.project-item-id != ''
         with:
           github-token: ${{ secrets.PROJECT_PAT }}
