@@ -55,4 +55,4 @@ jobs:
           field-name: "Status"
 
           # REQUIRED: Change 'In Progress' if your status is named differently
-          field-value: "In Progress"
+          field-value: "In progress"
