@@ -4,7 +4,7 @@ import { SignJWT, jwtVerify } from "jose";
 import bcrypt from "bcryptjs";
 import { cookies, headers } from "next/headers";
 import crypto from "crypto";
-import useSession from "@/models/session";
+import userSession from "@/models/session";
 
 const SECRET_KEY = new TextEncoder().encode(config.jwt.secret);
 const EXPIRES_IN = config.jwt.expiresIn;
@@ -85,7 +85,7 @@ export async function setSession(user: Record<string, any>) {
     maxAge: config.session.timeout,
   });
 
-  await useSession.create({
+  await userSession.create({
     user: user.id,
     isActive: true,
     jti,
@@ -103,7 +103,7 @@ export async function clearSession() {
   const jti = token ? (await verifyToken(token))?.jti : null;
 
   if (token && jti) {
-    await useSession.updateOne({ jti }, { isActive: false });
+    await userSession.updateOne({ jti }, { isActive: false });
   }
   cookieStore.delete(config.session.cookieName);
 }

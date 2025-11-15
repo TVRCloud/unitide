@@ -118,7 +118,7 @@ export default function LandingPage() {
             <div className="w-10 h-10 rounded-xl bg-linear-to-br from-primary to-secondary flex items-center justify-center">
               <Sparkles className="w-5 h-5 text-primary-foreground" />
             </div>
-            <span className="text-xl font-bold tracking-tight">TeamSync</span>
+            <span className="text-xl font-bold tracking-tight">UniTide</span>
           </motion.div>
 
           <div className="hidden md:flex items-center gap-8">
@@ -282,7 +282,7 @@ export default function LandingPage() {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="text-xl md:text-2xl text-muted-foreground mb-12 max-w-3xl mx-auto"
           >
-            TeamSync helps you organize projects, track progress, and keep
+            UniTide helps you organize projects, track progress, and keep
             everyone aligned — all in one intuitive platform.
           </motion.p>
 
@@ -393,7 +393,7 @@ export default function LandingPage() {
       {/* Footer */}
       <footer className="border-t border-border py-12 px-6">
         <div className="max-w-7xl mx-auto text-center text-muted-foreground">
-          <p>© 2025 TeamSync. Empowering teams worldwide.</p>
+          <p>© 2025 UniTide. Empowering teams worldwide.</p>
         </div>
       </footer>
 

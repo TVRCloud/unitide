@@ -27,7 +27,7 @@ export function MobileMenu() {
       </SheetTrigger>
       <SheetContent className="sm:w-72 px-3 h-full flex flex-col" side="left">
         <SheetHeader>
-          <SheetTitle>TeamSync</SheetTitle>
+          <SheetTitle>UniTide</SheetTitle>
           <p className="text-xs text-muted-foreground">
             CRM{" "}
             {isLoading ? "" : <span className="uppercase">{user?.role}</span>}

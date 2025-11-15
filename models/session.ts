@@ -33,4 +33,4 @@ const SessionSchema = new Schema(
 // );
 
 export default models.UserSession ||
-  model("UserSession", SessionSchema, "useSession");
+  model("UserSession", SessionSchema, "userSession");

@@ -70,8 +70,8 @@ This project helps teams manage projects, assign tasks, collaborate, and track p
 1. **Clone the repository**
 
    ```bash
-   git clone https://github.com/TVRCloud/teamsync.git
-   cd teamsync
+   git clone https://github.com/TVRCloud/unitide.git
+   cd unitide
    ```
 
 2. **Install dependencies**
@@ -113,4 +113,3 @@ This project helps teams manage projects, assign tasks, collaborate, and track p
 | `jsonwebtoken`          | JWT auth                        |
 
 ---
-

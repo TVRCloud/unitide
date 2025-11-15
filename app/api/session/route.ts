@@ -1,7 +1,7 @@
 import { authenticateUser } from "@/lib/authenticateUser";
 import connectDB from "@/lib/mongodb";
 import { NextResponse } from "next/server";
-import useSession from "@/models/session";
+import userSession from "@/models/session";
 
 export async function GET(request: Request) {
   try {
@@ -24,7 +24,7 @@ export async function GET(request: Request) {
         }
       : {};
 
-    const sessions = await useSession.aggregate([
+    const sessions = await userSession.aggregate([
       { $match: query },
       {
         $lookup: {

@@ -1,0 +1,51 @@
+# .github/workflows/move-to-progress.yml
+name: "Move Issue to In Progress on Branch Create"
+
+on:
+  # Trigger the workflow when a new branch is created
+  create:
+
+jobs:
+  move_issue_to_progress:
+    runs-on: ubuntu-latest
+
+    # Only run this job if the created item is a branch (not a tag)
+    if: github.event.ref_type == 'branch'
+
+    steps:
+      # Step 1: Extract the issue number from the branch name
+      - name: Extract issue number
+        run: |
+          ISSUE_NUMBER=$(echo "${{ github.ref }}" | sed 's|refs/heads/||' | cut -d'-' -f1)
+          echo "ISSUE_NUMBER=${ISSUE_NUMBER}" >> $GITHUB_ENV
+        id: extract
+
+      # Step 2: Get the Project Item ID from the issue number
+      - name: Get project item id
+        uses: monry/actions-get-project-item-id@v2
+        id: get-item-id
+        with:
+          github-token: ${{ secrets.PROJECT_PAT }}
+          project-owner: "TVRCloud"
+          project-number: 7
+          issue-repository: ${{ github.repository }}
+          issue-number: ${{ env.ISSUE_NUMBER }}
+
+      # Step 3: Update the "Status" field of that project item
+      - name: Update project item status
+        uses: titoportas/update-project-fields@v0.1.0
+        if: steps.get-item-id.outputs.project-item-id != ''
+        with:
+          github-token: ${{ secrets.PROJECT_PAT }}
+
+          # --- THIS IS THE NEW LINE ---
+          project-url: "https://github.com/orgs/TVRCloud/projects/7"
+
+          # The ID of the card you want to move
+          item-id: ${{ steps.get-item-id.outputs.project-item-id }}
+
+          # The name of the column
+          field-keys: "Status"
+
+          # The name of the status option
+          field-values: "In progress"

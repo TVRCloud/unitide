@@ -49,7 +49,7 @@ export function Sidebar() {
               )}
             >
               <div>
-                <h1 className="text-lg font-semibold">TeamSync</h1>
+                <h1 className="text-lg font-semibold">UniTide</h1>
                 <p className="text-xs text-muted-foreground">
                   CRM{" "}
                   {isLoading ? (

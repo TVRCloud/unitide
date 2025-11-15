@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { config } from "@/lib/config";
 import { clearSession, verifyToken } from "@/utils/auth";
-import useSession from "@/models/session";
+import userSession from "@/models/session";
 
 type AuthResult =
   | { user: any; errorResponse?: never }
@@ -34,7 +34,7 @@ export async function authenticateUser(
     };
   }
 
-  const session = await useSession.findOne({ jti: decoded.jti });
+  const session = await userSession.findOne({ jti: decoded.jti });
 
   if (!session || !session.isActive || session.expiresAt < new Date()) {
     await clearSession();
