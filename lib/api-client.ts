@@ -182,3 +182,42 @@ export const fetchSessions = async ({
   const res = await apiClient.get(`/api/session?${params.toString()}`);
   return res.data;
 };
+
+// ---------------------------
+// -------NOTIFICATION--------
+// ---------------------------
+export const fetchAlerts = async ({
+  skip,
+  search,
+  type,
+  audienceType,
+  role,
+  sortField,
+  sortOrder,
+}: {
+  skip: number;
+  search?: string;
+  type?: string;
+  audienceType?: string;
+  role?: string;
+  sortField?: string;
+  sortOrder?: "asc" | "desc";
+}) => {
+  const params = new URLSearchParams({
+    skip: String(skip),
+    limit: "20",
+  });
+
+  if (search) params.set("search", search);
+  if (type) params.set("type", type);
+  if (audienceType) params.set("audienceType", audienceType);
+  if (role) params.set("role", role);
+  if (sortField) params.set("sortField", sortField);
+  if (sortOrder) params.set("sortOrder", sortOrder);
+
+  const res = await apiClient.get(
+    `/api/notifications/all?${params.toString()}`
+  );
+
+  return res.data;
+};

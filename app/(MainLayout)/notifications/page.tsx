@@ -1,11 +1,11 @@
+import LayoutWrap from "@/components/layout-wrap";
 import NotificationsMain from "@/components/notifications/NotificationsMain";
-import React from "react";
 
 const Notifications = () => {
   return (
-    <div>
+    <LayoutWrap>
       <NotificationsMain />
-    </div>
+    </LayoutWrap>
   );
 };
 

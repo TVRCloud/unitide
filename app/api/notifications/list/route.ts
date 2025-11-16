@@ -11,7 +11,21 @@ export async function GET() {
     if (errorResponse) return errorResponse;
 
     const notifications = await Notification.aggregate([
+      {
+        $match: {
+          $or: [
+            { type: "BROADCAST", audienceType: "ALL" },
+            { type: "ROLE_BASED", audienceType: "ROLE", roles: user.role },
+            {
+              type: "DIRECT",
+              audienceType: "USER",
+              users: new mongoose.Types.ObjectId(user.id),
+            },
+          ],
+        },
+      },
       { $sort: { createdAt: -1 } },
+      { $limit: 50 },
       {
         $lookup: {
           from: "notificationreads",

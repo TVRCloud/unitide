@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,22 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { Button } from "./ui/button";
-import {
-  Activity,
-  AlertCircle,
-  Bell,
-  Briefcase,
-  Check,
-  Clock,
-  ListTodo,
-  MessageSquare,
-  Radio,
-  Settings,
-  Shield,
-  Trash2,
-  User,
-  Users,
-} from "lucide-react";
+import { Bell, Check, Clock, Settings, Trash2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { Badge } from "./ui/badge";
 import { ScrollArea } from "./ui/scroll-area";
@@ -31,52 +16,15 @@ import {
   useNotificationStore,
   useNotificationStream,
 } from "@/store/useNotificationStore";
-import { useRecentAlerts } from "@/hooks/useNotifications";
+import { useNotificationAlerts } from "@/hooks/useNotifications";
 import { cn } from "@/lib/utils";
 import { Separator } from "./ui/separator";
 import { DateTime } from "luxon";
 import { useRouter } from "next/navigation";
-
-type NotificationType =
-  | "BROADCAST"
-  | "TASK"
-  | "PROJECT"
-  | "TEAM"
-  | "DEADLINE"
-  | "SECURITY"
-  | "COMMENT"
-  | "USER"
-  | "ACTIVITY";
-
-const getNotificationIcon = (type: NotificationType) => {
-  const icons = {
-    BROADCAST: Radio,
-    TASK: ListTodo,
-    PROJECT: Briefcase,
-    TEAM: Users,
-    DEADLINE: AlertCircle,
-    SECURITY: Shield,
-    COMMENT: MessageSquare,
-    USER: User,
-    ACTIVITY: Activity,
-  };
-  return icons[type] || Bell;
-};
-
-const getNotificationColor = (type: NotificationType) => {
-  const colors = {
-    BROADCAST: "from-purple-500 to-purple-600",
-    TASK: "from-blue-500 to-blue-600",
-    PROJECT: "from-green-500 to-green-600",
-    TEAM: "from-orange-500 to-orange-600",
-    DEADLINE: "from-red-500 to-red-600",
-    SECURITY: "from-yellow-500 to-yellow-600",
-    COMMENT: "from-pink-500 to-pink-600",
-    USER: "from-cyan-500 to-cyan-600",
-    ACTIVITY: "from-indigo-500 to-indigo-600",
-  };
-  return colors[type] || "from-slate-500 to-slate-600";
-};
+import {
+  getNotificationColor,
+  getNotificationIcon,
+} from "@/utils/notification";
 
 type BadgeVariant = "default" | "secondary" | "outline" | "destructive";
 
@@ -102,7 +50,7 @@ const NavNotification = () => {
   const clearAll = useNotificationStore((s) => s.clearAll);
   const router = useRouter();
 
-  useRecentAlerts();
+  useNotificationAlerts();
   useNotificationStream();
 
   return (
