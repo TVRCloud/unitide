@@ -11,7 +11,6 @@ import {
   Check,
   CheckCheck,
   Clock,
-  Eye,
   Filter,
   Inbox,
   MoreVertical,
@@ -48,7 +47,6 @@ import { Badge } from "../ui/badge";
 import { Separator } from "../ui/separator";
 import { Skeleton } from "../ui/skeleton";
 import {
-  getAudienceBadge,
   getNotificationColor,
   getNotificationIcon,
 } from "@/utils/notification";
