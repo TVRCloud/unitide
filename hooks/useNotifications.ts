@@ -1,6 +1,7 @@
 "use client";
+import { fetchAlerts } from "@/lib/api-client";
 import { useNotificationStore } from "@/store/useNotificationStore";
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { toast } from "sonner";
 
@@ -34,7 +35,7 @@ export function useNotifications(user: { id: string; roles: string[] }) {
   }, [user]);
 }
 
-export const useRecentAlerts = () => {
+export const useNotificationAlerts = () => {
   const setAll = useNotificationStore((s) => s.setAll);
 
   return useQuery({
@@ -57,5 +58,48 @@ export const useRecentAlerts = () => {
       return notifications;
     },
     refetchOnWindowFocus: false,
+  });
+};
+
+export const useInfiniteAlerts = ({
+  search = "",
+  type,
+  audienceType,
+  role,
+  sortField = "createdAt",
+  sortOrder = "desc",
+}: {
+  search?: string;
+  type?: string;
+  audienceType?: string;
+  role?: string;
+  sortField?: string;
+  sortOrder?: "asc" | "desc";
+}) => {
+  return useInfiniteQuery({
+    queryKey: [
+      "all-alerts",
+      search,
+      type,
+      audienceType,
+      role,
+      sortField,
+      sortOrder,
+    ],
+    queryFn: ({ pageParam = 0 }) =>
+      fetchAlerts({
+        skip: pageParam,
+        search,
+        type,
+        audienceType,
+        role,
+        sortField,
+        sortOrder,
+      }),
+
+    initialPageParam: 0,
+
+    getNextPageParam: (lastPage, allPages) =>
+      lastPage.length < 20 ? undefined : allPages.length * 20,
   });
 };
