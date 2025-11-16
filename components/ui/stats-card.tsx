@@ -1,6 +1,6 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   type LucideIcon,
   TrendingUp,
@@ -8,8 +8,8 @@ import {
   Minus,
   Loader2,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
 
 interface StatsCardProps {
   title: string;
@@ -19,6 +19,7 @@ interface StatsCardProps {
   trend?: "up" | "down" | "neutral";
   isLoading?: boolean;
   index?: number;
+  color?: string;
 }
 
 export function StatsCard({
@@ -29,46 +30,56 @@ export function StatsCard({
   trend,
   isLoading,
   index = 0,
+  color,
 }: StatsCardProps) {
   const TrendIcon =
     trend === "up" ? TrendingUp : trend === "down" ? TrendingDown : Minus;
+
+  const gradientColor = color ? color : "from-gray-400 to-gray-500";
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.05 }}
       whileHover={{ y: -4 }}
-      transition={{ delay: 0.1 + index * 0.05 }}
     >
-      <Card className="p-3 md:p-4 h-full">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-0 sm:pb-1 md:pb-2">
-          <CardTitle className="text-sm md:text-base font-medium truncate w-[calc(100%-1.5rem)]">
-            {title}
-          </CardTitle>
-          <Icon className="h-4 w-4 text-muted-foreground shrink-0" />
-        </CardHeader>
-        <CardContent className="h-full">
-          <div className="text-lg md:text-2xl font-bold h-9 flex items-center">
-            {isLoading ? (
-              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-            ) : (
-              value
-            )}
+      <Card className="relative overflow-hidden group cursor-pointer hover:shadow-lg transition-shadow">
+        {/* gradient circle */}
+        <div
+          className={cn(
+            "absolute top-0 right-0 w-24 h-24 bg-linear-to-br opacity-10 rounded-full -mr-12 -mt-12 group-hover:scale-150 transition-transform duration-500",
+            gradientColor
+          )}
+        />
+
+        <CardContent className="pt-3">
+          <div className="flex items-center justify-between mb-2">
+            <Icon className="w-5 h-5 text-muted-foreground" />
+            <span className="text-3xl font-bold">
+              {isLoading ? (
+                <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+              ) : (
+                value
+              )}
+            </span>
           </div>
 
+          <p className="text-sm text-muted-foreground font-medium truncate">
+            {title}
+          </p>
+
           {!isLoading && description && (
-            <div className="flex items-center text-[10px] md:text-xs text-muted-foreground mt-1 truncate">
-              {trend && (
-                <TrendIcon
-                  className={cn(
-                    "mr-1 h-3 w-3 shrink-0",
-                    trend === "up" && "text-green-600",
-                    trend === "down" && "text-red-600",
-                    trend === "neutral" && "text-gray-600"
-                  )}
-                />
-              )}
-              <span className="truncate">{description}</span>
+            <div className="flex items-center text-xs text-muted-foreground mt-1 truncate">
+              <TrendIcon
+                className={cn(
+                  "mr-1 h-3 w-3 shrink-0",
+                  trend === "up" && "text-green-600",
+                  trend === "down" && "text-red-600",
+                  trend === "neutral" && "text-gray-600"
+                )}
+              />
+              {description}
             </div>
           )}
         </CardContent>
