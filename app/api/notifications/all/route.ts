@@ -82,6 +82,17 @@ export async function GET(request: Request) {
           read: { $cond: [{ $gt: [{ $size: "$readInfo" }, 0] }, true, false] },
         },
       },
+      {
+        $project: {
+          _id: 1,
+          title: 1,
+          body: 1,
+          type: 1,
+          audienceType: 1,
+          createdAt: 1,
+          read: 1,
+        },
+      },
     ]);
 
     return NextResponse.json(notifications);
