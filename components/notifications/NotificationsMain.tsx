@@ -12,11 +12,10 @@ import {
   CheckCheck,
   Clock,
   Eye,
-  Filter,
   Inbox,
   MoreVertical,
+  Plus,
   Search,
-  Settings,
   Trash2,
   X,
 } from "lucide-react";
@@ -92,31 +91,9 @@ const NotificationsMain = () => {
               <CheckCheck className="w-4 h-4 mr-2" />
               Mark All Read
             </Button>{" "}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button>
-                  <Settings className="w-4 h-4 mr-2" />
-                  Settings
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuLabel>Notification Settings</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                  <Bell className="w-4 h-4 mr-2" />
-                  Preferences
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Filter className="w-4 h-4 mr-2" />
-                  Filter Rules
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-destructive">
-                  <Trash2 className="w-4 h-4 mr-2" />
-                  Clear All
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>{" "}
+            <Button>
+              <Plus className="w-4 h-4 mr-2" /> Create{" "}
+            </Button>
           </div>
         }
       />
