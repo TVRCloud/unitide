@@ -11,6 +11,7 @@ import {
   Check,
   CheckCheck,
   Clock,
+  Eye,
   Filter,
   Inbox,
   MoreVertical,
@@ -51,8 +52,10 @@ import {
   getNotificationIcon,
 } from "@/utils/notification";
 import { DateTime } from "luxon";
+import { useRouter } from "next/navigation";
 
 const NotificationsMain = () => {
+  const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const [type, setType] = useState<string>("");
   const [audience, setAudience] = useState<string>("");
@@ -312,7 +315,7 @@ const NotificationsMain = () => {
                           exit={{ opacity: 0, x: -20 }}
                           transition={{ delay: idx * 0.02 }}
                           layout
-                          className={`p-5 rounded-xl border transition-all cursor-pointer group ${
+                          className={`p-5 rounded-xl border transition-all group ${
                             notification.read
                               ? "bg-card hover:bg-accent"
                               : "bg-primary/5 hover:bg-primary/10 border-primary/20"
@@ -344,28 +347,43 @@ const NotificationsMain = () => {
                                   )}
                                 </div>
 
-                                <DropdownMenu>
-                                  <DropdownMenuTrigger asChild>
-                                    <Button variant="ghost" size="icon">
-                                      <MoreVertical className="w-4 h-4" />
-                                    </Button>
-                                  </DropdownMenuTrigger>
-                                  <DropdownMenuContent align="end">
-                                    <DropdownMenuLabel>
-                                      Actions
-                                    </DropdownMenuLabel>
-                                    <DropdownMenuSeparator />
-                                    <DropdownMenuItem>
-                                      <Check className="w-4 h-4 mr-2" />
-                                      Mark as{" "}
-                                      {notification.read ? "Unread" : "Read"}
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem className="text-destructive">
-                                      <Trash2 className="w-4 h-4 mr-2" />
-                                      Delete
-                                    </DropdownMenuItem>
-                                  </DropdownMenuContent>
-                                </DropdownMenu>
+                                <div>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="hover:text-primary"
+                                    onClick={() => {
+                                      router.push(
+                                        `/notifications/${notification._id}`
+                                      );
+                                    }}
+                                  >
+                                    <Eye className="w-4 h-4" />
+                                  </Button>
+
+                                  <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                      <Button variant="ghost" size="icon">
+                                        <MoreVertical className="w-4 h-4" />
+                                      </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                      <DropdownMenuLabel>
+                                        Actions
+                                      </DropdownMenuLabel>
+                                      <DropdownMenuSeparator />
+                                      <DropdownMenuItem>
+                                        <Check className="w-4 h-4 mr-2" />
+                                        Mark as{" "}
+                                        {notification.read ? "Unread" : "Read"}
+                                      </DropdownMenuItem>
+                                      <DropdownMenuItem className="text-destructive">
+                                        <Trash2 className="w-4 h-4 mr-2" />
+                                        Delete
+                                      </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                  </DropdownMenu>
+                                </div>
                               </div>
 
                               <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
