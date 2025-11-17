@@ -9,6 +9,11 @@ export async function GET(request: Request) {
     const { errorResponse } = await authenticateUser(["admin"]);
     if (errorResponse) return errorResponse;
 
+    await userSession.updateMany(
+      { expiresAt: { $lte: new Date() }, isActive: true },
+      { $set: { isActive: false } }
+    );
+
     const { searchParams } = new URL(request.url);
 
     const skip = parseInt(searchParams.get("skip") || "0");
