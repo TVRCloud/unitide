@@ -221,3 +221,8 @@ export const fetchAlerts = async ({
 
   return res.data;
 };
+
+export const fetchSingleAlert = async (id: string) => {
+  const res = await apiClient.get(`/api/notifications/${id}`);
+  return res.data;
+};
