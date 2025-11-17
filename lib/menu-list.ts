@@ -13,6 +13,7 @@ import {
   Briefcase,
   FileSpreadsheet,
   ScrollText,
+  Fingerprint,
 } from "lucide-react";
 
 export const menuList = [
@@ -115,9 +116,14 @@ export const menuList = [
         icon: Settings,
       },
       {
-        href: "/logs",
+        href: "/settings/logs",
         label: "Logs",
         icon: ScrollText,
+      },
+      {
+        href: "/settings/session",
+        label: "Session",
+        icon: Fingerprint,
       },
     ],
   },
