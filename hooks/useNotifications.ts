@@ -1,5 +1,5 @@
 "use client";
-import { fetchAlerts } from "@/lib/api-client";
+import { fetchAlerts, fetchSingleAlert } from "@/lib/api-client";
 import { useNotificationStore } from "@/store/useNotificationStore";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
@@ -101,5 +101,12 @@ export const useInfiniteAlerts = ({
 
     getNextPageParam: (lastPage, allPages) =>
       lastPage.length < 20 ? undefined : allPages.length * 20,
+  });
+};
+
+export const useViewAlert = (id: string) => {
+  return useQuery({
+    queryKey: ["alert", id],
+    queryFn: () => fetchSingleAlert(id),
   });
 };
