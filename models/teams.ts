@@ -4,6 +4,7 @@ const TeamSchema = new Schema(
   {
     name: { type: String, required: true },
     description: { type: String },
+    lead: { type: Schema.Types.ObjectId, ref: "Users" },
     members: [{ type: Schema.Types.ObjectId, ref: "Users" }],
     createdBy: { type: Schema.Types.ObjectId, ref: "Users" },
   },

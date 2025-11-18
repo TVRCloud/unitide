@@ -14,6 +14,7 @@ const ProjectSchema = new Schema(
       enum: ["low", "medium", "high", "urgent"],
       default: "medium",
     },
+    manager: { type: Schema.Types.ObjectId, ref: "Users" },
     teams: [{ type: Schema.Types.ObjectId, ref: "Teams" }],
     createdBy: { type: Schema.Types.ObjectId, ref: "Users" },
     updatedBy: { type: Schema.Types.ObjectId, ref: "Users" },
