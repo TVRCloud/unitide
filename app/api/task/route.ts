@@ -2,6 +2,7 @@
 import { authenticateUser } from "@/lib/authenticateUser";
 import connectDB from "@/lib/mongodb";
 import tasks from "@/models/tasks";
+import { createTaskSchema } from "@/schemas/task";
 import mongoose from "mongoose";
 import { NextResponse } from "next/server";
 
@@ -123,3 +124,108 @@ export async function GET(request: Request) {
     );
   }
 }
+
+export async function POST(request: Request) {
+  try {
+    await connectDB();
+
+    const { user, errorResponse } = await authenticateUser([
+      "admin",
+      "manager",
+      "lead",
+    ]);
+    if (errorResponse) return errorResponse;
+
+    const body = await request.json();
+
+    const parsed = createTaskSchema.safeParse(body);
+    if (!parsed.success)
+      return NextResponse.json(
+        { error: parsed.error.flatten() },
+        { status: 400 }
+      );
+
+    const data = parsed.data;
+
+    const newTask = await tasks.create({
+      ...data,
+      createdBy: user.id,
+    });
+
+    return NextResponse.json(newTask, { status: 201 });
+  } catch (err) {
+    console.error("POST /api/tasks error:", err);
+    return NextResponse.json(
+      { error: "Failed to create task" },
+      { status: 500 }
+    );
+  }
+}
+
+// export async function PUT(
+//   request: Request,
+//   { params }: { params: { id: string } }
+// ) {
+//   try {
+//     await connectDB();
+
+//     const { user, errorResponse } = await authenticateUser([
+//       "admin",
+//       "manager",
+//       "lead",
+//       "user",
+//     ]);
+//     if (errorResponse) return errorResponse;
+
+//     const body = await request.json();
+
+//     const parsed = updateTaskSchema.safeParse(body);
+//     if (!parsed.success)
+//       return NextResponse.json(
+//         { error: parsed.error.flatten() },
+//         { status: 400 }
+//       );
+
+//     const updated = await tasks.findByIdAndUpdate(
+//       params.id,
+//       { ...parsed.data, updatedBy: user.id },
+//       { new: true }
+//     );
+
+//     return NextResponse.json(updated, { status: 200 });
+//   } catch (err) {
+//     console.error("PUT /api/tasks/:id error:", err);
+//     return NextResponse.json(
+//       { error: "Failed to update task" },
+//       { status: 500 }
+//     );
+//   }
+// }
+
+// export async function DELETE(
+//   request: Request,
+//   { params }: { params: { id: string } }
+// ) {
+//   try {
+//     await connectDB();
+
+//     const { errorResponse } = await authenticateUser([
+//       "admin",
+//       "manager",
+//     ]);
+//     if (errorResponse) return errorResponse;
+
+//     await Task.findByIdAndDelete(params.id);
+
+//     return NextResponse.json(
+//       { message: "Task deleted" },
+//       { status: 200 }
+//     );
+//   } catch (err) {
+//     console.error("DELETE /api/tasks/:id error:", err);
+//     return NextResponse.json(
+//       { error: "Failed to delete task" },
+//       { status: 500 }
+//     );
+//   }
+// }
