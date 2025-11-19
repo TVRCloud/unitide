@@ -10,20 +10,42 @@ export async function GET() {
     const { user, errorResponse } = await authenticateUser();
     if (errorResponse) return errorResponse;
 
-    const notifications = await Notification.aggregate([
-      {
+    const isAdmin = user.role === "admin";
+
+    let matchStage;
+
+    if (isAdmin) {
+      matchStage = {
+        $match: {
+          type: "BROADCAST",
+        },
+      };
+    } else {
+      // Use $in operator for proper array matching on roles and users
+      matchStage = {
         $match: {
           $or: [
+            // All users get notifications sent to everyone
             { type: "BROADCAST", audienceType: "ALL" },
-            { type: "ROLE_BASED", audienceType: "ROLE", roles: user.role },
+            // Users with matching role get role-based notifications
             {
-              type: "DIRECT",
+              type: "BROADCAST",
+              audienceType: "ROLE",
+              roles: { $in: [user.role] },
+            },
+            // Users whose ID is in the users array get direct notifications
+            {
+              type: "BROADCAST",
               audienceType: "USER",
-              users: new mongoose.Types.ObjectId(user.id),
+              users: { $in: [new mongoose.Types.ObjectId(user.id)] },
             },
           ],
         },
-      },
+      };
+    }
+
+    const notifications = await Notification.aggregate([
+      matchStage,
       { $sort: { createdAt: -1 } },
       { $limit: 50 },
       {
