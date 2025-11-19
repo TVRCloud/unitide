@@ -3,11 +3,6 @@
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import {
-  CreateNotificationInput,
-  CreateNotificationSchema,
-} from "@/types/notification";
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -37,6 +32,10 @@ import {
 
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+  createNotificationSchema,
+  TCreateNotificationSchema,
+} from "@/schemas/notification";
 
 const mockUsers = [
   { id: "690c46954ff6e77ed5990b2f", name: "Amegh T S" },
@@ -48,8 +47,8 @@ const mockUsers = [
 const availableRoles = ["admin", "manager", "lead", "member"];
 
 export default function NotificationForm() {
-  const form = useForm<CreateNotificationInput>({
-    resolver: zodResolver(CreateNotificationSchema),
+  const form = useForm<TCreateNotificationSchema>({
+    resolver: zodResolver(createNotificationSchema),
     defaultValues: {
       type: "BROADCAST",
       title: "",
