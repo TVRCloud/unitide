@@ -14,7 +14,6 @@ import {
   Eye,
   Inbox,
   MoreVertical,
-  Plus,
   Search,
   Trash2,
   X,
@@ -52,6 +51,8 @@ import {
 } from "@/utils/notification";
 import { DateTime } from "luxon";
 import { useRouter } from "next/navigation";
+import AddNotification from "./AddNotification";
+import { RoleGuard } from "../RoleGuard";
 
 const NotificationsMain = () => {
   const router = useRouter();
@@ -91,9 +92,9 @@ const NotificationsMain = () => {
               <CheckCheck className="w-4 h-4 mr-2" />
               Mark All Read
             </Button>{" "}
-            <Button>
-              <Plus className="w-4 h-4 mr-2" /> Create{" "}
-            </Button>
+            <RoleGuard roles={["admin", "manager"]}>
+              <AddNotification />
+            </RoleGuard>
           </div>
         }
       />
@@ -166,33 +167,35 @@ const NotificationsMain = () => {
                   </Select>
                 </div>
 
-                <div>
-                  <Select onValueChange={setAudience} value={audience}>
-                    <SelectTrigger className="w-[120px]">
-                      <SelectValue placeholder="Audience" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="ALL">Everyone</SelectItem>
-                      <SelectItem value="ROLE">Role</SelectItem>
-                      <SelectItem value="SPECIFIC">Specific</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                <RoleGuard roles={["admin", "manager"]}>
+                  <div>
+                    <Select onValueChange={setAudience} value={audience}>
+                      <SelectTrigger className="w-[120px]">
+                        <SelectValue placeholder="Audience" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="ALL">Everyone</SelectItem>
+                        <SelectItem value="ROLE">Role</SelectItem>
+                        <SelectItem value="SPECIFIC">Specific</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-                <div>
-                  <Select onValueChange={setRole} value={role}>
-                    <SelectTrigger className="w-[120px]">
-                      <SelectValue placeholder="Role" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="ALL">All</SelectItem>
-                      <SelectItem value="admin">Admin</SelectItem>
-                      <SelectItem value="manager">Manager</SelectItem>
-                      <SelectItem value="member">Member</SelectItem>
-                      <SelectItem value="guest">Guest</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                  <div>
+                    <Select onValueChange={setRole} value={role}>
+                      <SelectTrigger className="w-[120px]">
+                        <SelectValue placeholder="Role" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="ALL">All</SelectItem>
+                        <SelectItem value="admin">Admin</SelectItem>
+                        <SelectItem value="manager">Manager</SelectItem>
+                        <SelectItem value="member">Member</SelectItem>
+                        <SelectItem value="guest">Guest</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </RoleGuard>
               </div>
             </div>
             {(searchTerm || type || audience || role) && (
