@@ -1,3 +1,4 @@
+import { TCreateNotificationSchema } from "@/schemas/notification";
 import { apiClient } from "@/utils/axios";
 
 // ---------------------------
@@ -215,9 +216,17 @@ export const fetchAlerts = async ({
   if (sortField) params.set("sortField", sortField);
   if (sortOrder) params.set("sortOrder", sortOrder);
 
-  const res = await apiClient.get(
-    `/api/notifications/all?${params.toString()}`
-  );
+  const res = await apiClient.get(`/api/notifications?${params.toString()}`);
 
+  return res.data;
+};
+
+export const fetchSingleAlert = async (id: string) => {
+  const res = await apiClient.get(`/api/notifications/${id}`);
+  return res.data;
+};
+
+export const createNotification = async (data: TCreateNotificationSchema) => {
+  const res = await apiClient.post(`/api/notifications`, data);
   return res.data;
 };

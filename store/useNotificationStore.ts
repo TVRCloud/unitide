@@ -62,6 +62,8 @@ export const useNotificationStream = () => {
   useEffect(() => {
     const es = new EventSource("/api/notifications/stream");
 
+    console.log(es);
+
     es.onmessage = (event) => {
       const n = JSON.parse(event.data);
 

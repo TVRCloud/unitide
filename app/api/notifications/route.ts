@@ -10,42 +10,33 @@ export async function GET() {
     const { user, errorResponse } = await authenticateUser();
     if (errorResponse) return errorResponse;
 
+    const userId = new mongoose.Types.ObjectId(user.id);
+    const userRole = user.role;
     const isAdmin = user.role === "admin";
 
-    let matchStage;
-
-    if (isAdmin) {
-      matchStage = {
-        $match: {
-          type: "BROADCAST",
-        },
-      };
-    } else {
-      // Use $in operator for proper array matching on roles and users
-      matchStage = {
-        $match: {
+    const matchStage = isAdmin
+      ? {} // Admin sees everything, no filtering
+      : {
           $or: [
-            // All users get notifications sent to everyone
-            { type: "BROADCAST", audienceType: "ALL" },
-            // Users with matching role get role-based notifications
+            // ALL notifications for everyone
+            { audienceType: "ALL" },
+            // ROLE-based: Check if user's role is in the roles array
             {
-              type: "BROADCAST",
               audienceType: "ROLE",
-              roles: { $in: [user.role] },
+              roles: { $in: [userRole] },
             },
-            // Users whose ID is in the users array get direct notifications
+            // USER-based: Check if user's ID is in the users array
             {
-              type: "BROADCAST",
               audienceType: "USER",
-              users: { $in: [new mongoose.Types.ObjectId(user.id)] },
+              users: { $in: [userId] },
             },
           ],
-        },
-      };
-    }
+        };
 
     const notifications = await Notification.aggregate([
-      matchStage,
+      {
+        $match: matchStage,
+      },
       { $sort: { createdAt: -1 } },
       { $limit: 50 },
       {
@@ -58,12 +49,7 @@ export async function GET() {
                 $expr: {
                   $and: [
                     { $eq: ["$notificationId", "$$notifId"] },
-                    {
-                      $eq: [
-                        "$userId",
-                        mongoose.Types.ObjectId.createFromHexString(user.id),
-                      ],
-                    },
+                    { $eq: ["$userId", userId] },
                   ],
                 },
               },
@@ -81,6 +67,34 @@ export async function GET() {
     ]);
 
     return NextResponse.json(notifications);
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json({ error: "Server Error" }, { status: 500 });
+  }
+}
+
+export async function POST(req: Request) {
+  try {
+    await connectDB();
+    const { errorResponse } = await authenticateUser(["admin", "manager"]);
+    if (errorResponse) return errorResponse;
+
+    const body = await req.json();
+    const { type, title, body: content, audienceType, roles, users } = body;
+
+    if (!type || !title || !content || !audienceType)
+      return NextResponse.json({ error: "Missing fields" }, { status: 400 });
+
+    const notification = await Notification.create({
+      type,
+      title,
+      body: content,
+      audienceType,
+      roles,
+      users,
+    });
+
+    return NextResponse.json(notification, { status: 201 });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error: "Server Error" }, { status: 500 });
