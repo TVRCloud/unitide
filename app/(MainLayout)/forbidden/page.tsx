@@ -31,7 +31,6 @@ export default function Forbidden() {
 
   return (
     <div className="min-h-screen bg-background text-foreground overflow-hidden relative">
-      {/* Animated Background - RETAINED ORIGINAL COLORS (primary/secondary/72, 184, 74) */}
       <div className="fixed inset-0 pointer-events-none">
         <motion.div
           className="absolute inset-0 opacity-20"
@@ -40,12 +39,11 @@ export default function Forbidden() {
               50 + mousePosition.x
             }% ${
               50 + mousePosition.y
-            }%, rgba(114, 184, 74, 0.15), transparent 40%)`, // Original Color
+            }%, rgba(114, 184, 74, 0.15), transparent 40%)`,
           }}
         />
         <div className="absolute inset-0 bg-linear-to-br from-primary/5 via-transparent to-secondary/5" />
 
-        {/* Grid Pattern */}
         <div
           className="absolute inset-0 opacity-[0.03]"
           style={{
@@ -58,9 +56,7 @@ export default function Forbidden() {
         />
       </div>
 
-      {/* Content */}
       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-6">
-        {/* 401 Number with Glitch Effect */}
         <motion.div
           initial={{ opacity: 0, scale: 0.5 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -87,7 +83,6 @@ export default function Forbidden() {
                 glitchActive ? "glitch" : ""
               }`}
             >
-              {/* Changed number to 401, RETAINED ORIGINAL GRADIENT CLASSES */}
               <span className="bg-linear-to-br from-primary via-secondary to-primary bg-clip-text text-transparent">
                 401
               </span>
@@ -105,7 +100,6 @@ export default function Forbidden() {
           </motion.div>
         </motion.div>
 
-        {/* Text Content - UPDATED FOR UNAUTHORIZED */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -123,7 +117,6 @@ export default function Forbidden() {
           </p>
         </motion.div>
 
-        {/* Action Buttons - RETAINED ORIGINAL BUTTON STYLING */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -151,7 +144,6 @@ export default function Forbidden() {
         </motion.div>
       </div>
 
-      {/* Styles - RETAINED ORIGINAL CSS BLOCK */}
       <style jsx>{`
         @keyframes glitch {
           0%,
