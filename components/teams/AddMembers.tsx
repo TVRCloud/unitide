@@ -24,7 +24,6 @@ const AddMembers = ({ form }: Props) => {
 
   return (
     <>
-      {/* Members */}
       <FormField
         control={form.control}
         name="members"
