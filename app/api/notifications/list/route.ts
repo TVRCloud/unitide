@@ -21,19 +21,15 @@ export async function GET() {
         },
       };
     } else {
-      // Use $in operator for proper array matching on roles and users
       matchStage = {
         $match: {
           $or: [
-            // All users get notifications sent to everyone
             { type: "BROADCAST", audienceType: "ALL" },
-            // Users with matching role get role-based notifications
             {
               type: "BROADCAST",
               audienceType: "ROLE",
               roles: { $in: [user.role] },
             },
-            // Users whose ID is in the users array get direct notifications
             {
               type: "BROADCAST",
               audienceType: "USER",

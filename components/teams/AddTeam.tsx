@@ -69,7 +69,6 @@ const AddTeam = () => {
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            {/* Team Name */}
             <FormField
               control={form.control}
               name="name"
@@ -91,7 +90,6 @@ const AddTeam = () => {
               )}
             />
 
-            {/* Description */}
             <FormField
               control={form.control}
               name="description"
@@ -111,7 +109,6 @@ const AddTeam = () => {
             />
 
             <AddMembers form={form} />
-            {/* Submit */}
             <Button
               type="submit"
               className="w-full"

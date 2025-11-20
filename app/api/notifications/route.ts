@@ -15,17 +15,14 @@ export async function GET() {
     const isAdmin = user.role === "admin";
 
     const matchStage = isAdmin
-      ? {} // Admin sees everything, no filtering
+      ? {}
       : {
           $or: [
-            // ALL notifications for everyone
             { audienceType: "ALL" },
-            // ROLE-based: Check if user's role is in the roles array
             {
               audienceType: "ROLE",
               roles: { $in: [userRole] },
             },
-            // USER-based: Check if user's ID is in the users array
             {
               audienceType: "USER",
               users: { $in: [userId] },

@@ -53,23 +53,19 @@ export function CollapseMenuButton({
     submenus?: any;
     active?: boolean;
   }): boolean => {
-    // Check if the menu has an explicit active flag
     if (menu.active) return true;
-    // If the menu has a href, check if it matches the current pathname.
     if (
       menu.href &&
       (pathname === menu.href || pathname.startsWith(menu.href))
     ) {
       return true;
     }
-    // If the menu has nested submenus, check them recursively.
     if (menu.submenus && menu.submenus.length > 0) {
       return menu.submenus.some(isMenuActive);
     }
     return false;
   };
 
-  // Determine if any submenu (or its descendants) is active.
   const isSubmenuActive = submenus.some(isMenuActive);
 
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
@@ -77,9 +73,6 @@ export function CollapseMenuButton({
   const handleSubmenuToggle = (label: string) => {
     setOpenSubmenu((prevOpen) => (prevOpen === label ? null : label));
   };
-
-  // Remove this line:
-  // const [isCollapsed, setIsCollapsed] = useState<boolean>(isSubmenuActive);
 
   return isOpen ? (
     <Collapsible open={isCollapsed} onOpenChange={onToggle} className="w-full">

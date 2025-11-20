@@ -74,7 +74,6 @@ const SignupMain = () => {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden">
         <motion.div
           animate={{ scale: [1, 1.2, 1], rotate: [0, 90, 0] }}
@@ -124,7 +123,6 @@ const SignupMain = () => {
                 onSubmit={form.handleSubmit(onSubmit)}
                 className="space-y-5"
               >
-                {/* Full Name */}
                 <FormField
                   control={form.control}
                   name="name"
@@ -146,7 +144,6 @@ const SignupMain = () => {
                   )}
                 />
 
-                {/* Email */}
                 <FormField
                   control={form.control}
                   name="email"
@@ -169,7 +166,6 @@ const SignupMain = () => {
                   )}
                 />
 
-                {/* Password */}
                 <FormField
                   control={form.control}
                   name="password"
@@ -195,7 +191,6 @@ const SignupMain = () => {
                   )}
                 />
 
-                {/* Submit Button */}
                 <Button
                   type="submit"
                   className="w-full group"
@@ -222,7 +217,6 @@ const SignupMain = () => {
               </form>
             </Form>
 
-            {/* Divider */}
             <div className="relative mt-6">
               <div className="absolute inset-0 flex items-center">
                 <span className="w-full border-t" />
@@ -232,7 +226,6 @@ const SignupMain = () => {
               </div>
             </div>
 
-            {/* Login link */}
             <p className="text-center text-sm text-muted-foreground mt-6">
               Already have an account?{" "}
               <a

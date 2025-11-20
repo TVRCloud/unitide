@@ -62,20 +62,29 @@ export const useNotificationStream = () => {
   useEffect(() => {
     const es = new EventSource("/api/notifications/stream");
 
-    console.log(es);
-
     es.onmessage = (event) => {
       const n = JSON.parse(event.data);
 
+      const roles = Array.isArray(user.roles)
+        ? user.roles
+        : user.role
+        ? [user.role]
+        : [];
+
       let shouldReceive = false;
+
       if (n.audienceType === "ALL") shouldReceive = true;
+
       if (
         n.audienceType === "ROLE" &&
-        n.roles?.some((r: string) => user.roles.includes(r))
-      )
+        n.roles?.some((r: string) => roles.includes(r))
+      ) {
         shouldReceive = true;
-      if (n.audienceType === "USER" && n.users?.includes(user.id))
+      }
+
+      if (n.audienceType === "USER" && n.users?.includes(user._id)) {
         shouldReceive = true;
+      }
 
       if (shouldReceive) {
         addNotification({

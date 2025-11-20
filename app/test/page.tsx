@@ -251,7 +251,6 @@ const SessionsPage = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
       <div className="border-b bg-linear-to-r from-background via-primary/5 to-background">
         <div className="max-w-[1800px] mx-auto px-6 py-6">
           <div className="flex items-center justify-between">
@@ -307,7 +306,6 @@ const SessionsPage = () => {
       </div>
 
       <div className="max-w-[1800px] mx-auto px-6 py-8 space-y-8">
-        {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {[
             {
@@ -359,9 +357,7 @@ const SessionsPage = () => {
           ))}
         </div>
 
-        {/* Device Breakdown & Filters */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Device Distribution */}
           <Card>
             <CardHeader>
               <CardTitle>Device Distribution</CardTitle>
@@ -417,7 +413,6 @@ const SessionsPage = () => {
             </CardContent>
           </Card>
 
-          {/* Filters */}
           <Card className="lg:col-span-2">
             <CardHeader>
               <CardTitle>Filter Sessions</CardTitle>
@@ -499,7 +494,6 @@ const SessionsPage = () => {
           </Card>
         </div>
 
-        {/* Sessions List */}
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
@@ -552,12 +546,10 @@ const SessionsPage = () => {
                         <Dialog key={`dialog-${session._id}`}>
                           <div className="p-5 rounded-xl border bg-card hover:shadow-md transition-shadow group">
                             <div className="flex items-start gap-4">
-                              {/* Device Icon */}
                               <div className="p-3 rounded-xl bg-linear-to-br from-primary/20 to-secondary/20 shrink-0">
                                 <DeviceIcon className="w-6 h-6 text-primary" />
                               </div>
 
-                              {/* Session Info */}
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-start justify-between gap-4 mb-3">
                                   <div className="flex-1">
@@ -597,10 +589,7 @@ const SessionsPage = () => {
                                         </span>
                                       </div>
                                       <div className="flex items-center gap-2">
-                                        {/* <BrowserIcon className="w-4 h-4 text-muted-foreground" /> */}
-                                        <span className="text-muted-foreground">
-                                          {/* {browser} */}
-                                        </span>
+                                        <span className="text-muted-foreground"></span>
                                       </div>
                                       <div className="flex items-center gap-2">
                                         <MapPin className="w-4 h-4 text-muted-foreground" />
@@ -660,7 +649,6 @@ const SessionsPage = () => {
                                     />
                                     <span className="flex items-center gap-1">
                                       <Calendar className="w-3 h-3" />
-                                      {/* {getTimeRemaining(session.expiresAt)} */}
                                     </span>
                                   </div>
                                   <Badge variant="outline" className="text-xs">
@@ -671,7 +659,6 @@ const SessionsPage = () => {
                             </div>
                           </div>
 
-                          {/* Session Details Dialog */}
                           <DialogContent className="max-w-2xl">
                             <DialogHeader>
                               <DialogTitle className="flex items-center gap-2">
@@ -684,7 +671,6 @@ const SessionsPage = () => {
                             </DialogHeader>
 
                             <div className="space-y-6 mt-4">
-                              {/* User Info */}
                               <div>
                                 <Label className="text-xs text-muted-foreground mb-3 block">
                                   User Information
@@ -712,7 +698,6 @@ const SessionsPage = () => {
 
                               <Separator />
 
-                              {/* Session Details */}
                               <div className="grid grid-cols-2 gap-4">
                                 <div>
                                   <Label className="text-xs text-muted-foreground">
@@ -756,7 +741,6 @@ const SessionsPage = () => {
 
                               <Separator />
 
-                              {/* Device & Browser Info */}
                               <div>
                                 <Label className="text-xs text-muted-foreground mb-3 block">
                                   Device Information
@@ -772,13 +756,10 @@ const SessionsPage = () => {
                                     </p>
                                   </div>
                                   <div className="p-3 rounded-lg bg-muted text-center">
-                                    {/* <BrowserIcon className="w-6 h-6 mx-auto mb-2 text-muted-foreground" /> */}
                                     <p className="text-xs text-muted-foreground mb-1">
                                       Browser
                                     </p>
-                                    <p className="text-sm font-medium">
-                                      {/* {browser} */}
-                                    </p>
+                                    <p className="text-sm font-medium"></p>
                                   </div>
                                   <div className="p-3 rounded-lg bg-muted text-center">
                                     <Globe className="w-6 h-6 mx-auto mb-2 text-muted-foreground" />
@@ -792,7 +773,6 @@ const SessionsPage = () => {
 
                               <Separator />
 
-                              {/* Timestamps */}
                               <div className="grid grid-cols-2 gap-4">
                                 <div>
                                   <Label className="text-xs text-muted-foreground">
@@ -869,7 +849,6 @@ const SessionsPage = () => {
 
                               <Separator />
 
-                              {/* User Agent */}
                               <div>
                                 <Label className="text-xs text-muted-foreground mb-2 block">
                                   User Agent String
@@ -882,7 +861,6 @@ const SessionsPage = () => {
                               </div>
                             </div>
 
-                            {/* Action Buttons */}
                             <DialogFooter className="gap-2">
                               <Button variant="outline">
                                 <Download className="w-4 h-4 mr-2" />
@@ -904,9 +882,7 @@ const SessionsPage = () => {
           </CardContent>
         </Card>
 
-        {/* Security Insights */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Recent Logins */}
           <Card>
             <CardHeader>
               <CardTitle>Recent Login Activity</CardTitle>
@@ -940,7 +916,6 @@ const SessionsPage = () => {
                       </p>
                       <div className="flex items-center gap-2 text-xs text-muted-foreground">
                         <DeviceIcon className="w-3 h-3" />
-                        {/* <span>{formatDate(session.loggedInAt)}</span> */}
                       </div>
                     </div>
                     <Badge
@@ -955,7 +930,6 @@ const SessionsPage = () => {
             </CardContent>
           </Card>
 
-          {/* Security Tips */}
           <Card>
             <CardHeader>
               <CardTitle>Security Recommendations</CardTitle>

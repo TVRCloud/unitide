@@ -98,7 +98,6 @@ const ViewNotificationMain = () => {
   return (
     <div className="min-h-screen py-8 px-4">
       <div>
-        {/* Main Card */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -152,7 +151,6 @@ const ViewNotificationMain = () => {
                 </motion.div>
               </div>
 
-              {/* Meta Information */}
               <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
                 <motion.div
                   initial={{ opacity: 0 }}

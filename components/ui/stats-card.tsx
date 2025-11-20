@@ -45,7 +45,6 @@ export function StatsCard({
       whileHover={{ y: -4 }}
     >
       <Card className="relative overflow-hidden group cursor-pointer hover:shadow-lg transition-shadow">
-        {/* gradient circle */}
         <div
           className={cn(
             "absolute top-0 right-0 w-24 h-24 bg-linear-to-br opacity-10 rounded-full -mr-12 -mt-12 group-hover:scale-150 transition-transform duration-500",

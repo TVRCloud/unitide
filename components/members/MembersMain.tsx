@@ -87,7 +87,6 @@ const MembersMain = () => {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {/* Search and Filters */}
             <div className="flex flex-col gap-4 md:flex-row">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -121,7 +120,6 @@ const MembersMain = () => {
 
             <Separator />
 
-            {/* Custom Table */}
             <div className="rounded-md border">
               <div className="overflow-x-auto">
                 <Table>
@@ -191,11 +189,7 @@ const MembersMain = () => {
                                 </div>
                               </TableCell>
                               <TableCell>
-                                <Badge
-                                  // variant={getRoleVariant(user.role)}
-                                  className="gap-1"
-                                >
-                                  {/* {getRoleIcon(user.role)} */}
+                                <Badge className="gap-1">
                                   {user.role.charAt(0).toUpperCase() +
                                     user.role.slice(1)}
                                 </Badge>

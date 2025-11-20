@@ -15,7 +15,6 @@ const fadeUp = {
 const Settings: React.FC = () => {
   return (
     <div className="p-6 space-y-8">
-      {/* Header */}
       <motion.div
         initial="hidden"
         animate="visible"
@@ -29,9 +28,7 @@ const Settings: React.FC = () => {
         </p>
       </motion.div>
 
-      {/* Settings Cards */}
       <div className="grid md:grid-cols-2 gap-6">
-        {/* Account Settings */}
         <motion.div
           initial="hidden"
           animate="visible"
@@ -57,7 +54,6 @@ const Settings: React.FC = () => {
           </Card>
         </motion.div>
 
-        {/* Notifications */}
         <motion.div
           initial="hidden"
           animate="visible"
@@ -83,7 +79,6 @@ const Settings: React.FC = () => {
           </Card>
         </motion.div>
 
-        {/* Privacy */}
         <motion.div
           initial="hidden"
           animate="visible"

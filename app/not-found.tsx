@@ -29,7 +29,6 @@ export default function NotFound() {
 
   return (
     <div className="min-h-screen bg-background text-foreground overflow-hidden relative">
-      {/* Animated Background */}
       <div className="fixed inset-0 pointer-events-none">
         <motion.div
           className="absolute inset-0 opacity-20"
@@ -43,7 +42,6 @@ export default function NotFound() {
         />
         <div className="absolute inset-0 bg-linear-to-br from-primary/5 via-transparent to-secondary/5" />
 
-        {/* Grid Pattern */}
         <div
           className="absolute inset-0 opacity-[0.03]"
           style={{
@@ -56,9 +54,7 @@ export default function NotFound() {
         />
       </div>
 
-      {/* Content */}
       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-6">
-        {/* 404 Number with Glitch Effect */}
         <motion.div
           initial={{ opacity: 0, scale: 0.5 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -102,7 +98,6 @@ export default function NotFound() {
           </motion.div>
         </motion.div>
 
-        {/* Text Content */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -120,7 +115,6 @@ export default function NotFound() {
           </p>
         </motion.div>
 
-        {/* Action Buttons */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -144,7 +138,6 @@ export default function NotFound() {
         </motion.div>
       </div>
 
-      {/* Styles */}
       <style jsx>{`
         @keyframes glitch {
           0%,

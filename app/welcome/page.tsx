@@ -86,7 +86,6 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
-      {/* Animated Background */}
       <div className="fixed inset-0 pointer-events-none">
         <motion.div
           className="absolute inset-0 opacity-30"
@@ -104,7 +103,6 @@ export default function LandingPage() {
         />
       </div>
 
-      {/* Navigation */}
       <motion.nav
         initial={{ y: -100 }}
         animate={{ y: 0 }}
@@ -209,7 +207,6 @@ export default function LandingPage() {
         </div>
       </motion.nav>
 
-      {/* Mobile Menu */}
       <AnimatePresence>
         {isMenuOpen && (
           <motion.div
@@ -246,7 +243,6 @@ export default function LandingPage() {
         )}
       </AnimatePresence>
 
-      {/* Hero Section */}
       <section className="relative pt-32 pb-20 px-6">
         <motion.div
           style={{ y: backgroundY, opacity }}
@@ -317,7 +313,6 @@ export default function LandingPage() {
         </motion.div>
       </section>
 
-      {/* Features Grid */}
       <section className="relative py-32 px-6 bg-muted/30">
         <div className="max-w-7xl mx-auto">
           <motion.div
@@ -361,7 +356,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* CTA Section */}
       <section className="relative py-32 px-6">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
@@ -390,7 +384,6 @@ export default function LandingPage() {
         </motion.div>
       </section>
 
-      {/* Footer */}
       <footer className="border-t border-border py-12 px-6">
         <div className="max-w-7xl mx-auto text-center text-muted-foreground">
           <p>© 2025 UniTide. Empowering teams worldwide.</p>

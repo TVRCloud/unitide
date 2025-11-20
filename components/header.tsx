@@ -84,7 +84,6 @@ export function Header() {
 
           <NavNotification />
 
-          {/* User Dropdown */}
           {isLoading ? (
             <div className="flex items-center justify-center h-8 w-8">
               <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />

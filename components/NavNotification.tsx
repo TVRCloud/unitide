@@ -137,11 +137,7 @@ const NavNotification = () => {
               </motion.div>
             ) : (
               notifications.map((notification, idx) => {
-                // const NotificationIcon = getNotificationIcon(notification.type);
-                const audienceBadge = getAudienceBadge(
-                  //   notification.audienceType
-                  "ALL"
-                );
+                const audienceBadge = getAudienceBadge("ALL");
                 const NotificationIcon = getNotificationIcon("COMMENT");
                 return (
                   <motion.div
@@ -161,7 +157,6 @@ const NavNotification = () => {
                     <div className="flex items-start gap-3">
                       <div
                         className={`p-2.5 rounded-lg bg-linear-to-br ${getNotificationColor(
-                          //   notification.type
                           "COMMENT"
                         )} shrink-0`}
                       >

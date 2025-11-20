@@ -2,7 +2,7 @@
 import { authenticateUser } from "@/lib/authenticateUser";
 import connectDB from "@/lib/mongodb";
 import tasks from "@/models/tasks";
-import { createTaskSchema } from "@/schemas/task";
+import { createTaskSchema, updateTaskSchema } from "@/schemas/task";
 import mongoose from "mongoose";
 import { NextResponse } from "next/server";
 
@@ -29,7 +29,6 @@ export async function GET(request: Request) {
       ? { title: { $regex: search, $options: "i" } }
       : {};
 
-    // Base pipeline
     const pipeline: any[] = [
       { $match: searchMatch },
 
@@ -59,15 +58,10 @@ export async function GET(request: Request) {
       },
     ];
 
-    // Role-based access ------------------------------------------
-
     if (user.role === "manager") {
       pipeline.push({
         $match: {
-          $or: [
-            { "project.manager": userId }, // project manager
-            { "project.createdBy": userId }, // project creator
-          ],
+          $or: [{ "project.manager": userId }, { "project.createdBy": userId }],
         },
       });
     }
@@ -75,10 +69,7 @@ export async function GET(request: Request) {
     if (user.role === "lead") {
       pipeline.push({
         $match: {
-          $or: [
-            { "team.lead": userId }, // lead of a team
-            { createdBy: userId }, // tasks created by lead
-          ],
+          $or: [{ "team.lead": userId }, { createdBy: userId }],
         },
       });
     }
@@ -86,15 +77,10 @@ export async function GET(request: Request) {
     if (user.role === "member") {
       pipeline.push({
         $match: {
-          $or: [
-            { assignedTo: userId }, // assigned to them
-            { createdBy: userId }, // they created the task
-          ],
+          $or: [{ assignedTo: userId }, { createdBy: userId }],
         },
       });
     }
-
-    // ADMIN: no match added (can see all tasks)
 
     pipeline.push(
       { $skip: skip },
@@ -209,18 +195,12 @@ export async function POST(request: Request) {
 //   try {
 //     await connectDB();
 
-//     const { errorResponse } = await authenticateUser([
-//       "admin",
-//       "manager",
-//     ]);
+//     const { errorResponse } = await authenticateUser(["admin", "manager"]);
 //     if (errorResponse) return errorResponse;
 
-//     await Task.findByIdAndDelete(params.id);
+//     await tasks.findByIdAndDelete(params.id);
 
-//     return NextResponse.json(
-//       { message: "Task deleted" },
-//       { status: 200 }
-//     );
+//     return NextResponse.json({ message: "Task deleted" }, { status: 200 });
 //   } catch (err) {
 //     console.error("DELETE /api/tasks/:id error:", err);
 //     return NextResponse.json(

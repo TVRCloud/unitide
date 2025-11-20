@@ -1,5 +1,3 @@
-// const notifId = params.id;
-
 import { authenticateUser } from "@/lib/authenticateUser";
 import connectDB from "@/lib/mongodb";
 import { Notification } from "@/models/notification";

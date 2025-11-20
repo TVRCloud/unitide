@@ -207,7 +207,6 @@ const DashboardMain = () => {
     <div className="flex flex-col gap-3">
       <HeaderSection title="Dashboard" subtitle="Welcome back!" />
 
-      {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatsCard
           title="Total Users"
@@ -368,7 +367,6 @@ const DashboardMain = () => {
           </CardContent>
         </Card>
 
-        {/* Upcoming Deadlines */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -460,7 +458,6 @@ const DashboardMain = () => {
           </CardContent>
         </Card>
 
-        {/* Recent Activity */}
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">

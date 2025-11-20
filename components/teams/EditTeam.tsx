@@ -102,7 +102,6 @@ const EditTeam = ({ defaultValues }: Props) => {
                 )}
               />
 
-              {/* Description */}
               <FormField
                 control={form.control}
                 name="description"
