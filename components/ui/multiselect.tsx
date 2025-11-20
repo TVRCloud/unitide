@@ -28,7 +28,6 @@ interface MultiSelectProps {
   options: Option[];
   isLoading?: boolean;
   onSearchChange?: (value: string) => void;
-  // ✅ New Props for Customization
   placeholder?: string;
   searchPlaceholder?: string;
   emptyText?: string;
@@ -48,7 +47,6 @@ const MultiSelect = ({
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
 
-  // Debounce logic remains the same
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearch(search.trim());
