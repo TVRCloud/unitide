@@ -68,9 +68,6 @@ export async function GET(request: Request) {
       },
       { $unwind: "$createdBy" },
 
-      // 4️⃣ If not admin, filter only projects where:
-      //    - user created the project
-      //    - OR user is part of one of the teams' members
       ...(user.role !== "admin"
         ? [
             {
