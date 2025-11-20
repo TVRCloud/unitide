@@ -19,6 +19,9 @@ export const useNotificationAlerts = () => {
     queryKey: ["notifications"],
     queryFn: async () => {
       const res = await fetch("/api/notifications/list");
+
+      console.log(res);
+
       if (!res.ok) throw new Error("Failed to fetch notifications");
       const data = await res.json();
 
