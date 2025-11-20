@@ -23,8 +23,6 @@ export default function AdvanceSidebar({
         )}
       >
         {children}
-
-        {/* <MobileDock /> */}
       </main>
     </>
   );
