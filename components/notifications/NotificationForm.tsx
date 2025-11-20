@@ -78,7 +78,6 @@ export default function NotificationForm() {
           });
         })}
       >
-        {/* Title */}
         <FormField
           control={form.control}
           name="title"
@@ -93,7 +92,6 @@ export default function NotificationForm() {
           )}
         />
 
-        {/* Body */}
         <FormField
           control={form.control}
           name="body"
@@ -108,7 +106,6 @@ export default function NotificationForm() {
           )}
         />
 
-        {/* Notification Type */}
         <FormField
           control={form.control}
           name="type"
@@ -134,7 +131,6 @@ export default function NotificationForm() {
           )}
         />
 
-        {/* Audience Type */}
         <FormField
           control={form.control}
           name="audienceType"
@@ -158,7 +154,6 @@ export default function NotificationForm() {
           )}
         />
 
-        {/* ROLE MULTI SELECT */}
         {audienceType === "ROLE" && (
           <FormField
             control={form.control}
@@ -206,7 +201,6 @@ export default function NotificationForm() {
           />
         )}
 
-        {/* USER MULTI SELECT */}
         {audienceType === "USER" && (
           <FormField
             control={form.control}
