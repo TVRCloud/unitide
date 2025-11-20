@@ -70,7 +70,6 @@ const AddNotification = () => {
   const onSubmit = async (values: TCreateNotificationSchema) => {
     await createNotification.mutateAsync(values, {
       onSuccess: () => {
-        // toast.success("Notification created successfully");
         setOpen(false);
       },
       onError: () => {
@@ -99,7 +98,6 @@ const AddNotification = () => {
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            {/* Title */}
             <FormField
               control={form.control}
               name="title"
@@ -114,7 +112,6 @@ const AddNotification = () => {
               )}
             />
 
-            {/* Body */}
             <FormField
               control={form.control}
               name="body"
@@ -129,7 +126,6 @@ const AddNotification = () => {
               )}
             />
 
-            {/* Audience Type */}
             <FormField
               control={form.control}
               name="audienceType"
@@ -156,7 +152,6 @@ const AddNotification = () => {
               )}
             />
 
-            {/* Role-based */}
             {audienceType === "ROLE" && (
               <FormField
                 control={form.control}
@@ -181,7 +176,6 @@ const AddNotification = () => {
               />
             )}
 
-            {/* User-based */}
             {audienceType === "USER" && (
               <FormField
                 control={form.control}
