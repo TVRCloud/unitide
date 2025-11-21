@@ -70,6 +70,8 @@ export async function GET(
           ],
         },
       },
+      { $unwind: "$createdBy" },
+      { $unwind: "$manager" },
     ]);
 
     if (!project) {
