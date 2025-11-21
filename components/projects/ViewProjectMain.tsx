@@ -12,7 +12,6 @@ import {
   MessageSquare,
   MoreHorizontal,
   Plus,
-  Share2,
   Trash2,
   Users,
 } from "lucide-react";
@@ -40,6 +39,7 @@ import {
 } from "../ui/dropdown-menu";
 import { DateTime } from "luxon";
 import { Separator } from "../ui/separator";
+import CreateTask from "../tasks/CreateTask";
 
 const milestones = [
   { name: "Project Kickoff", date: "2025-10-01", status: "completed" },
@@ -158,10 +158,8 @@ const ViewProjectMain = () => {
             </motion.div>
           </div>
           <div className="flex items-center gap-2 self-start md:self-auto">
-            <Button variant="outline" size="sm" className="gap-2">
-              <Share2 className="h-4 w-4" />
-              Share
-            </Button>
+            <CreateTask projectId={data._id} />
+
             <Button variant="outline" size="sm" className="gap-2">
               <Edit className="h-4 w-4" />
               Edit
