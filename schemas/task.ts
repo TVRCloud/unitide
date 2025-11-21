@@ -4,7 +4,7 @@ export const createTaskSchema = z.object({
   title: z.string().min(1),
   description: z.string().optional(),
   project: z.string().min(1),
-  team: z.string().optional(),
+  teams: z.array(z.string()).optional(),
 
   assignedTo: z.array(z.string()).optional(),
   watchers: z.array(z.string()).optional(),
