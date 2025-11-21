@@ -42,6 +42,37 @@ const milestones = [
   { name: "Production Launch", date: "2025-12-31", status: "pending" },
 ];
 
+const activities = [
+  {
+    user: "Sarah Johnson",
+    avatar: "SJ",
+    action: "completed task",
+    target: "Payment Integration",
+    time: "2 hours ago",
+  },
+  {
+    user: "Michael Chen",
+    avatar: "MC",
+    action: "added comment on",
+    target: "API Documentation",
+    time: "5 hours ago",
+  },
+  {
+    user: "Amegh T S",
+    avatar: "AT",
+    action: "updated status of",
+    target: "User Authentication",
+    time: "1 day ago",
+  },
+  {
+    user: "Emma Wilson",
+    avatar: "EW",
+    action: "uploaded design for",
+    target: "Checkout Page",
+    time: "2 days ago",
+  },
+];
+
 const ViewProjectMain = () => {
   const params = useParams<{ id: string }>();
   const { data, isLoading } = useViewProject(params.id);
@@ -393,12 +424,71 @@ const ViewProjectMain = () => {
                   </CardContent>
                 </Card>
               </TabsContent>
+
+              <TabsContent value="activity" className="mt-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Recent Activity</CardTitle>
+                    <CardDescription>
+                      Latest updates and changes
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {activities.map((activity, i) => (
+                        <motion.div
+                          key={i}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: i * 0.05 }}
+                          className="flex items-start gap-3"
+                        >
+                          <Avatar className="h-8 w-8">
+                            <AvatarFallback className="text-xs bg-linear-to-br from-primary to-secondary text-primary-foreground">
+                              {activity.avatar}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex-1">
+                            <p className="text-sm">
+                              <span className="font-medium">
+                                {activity.user}
+                              </span>{" "}
+                              <span className="text-muted-foreground">
+                                {activity.action}
+                              </span>{" "}
+                              <span className="font-medium">
+                                {activity.target}
+                              </span>
+                            </p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              {activity.time}
+                            </p>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
             </Tabs>
           </motion.div>
         </div>
 
         {/* right */}
-        <div className="space-y-6">hh</div>
+        <div className="space-y-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Project Manager</CardTitle>
+              </CardHeader>
+              <CardContent></CardContent>
+            </Card>
+          </motion.div>
+        </div>
       </div>
     </div>
   );
