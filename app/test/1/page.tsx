@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -145,7 +146,7 @@ export default function ProjectsDashboard() {
     },
   ];
 
-  const formatDate = (dateString) => {
+  const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
@@ -153,7 +154,7 @@ export default function ProjectsDashboard() {
     });
   };
 
-  const getStatusConfig = (status) => {
+  const getStatusConfig = (status: string) => {
     switch (status) {
       case "active":
         return {
@@ -186,7 +187,7 @@ export default function ProjectsDashboard() {
     }
   };
 
-  const getPriorityConfig = (priority) => {
+  const getPriorityConfig = (priority: string) => {
     switch (priority) {
       case "urgent":
         return {
@@ -216,13 +217,6 @@ export default function ProjectsDashboard() {
     }
   };
 
-  const getDaysRemaining = (endDate) => {
-    const end = new Date(endDate);
-    const today = new Date();
-    const diff = Math.ceil((end - today) / (1000 * 60 * 60 * 24));
-    return diff;
-  };
-
   const filteredProjects = projects.filter((project) => {
     const matchesSearch =
       project.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -234,10 +228,10 @@ export default function ProjectsDashboard() {
     return matchesSearch && matchesStatus && matchesPriority;
   });
 
-  const toggleProjectSelection = (projectId) => {
-    setSelectedProjects((prev) =>
+  const toggleProjectSelection = (projectId: string) => {
+    setSelectedProjects((prev: any) =>
       prev.includes(projectId)
-        ? prev.filter((id) => id !== projectId)
+        ? prev.filter((id: string) => id !== projectId)
         : [...prev, projectId]
     );
   };
@@ -445,7 +439,6 @@ export default function ProjectsDashboard() {
                       const priorityConfig = getPriorityConfig(
                         project.priority
                       );
-                      const daysRemaining = getDaysRemaining(project.endDate);
                       return (
                         <motion.div
                           key={project._id}
@@ -463,14 +456,14 @@ export default function ProjectsDashboard() {
                             <CardHeader className="pb-3">
                               <div className="flex items-start justify-between">
                                 <div className="flex items-center gap-2">
-                                  <Checkbox
+                                  {/* <Checkbox
                                     checked={selectedProjects.includes(
                                       project._id
                                     )}
                                     onCheckedChange={() =>
                                       toggleProjectSelection(project._id)
                                     }
-                                  />
+                                  /> */}
                                   <div
                                     className="w-10 h-10 rounded-lg flex items-center justify-center"
                                     style={{
@@ -520,7 +513,7 @@ export default function ProjectsDashboard() {
                             <CardContent className="space-y-4">
                               <div className="flex gap-2 flex-wrap">
                                 <Badge
-                                  variant={statusConfig.variant}
+                                  variant={statusConfig.variant as any}
                                   className="gap-1"
                                 >
                                   <statusConfig.icon className="h-3 w-3" />
@@ -560,7 +553,7 @@ export default function ProjectsDashboard() {
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
                                   <Avatar className="h-7 w-7">
-                                    <AvatarFallback className="text-xs bg-gradient-to-br from-primary to-secondary text-primary-foreground">
+                                    <AvatarFallback className="text-xs bg-linear-to-br from-primary to-secondary text-primary-foreground">
                                       {project.manager.avatar}
                                     </AvatarFallback>
                                   </Avatar>
@@ -593,14 +586,14 @@ export default function ProjectsDashboard() {
                                 filteredProjects.length &&
                               filteredProjects.length > 0
                             }
-                            onCheckedChange={() =>
-                              setSelectedProjects(
-                                selectedProjects.length ===
-                                  filteredProjects.length
-                                  ? []
-                                  : filteredProjects.map((p) => p._id)
-                              )
-                            }
+                            // onCheckedChange={() =>
+                            //   setSelectedProjects(
+                            //     selectedProjects.length ===
+                            //       filteredProjects.length
+                            //       ? []
+                            //       : filteredProjects.map((p) => p._id)
+                            //   )
+                            // }
                           />
                         </th>
                         <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
@@ -642,7 +635,7 @@ export default function ProjectsDashboard() {
                           >
                             <td className="p-4 align-middle">
                               <Checkbox
-                                checked={selectedProjects.includes(project._id)}
+                                // checked={selectedProjects.includes(project._id)}
                                 onCheckedChange={() =>
                                   toggleProjectSelection(project._id)
                                 }
@@ -671,7 +664,7 @@ export default function ProjectsDashboard() {
                             </td>
                             <td className="p-4 align-middle">
                               <Badge
-                                variant={statusConfig.variant}
+                                variant={statusConfig.variant as any}
                                 className="gap-1"
                               >
                                 <statusConfig.icon className="h-3 w-3" />
@@ -701,7 +694,7 @@ export default function ProjectsDashboard() {
                             <td className="p-4 align-middle">
                               <div className="flex items-center gap-2">
                                 <Avatar className="h-7 w-7">
-                                  <AvatarFallback className="text-xs bg-gradient-to-br from-primary to-secondary text-primary-foreground">
+                                  <AvatarFallback className="text-xs bg-linear-to-br from-primary to-secondary text-primary-foreground">
                                     {project.manager.avatar}
                                   </AvatarFallback>
                                 </Avatar>
