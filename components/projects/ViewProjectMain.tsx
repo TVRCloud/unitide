@@ -3,11 +3,17 @@
 import { useParams } from "next/navigation";
 import { motion } from "framer-motion";
 import {
+  Archive,
   ChevronRight,
+  Copy,
+  Edit,
   FolderKanban,
   Mail,
+  MessageSquare,
   MoreHorizontal,
   Plus,
+  Share2,
+  Trash2,
   Users,
 } from "lucide-react";
 import { useViewProject } from "@/hooks/useProjects";
@@ -33,6 +39,7 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { DateTime } from "luxon";
+import { Separator } from "../ui/separator";
 
 const milestones = [
   { name: "Project Kickoff", date: "2025-10-01", status: "completed" },
@@ -151,7 +158,36 @@ const ViewProjectMain = () => {
             </motion.div>
           </div>
           <div className="flex items-center gap-2 self-start md:self-auto">
-            edit
+            <Button variant="outline" size="sm" className="gap-2">
+              <Share2 className="h-4 w-4" />
+              Share
+            </Button>
+            <Button variant="outline" size="sm" className="gap-2">
+              <Edit className="h-4 w-4" />
+              Edit
+            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="icon">
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem>
+                  <Copy className="mr-2 h-4 w-4" />
+                  Duplicate
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Archive className="mr-2 h-4 w-4" />
+                  Archive
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="text-destructive">
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </motion.div>
@@ -485,7 +521,93 @@ const ViewProjectMain = () => {
               <CardHeader>
                 <CardTitle className="text-lg">Project Manager</CardTitle>
               </CardHeader>
-              <CardContent></CardContent>
+              <CardContent>
+                <div className="flex items-center gap-3">
+                  <Avatar className="h-12 w-12">
+                    <AvatarFallback className="bg-linear-to-br from-primary to-secondary text-primary-foreground text-lg">
+                      {data.manager.avatar}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="font-semibold">{data.manager.name}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {data.manager.email}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex gap-2 mt-4">
+                  <Button variant="outline" size="sm" className="flex-1">
+                    <Mail className="h-4 w-4 mr-2" />
+                    Email
+                  </Button>
+                  <Button variant="outline" size="sm" className="flex-1">
+                    <MessageSquare className="h-4 w-4 mr-2" />
+                    Message
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+          >
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Details</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Status</span>
+                  <Badge variant={statusConfig.variant as any}>
+                    {statusConfig.label}
+                  </Badge>
+                </div>
+                <Separator />
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Priority</span>
+                  <Badge variant="outline" className={priorityConfig.color}>
+                    {priorityConfig.label}
+                  </Badge>
+                </div>
+                <Separator />
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Start Date</span>
+                  <span className="font-medium">
+                    {/* {formatDate(data.startDate)} */}
+                  </span>
+                </div>
+                <Separator />
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">End Date</span>
+                  <span className="font-medium">
+                    {/* {formatDate(data.endDate)} */}
+                  </span>
+                </div>
+                <Separator />
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Created</span>
+                  <span className="text-sm">
+                    {DateTime.fromISO(data.createdAt).toFormat("dd LLL yy")}
+                  </span>
+                </div>
+                <Separator />
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Updated</span>
+                  <span className="text-sm">
+                    {DateTime.fromISO(data.updatedAt).toFormat("dd LLL yy")}
+                  </span>
+                </div>
+                <Separator />
+                <div className="flex justify-between items-center">
+                  <span className="text-muted-foreground">Project ID</span>
+                  <code className="text-xs bg-muted px-2 py-1 rounded">
+                    {data._id.slice(-8)}
+                  </code>
+                </div>
+              </CardContent>
             </Card>
           </motion.div>
         </div>
