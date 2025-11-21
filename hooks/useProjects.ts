@@ -1,7 +1,12 @@
-import { createProject, fetchProjects } from "@/lib/api-client";
+import {
+  createProject,
+  fetchProjects,
+  fetchSingleProject,
+} from "@/lib/api-client";
 import {
   useInfiniteQuery,
   useMutation,
+  useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
 
@@ -27,5 +32,12 @@ export const useInfiniteProjects = (search: string) => {
     initialPageParam: 0,
     getNextPageParam: (lastPage, allPages) =>
       lastPage.length < 20 ? undefined : allPages.length * 20,
+  });
+};
+
+export const useViewProject = (id: string) => {
+  return useQuery({
+    queryKey: ["project", id],
+    queryFn: () => fetchSingleProject(id),
   });
 };

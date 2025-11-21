@@ -115,6 +115,11 @@ export const fetchProjects = async ({
   return res.data;
 };
 
+export const fetchSingleProject = async (id: string) => {
+  const res = await apiClient.get(`/api/projects/${id}`);
+  return res.data;
+};
+
 // ---------------------------
 // -----------TEAMS------------
 // ---------------------------
