@@ -58,8 +58,8 @@ const TaskSchema = new Schema(
       default: "task",
     },
 
-    storyPoints: { type: Number },
-    sprint: { type: Schema.Types.ObjectId, ref: "Sprints" },
+    // storyPoints: { type: Number },
+    // sprint: { type: Schema.Types.ObjectId, ref: "Sprints" },
 
     tags: [{ type: String }],
     colorLabel: { type: String },
