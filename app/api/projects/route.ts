@@ -134,6 +134,7 @@ export async function POST(request: Request) {
     const project = await projects.create({
       ...validated,
       createdBy: decoded.id,
+      manager: decoded.id,
       color,
     });
 
