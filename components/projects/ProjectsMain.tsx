@@ -25,6 +25,8 @@ import { useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
 import { Skeleton } from "../ui/skeleton";
 import { useInfiniteProjects } from "@/hooks/useProjects";
+import { Button } from "../ui/button";
+import { useRouter } from "next/navigation";
 
 type Project = {
   _id: string;
@@ -44,6 +46,7 @@ type Project = {
 };
 
 const ProjectsMain = () => {
+  const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const { ref, inView } = useInView();
 
@@ -104,6 +107,7 @@ const ProjectsMain = () => {
                       <TableHead>Status</TableHead>
                       <TableHead>Teams</TableHead>
                       <TableHead>Created By</TableHead>
+                      <TableHead></TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -131,6 +135,17 @@ const ProjectsMain = () => {
                               </TableCell>
                               <TableCell>
                                 {project.createdBy?.name || "—"}
+                              </TableCell>
+                              <TableCell className="max-w-[70px]">
+                                <Button
+                                  variant="link"
+                                  size="sm"
+                                  onClick={() =>
+                                    router.push(`/projects/${project._id}`)
+                                  }
+                                >
+                                  View Project
+                                </Button>
                               </TableCell>
                             </TableRow>
                           ))}
