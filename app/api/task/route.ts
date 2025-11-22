@@ -2,7 +2,7 @@
 import { authenticateUser } from "@/lib/authenticateUser";
 import connectDB from "@/lib/mongodb";
 import tasks from "@/models/tasks";
-import { createTaskSchema, updateTaskSchema } from "@/schemas/task";
+import { createTaskSchema } from "@/schemas/task";
 import mongoose from "mongoose";
 import { NextResponse } from "next/server";
 
