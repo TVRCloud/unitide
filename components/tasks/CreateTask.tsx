@@ -28,12 +28,15 @@ import {
   SelectValue,
 } from "../ui/select";
 import { Button } from "../ui/button";
+import { useCreateTask } from "@/hooks/useTask";
 
 type Props = {
   projectId: string;
 };
 
 const CreateTask = ({ projectId }: Props) => {
+  const addTask = useCreateTask();
+
   const form = useForm<TCreateTaskSchema>({
     resolver: zodResolver(createTaskSchema),
     defaultValues: {
@@ -50,7 +53,7 @@ const CreateTask = ({ projectId }: Props) => {
   });
 
   const onSubmit = (values: TCreateTaskSchema) => {
-    console.log("Task Form Values:", values);
+    addTask.mutate(values);
   };
 
   return (
