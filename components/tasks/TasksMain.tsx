@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { useInfiniteTasks } from "@/hooks/useTask";
 import { useEffect, useMemo, useState } from "react";
@@ -9,15 +10,9 @@ import {
   ListTodo,
   Play,
   Pause,
-  Check,
   CheckCircle2,
   AlertTriangle,
   Search,
-  ListOrdered,
-  ArrowUp,
-  ArrowDown,
-  Users,
-  Briefcase,
   Bug,
   Bookmark,
   Lightbulb,
@@ -26,6 +21,11 @@ import {
   MoreHorizontal,
   Edit,
   Trash2,
+  Circle,
+  Eye,
+  XCircle,
+  Flag,
+  Timer,
 } from "lucide-react";
 import {
   Card,
@@ -52,6 +52,9 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { Button } from "../ui/button";
+import { Badge } from "../ui/badge";
+import { DateTime } from "luxon";
+import { Avatar, AvatarFallback } from "../ui/avatar";
 
 interface TaskFilters {
   status?: string;
@@ -61,6 +64,45 @@ interface TaskFilters {
   sortBy?: string;
   order?: "asc" | "desc";
 }
+
+const statusMap: Record<
+  string,
+  { icon: LucideIcon; color: string; label: string }
+> = {
+  todo: { icon: Circle, color: "text-gray-500 bg-gray-500/10", label: "To Do" },
+  "in-progress": {
+    icon: Play,
+    color: "text-blue-500 bg-blue-500/10",
+    label: "In Progress",
+  },
+  review: {
+    icon: Eye,
+    color: "text-purple-500 bg-purple-500/10",
+    label: "Review",
+  },
+  completed: {
+    icon: CheckCircle2,
+    color: "text-green-500 bg-green-500/10",
+    label: "Completed",
+  },
+  blocked: {
+    icon: Pause,
+    color: "text-red-500 bg-red-500/10",
+    label: "Blocked",
+  },
+  cancelled: {
+    icon: XCircle,
+    color: "text-gray-400 bg-gray-400/10",
+    label: "Cancelled",
+  },
+};
+
+const priorityMap: Record<string, string> = {
+  urgent: "text-red-500 bg-red-500/10",
+  high: "text-orange-500 bg-orange-500/10",
+  medium: "text-yellow-500 bg-yellow-500/10",
+  low: "text-green-500 bg-green-500/10",
+};
 
 const typeMap: Record<string, { icon: LucideIcon; color: string }> = {
   task: { icon: ListTodo, color: "text-blue-500" },
@@ -106,7 +148,6 @@ const TasksMain = () => {
   };
 
   const filteredTasks = data?.pages.flat() || [];
-  const isEmpty = !isLoading && filteredTasks.length === 0;
 
   return (
     <div className="flex flex-col gap-3">
@@ -283,8 +324,7 @@ const TasksMain = () => {
                 </div>
               ) : (
                 filteredTasks.map((task, index) => {
-                  console.log(task);
-
+                  const status = statusMap[task.status];
                   const type = typeMap[task.type];
 
                   return (
@@ -340,6 +380,80 @@ const TasksMain = () => {
                               </DropdownMenuContent>
                             </DropdownMenu>
                           </div>
+
+                          <div className="flex flex-wrap gap-2 mt-3">
+                            <Badge
+                              variant="outline"
+                              className={`gap-1 ${status.color}`}
+                            >
+                              <status.icon className="h-3 w-3" />
+                              {status.label}
+                            </Badge>
+                            <Badge
+                              variant="outline"
+                              className={`gap-1 ${priorityMap[task.priority]}`}
+                            >
+                              <Flag className="h-3 w-3" />
+                              {task.priority}
+                            </Badge>
+
+                            {/* {task.dueDate && (
+                              <Badge variant="outline" className="gap-1">
+                                <Calendar className="h-3 w-3" />
+                                {DateTime.fromISO(task.dueDate).toFormat(
+                                  "dd LLL"
+                                )}
+                              </Badge>
+                            )} */}
+                            {/* {task.checklists && task.checklists.length > 0 && (
+                              <Badge variant="outline" className="gap-1">
+                                <CheckSquare className="h-3 w-3" />
+                                {
+                                  task.checklists.filter(
+                                    (c: any) => c.completed
+                                  ).length
+                                }
+                                /{task.checklists.length}
+                              </Badge>
+                            )} */}
+                            {/* {task.attachments &&
+                              task.attachments.length > 0 && (
+                                <Badge variant="outline">
+                                  <Paperclip className="h-3 w-3" />
+                                </Badge>
+                              )} */}
+                            {/* {task.comments && task.comments.length > 0 && (
+                              <Badge variant="outline" className="gap-1">
+                                <MessageSquare className="h-3 w-3" />
+                                {task.comments.length}
+                              </Badge>
+                            )} */}
+                          </div>
+                          <div className="flex items-center justify-between mt-3">
+                            <div className="flex -space-x-2">
+                              {task.assignedTo &&
+                                task.assignedTo
+                                  .slice(0, 3)
+                                  .map((user: any, index: number) => (
+                                    <Avatar
+                                      key={index}
+                                      className="h-7 w-7 border-2 border-background"
+                                    >
+                                      <AvatarFallback className="text-xs bg-linear-to-br from-primary to-secondary text-primary-foreground">
+                                        {user.avatar}
+                                      </AvatarFallback>
+                                    </Avatar>
+                                  ))}
+                            </div>
+                            {task.timeTracked && task.timeTracked > 0 && (
+                              <span className="text-xs text-muted-foreground flex items-center gap-1">
+                                <Timer className="h-3 w-3" />
+                                {DateTime.fromMillis(task.timeTracked).toFormat(
+                                  "hh:mm"
+                                )}
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </motion.div>
@@ -347,6 +461,16 @@ const TasksMain = () => {
                 })
               )}
             </AnimatePresence>
+
+            <div className="flex justify-center" ref={ref}>
+              <span className="p-4 text-center text-muted-foreground text-xs">
+                {isFetchingNextPage
+                  ? "Loading more..."
+                  : hasNextPage
+                  ? "Scroll to load more"
+                  : "No more tasks"}
+              </span>
+            </div>
           </CardContent>
         </Card>
       </motion.div>
