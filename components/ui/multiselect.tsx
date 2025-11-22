@@ -34,9 +34,9 @@ interface MultiSelectProps {
 }
 
 const MultiSelect = ({
-  value,
+  value = [],
   onChange,
-  options,
+  options = [],
   isLoading,
   onSearchChange,
   placeholder = "Select items...",
@@ -67,7 +67,9 @@ const MultiSelect = ({
     }
   };
 
-  const selectedOptions = options.filter((opt) => value.includes(opt.value));
+  const selectedOptions = (options || []).filter((opt) =>
+    (value || []).includes(opt.value)
+  );
 
   return (
     <div className="space-y-2">

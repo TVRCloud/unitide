@@ -2,7 +2,7 @@
 import { authenticateUser } from "@/lib/authenticateUser";
 import connectDB from "@/lib/mongodb";
 import tasks from "@/models/tasks";
-import { createTaskSchema, updateTaskSchema } from "@/schemas/task";
+import { createTaskSchema } from "@/schemas/task";
 import mongoose from "mongoose";
 import { NextResponse } from "next/server";
 
@@ -93,7 +93,7 @@ export async function GET(request: Request) {
           type: 1,
           createdAt: 1,
           updatedAt: 1,
-          project: { name: 1, _id: 1 },
+          project: { name: 1, color: 1 },
           team: { name: 1, _id: 1 },
         },
       }
