@@ -1,5 +1,18 @@
 import { TCreateNotificationSchema } from "@/schemas/notification";
+import { TCreateTaskSchema } from "@/schemas/task";
 import { apiClient } from "@/utils/axios";
+
+type FetchTasksParams = {
+  skip: number;
+  limit: number;
+  search: string;
+  status?: string;
+  priority?: string;
+  projectId?: string;
+  teamId?: string;
+  sortBy?: string;
+  order?: "asc" | "desc";
+};
 
 // ---------------------------
 // -----------USER------------
@@ -233,5 +246,29 @@ export const fetchSingleAlert = async (id: string) => {
 
 export const createNotification = async (data: TCreateNotificationSchema) => {
   const res = await apiClient.post(`/api/notifications`, data);
+  return res.data;
+};
+
+// ---------------------------
+// ----------TASK-------------
+// ---------------------------
+export const createTask = async (data: TCreateTaskSchema) => {
+  const res = await apiClient.post(`/api/task`, data);
+  return res.data;
+};
+
+export const fetchTasks = async (params: FetchTasksParams) => {
+  const query = new URLSearchParams();
+  query.append("skip", params.skip.toString());
+  query.append("limit", params.limit.toString());
+  if (params.search) query.append("search", params.search);
+  if (params.status) query.append("status", params.status);
+  if (params.priority) query.append("priority", params.priority);
+  if (params.projectId) query.append("projectId", params.projectId);
+  if (params.teamId) query.append("teamId", params.teamId);
+  if (params.sortBy) query.append("sortBy", params.sortBy);
+  if (params.order) query.append("order", params.order);
+
+  const res = await apiClient.get(`/api/task?${query.toString()}`);
   return res.data;
 };
