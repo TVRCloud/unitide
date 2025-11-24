@@ -5,7 +5,8 @@ import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
-import { Bell, Shield, User } from "lucide-react";
+import { Bell, Shield, User, Download } from "lucide-react";
+import InstallButton from "@/components/InstallButton"; // import your install button
 
 const fadeUp = {
   hidden: { opacity: 0, y: 15 },
@@ -29,6 +30,7 @@ const Settings: React.FC = () => {
       </motion.div>
 
       <div className="grid md:grid-cols-2 gap-6">
+        {/* Account Card */}
         <motion.div
           initial="hidden"
           animate="visible"
@@ -54,6 +56,7 @@ const Settings: React.FC = () => {
           </Card>
         </motion.div>
 
+        {/* Notifications Card */}
         <motion.div
           initial="hidden"
           animate="visible"
@@ -79,6 +82,7 @@ const Settings: React.FC = () => {
           </Card>
         </motion.div>
 
+        {/* Privacy Card */}
         <motion.div
           initial="hidden"
           animate="visible"
@@ -104,6 +108,27 @@ const Settings: React.FC = () => {
           </Card>
         </motion.div>
       </div>
+
+      {/* Download / Install Section */}
+      <motion.div
+        initial="hidden"
+        animate="visible"
+        variants={fadeUp}
+        transition={{ delay: 0.4 }}
+      >
+        <Card className="shadow-sm">
+          <CardHeader className="flex flex-row items-center gap-2">
+            <Download className="w-5 h-5 text-primary" />
+            <CardTitle>Install / Download App</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p>
+              Install this app to get an app-like experience and access offline.
+            </p>
+            <InstallButton />
+          </CardContent>
+        </Card>
+      </motion.div>
     </div>
   );
 };
