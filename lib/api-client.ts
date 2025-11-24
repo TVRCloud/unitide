@@ -272,3 +272,8 @@ export const fetchTasks = async (params: FetchTasksParams) => {
   const res = await apiClient.get(`/api/task?${query.toString()}`);
   return res.data;
 };
+
+export const fetchSingleTask = async (id: string) => {
+  const res = await apiClient.get(`/api/task/${id}`);
+  return res.data;
+};

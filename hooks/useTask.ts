@@ -1,7 +1,9 @@
-import { createTask, fetchTasks } from "@/lib/api-client";
+import { createTask, fetchSingleTask, fetchTasks } from "@/lib/api-client";
+import { TTask } from "@/types/task";
 import {
   useInfiniteQuery,
   useMutation,
+  useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
 
@@ -41,5 +43,12 @@ export const useInfiniteTasks = (
     initialPageParam: 0,
     getNextPageParam: (lastPage, allPages) =>
       lastPage.length < limit ? undefined : allPages.length * limit,
+  });
+};
+
+export const useViewTask = (id: string) => {
+  return useQuery<TTask>({
+    queryKey: ["task", id],
+    queryFn: () => fetchSingleTask(id),
   });
 };

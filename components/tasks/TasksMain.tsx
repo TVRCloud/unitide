@@ -9,21 +9,14 @@ import { AnimatePresence, motion } from "framer-motion";
 import {
   ListTodo,
   Play,
-  Pause,
   CheckCircle2,
   AlertTriangle,
   Search,
-  Bug,
-  Bookmark,
-  Lightbulb,
-  LucideIcon,
   FolderKanban,
   MoreHorizontal,
   Edit,
   Trash2,
-  Circle,
   Eye,
-  XCircle,
   Flag,
   Timer,
 } from "lucide-react";
@@ -55,6 +48,8 @@ import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
 import { DateTime } from "luxon";
 import { Avatar, AvatarFallback } from "../ui/avatar";
+import { useRouter } from "next/navigation";
+import { priorityMap, statusMap, typeMap } from "@/utils/task";
 
 interface TaskFilters {
   status?: string;
@@ -65,53 +60,8 @@ interface TaskFilters {
   order?: "asc" | "desc";
 }
 
-const statusMap: Record<
-  string,
-  { icon: LucideIcon; color: string; label: string }
-> = {
-  todo: { icon: Circle, color: "text-gray-500 bg-gray-500/10", label: "To Do" },
-  "in-progress": {
-    icon: Play,
-    color: "text-blue-500 bg-blue-500/10",
-    label: "In Progress",
-  },
-  review: {
-    icon: Eye,
-    color: "text-purple-500 bg-purple-500/10",
-    label: "Review",
-  },
-  completed: {
-    icon: CheckCircle2,
-    color: "text-green-500 bg-green-500/10",
-    label: "Completed",
-  },
-  blocked: {
-    icon: Pause,
-    color: "text-red-500 bg-red-500/10",
-    label: "Blocked",
-  },
-  cancelled: {
-    icon: XCircle,
-    color: "text-gray-400 bg-gray-400/10",
-    label: "Cancelled",
-  },
-};
-
-const priorityMap: Record<string, string> = {
-  urgent: "text-red-500 bg-red-500/10",
-  high: "text-orange-500 bg-orange-500/10",
-  medium: "text-yellow-500 bg-yellow-500/10",
-  low: "text-green-500 bg-green-500/10",
-};
-
-const typeMap: Record<string, { icon: LucideIcon; color: string }> = {
-  task: { icon: ListTodo, color: "text-blue-500" },
-  bug: { icon: Bug, color: "text-red-500" },
-  story: { icon: Bookmark, color: "text-purple-500" },
-  feature: { icon: Lightbulb, color: "text-yellow-500" },
-};
-
 const TasksMain = () => {
+  const router = useRouter();
   const { ref, inView } = useInView();
   const [searchTerm, setSearchTerm] = useState("");
   const [filters, setFilters] = useState<TaskFilters>({
@@ -357,28 +307,38 @@ const TasksMain = () => {
                               </p>
                             </div>
 
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-8 w-8 opacity-0 group-hover:opacity-100"
-                                >
-                                  <MoreHorizontal className="h-4 w-4" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                <DropdownMenuItem>
-                                  <Edit className="mr-2 h-4 w-4" />
-                                  Edit
-                                </DropdownMenuItem>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem className="text-destructive">
-                                  <Trash2 className="mr-2 h-4 w-4" />
-                                  Delete
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
+                            <div className="flex gap-2  opacity-0 group-hover:opacity-100 transition-all">
+                              <Button
+                                size="icon"
+                                onClick={() => {
+                                  router.push(`tasks/${task._id}`);
+                                }}
+                              >
+                                <Eye className=" h-4 w-4" />
+                              </Button>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-8 w-8"
+                                  >
+                                    <MoreHorizontal className="h-4 w-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem>
+                                    <Edit className="mr-2 h-4 w-4" />
+                                    Edit
+                                  </DropdownMenuItem>
+                                  <DropdownMenuSeparator />
+                                  <DropdownMenuItem className="text-destructive">
+                                    <Trash2 className="mr-2 h-4 w-4" />
+                                    Delete
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </div>
                           </div>
 
                           <div className="flex flex-wrap gap-2 mt-3">
