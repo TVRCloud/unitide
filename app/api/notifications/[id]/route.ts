@@ -11,54 +11,40 @@ export async function GET(
   try {
     await connectDB();
     const { id } = await context.params;
-    const { user, errorResponse } = await authenticateUser([
-      "admin",
-      "manager",
-    ]);
+    const { errorResponse } = await authenticateUser();
     if (errorResponse) return errorResponse;
 
     const notification = await Notification.aggregate([
       { $match: { _id: mongoose.Types.ObjectId.createFromHexString(id) } },
       {
-        $match: {
-          $or: [
-            { type: "BROADCAST", audienceType: "ALL" },
-            { type: "ROLE_BASED", audienceType: "ROLE", roles: user.role },
-            {
-              type: "DIRECT",
-              audienceType: "USER",
-              users: mongoose.Types.ObjectId.createFromHexString(user.id),
+        $addFields: {
+          users: {
+            $map: {
+              input: "$users",
+              as: "u",
+              in: { $toObjectId: "$$u" },
             },
-          ],
+          },
         },
       },
       {
         $lookup: {
-          from: "notificationreads",
-          let: { notifId: "$_id" },
-          pipeline: [
-            {
-              $match: {
-                $expr: {
-                  $and: [
-                    { $eq: ["$notificationId", "$$notifId"] },
-                    {
-                      $eq: [
-                        "$userId",
-                        mongoose.Types.ObjectId.createFromHexString(user.id),
-                      ],
-                    },
-                  ],
-                },
-              },
-            },
-          ],
-          as: "readInfo",
+          from: "users",
+          localField: "users",
+          foreignField: "_id",
+          as: "users",
         },
       },
       {
-        $addFields: {
-          read: { $cond: [{ $gt: [{ $size: "$readInfo" }, 0] }, true, false] },
+        $project: {
+          users: 1,
+          type: 1,
+          title: 1,
+          body: 1,
+          audienceType: 1,
+          roles: 1,
+          createdAt: 1,
+          updatedAt: 1,
         },
       },
     ]);

@@ -1,36 +1,6 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import mongoose, { Schema, Document, models, model } from "mongoose";
+import { Schema, models, model } from "mongoose";
 
-export type NotificationType =
-  | "BROADCAST"
-  | "ROLE_BASED"
-  | "DIRECT"
-  | "SYSTEM"
-  | "TASK";
-export type AudienceType = "ALL" | "ROLE" | "USER";
-
-export interface INotification extends Document {
-  _id: mongoose.Types.ObjectId;
-  type: NotificationType;
-  title: string;
-  body: string;
-  audienceType: AudienceType;
-  roles?: string[];
-  users?: mongoose.Types.ObjectId[];
-  meta?: Record<string, any>;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export interface INotificationRead extends Document {
-  _id: mongoose.Types.ObjectId;
-  userId: mongoose.Types.ObjectId;
-  notificationId: mongoose.Types.ObjectId;
-  readAt: Date;
-  createdAt: Date;
-}
-
-const notificationSchema = new Schema<INotification>(
+const notificationSchema = new Schema(
   {
     type: {
       type: String,
@@ -47,6 +17,7 @@ const notificationSchema = new Schema<INotification>(
     roles: [{ type: String }],
     users: [{ type: Schema.Types.ObjectId, ref: "User" }],
     meta: { type: Schema.Types.Mixed },
+    createdBy: { type: Schema.Types.ObjectId, ref: "User", required: true },
   },
   { timestamps: true }
 );
@@ -57,7 +28,7 @@ notificationSchema.index({ type: 1 });
 notificationSchema.index({ roles: 1 });
 notificationSchema.index({ users: 1 });
 
-const notificationReadSchema = new Schema<INotificationRead>(
+const notificationReadSchema = new Schema(
   {
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
     notificationId: {
@@ -78,8 +49,6 @@ notificationReadSchema.index({ userId: 1, readAt: -1 });
 notificationReadSchema.index({ createdAt: -1 });
 
 export const Notification =
-  models.Notification ||
-  model<INotification>("Notification", notificationSchema);
+  models.Notification || model("Notification", notificationSchema);
 export const NotificationRead =
-  models.NotificationRead ||
-  model<INotificationRead>("NotificationRead", notificationReadSchema);
+  models.NotificationRead || model("NotificationRead", notificationReadSchema);

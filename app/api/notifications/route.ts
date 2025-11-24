@@ -73,7 +73,10 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     await connectDB();
-    const { errorResponse } = await authenticateUser(["admin", "manager"]);
+    const { user, errorResponse } = await authenticateUser([
+      "admin",
+      "manager",
+    ]);
     if (errorResponse) return errorResponse;
 
     const body = await req.json();
@@ -89,6 +92,7 @@ export async function POST(req: Request) {
       audienceType,
       roles,
       users,
+      createdBy: user.id,
     });
 
     return NextResponse.json(notification, { status: 201 });
