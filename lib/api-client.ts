@@ -1,3 +1,4 @@
+import { TCreateChatSchema } from "@/schemas/chat";
 import { TCreateNotificationSchema } from "@/schemas/notification";
 import { TCreateTaskSchema } from "@/schemas/task";
 import { apiClient } from "@/utils/axios";
@@ -275,5 +276,30 @@ export const fetchTasks = async (params: FetchTasksParams) => {
 
 export const fetchSingleTask = async (id: string) => {
   const res = await apiClient.get(`/api/task/${id}`);
+  return res.data;
+};
+
+// ---------------------------
+// ----------CHAT-------------
+// ---------------------------
+export const createChat = async (data: TCreateChatSchema) => {
+  const res = await apiClient.post(`/api/chat`, data);
+  return res.data;
+};
+
+export const fetchChats = async ({
+  skip,
+  search,
+}: {
+  skip: number;
+  search: string;
+}) => {
+  const params = new URLSearchParams({
+    skip: String(skip),
+    limit: "20",
+    search,
+  });
+
+  const res = await apiClient.get(`/api/chat?${params.toString()}`);
   return res.data;
 };
