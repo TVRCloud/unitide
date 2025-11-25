@@ -7,10 +7,16 @@ import { useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
 import { ScrollArea } from "../ui/scroll-area";
 import ChatListItem from "./ChatListItem";
+import { useRouter, useSearchParams } from "next/navigation";
+import ChatArea from "./ChatArea";
 
 const ChatMain = () => {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const chatIdFromURL = searchParams.get("chatId");
+
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedChat, setSelectedChat] = useState<any>();
+  const [selectedChat, setSelectedChat] = useState<any>(chatIdFromURL ?? null);
   const { ref, inView } = useInView();
 
   const { data, fetchNextPage, hasNextPage, isLoading, isFetchingNextPage } =
@@ -62,8 +68,14 @@ const ChatMain = () => {
                 <ChatListItem
                   key={index}
                   chat={chat}
-                  isActive={selectedChat?._id === chat._id}
-                  onClick={() => setSelectedChat(chat)}
+                  isActive={selectedChat === chat._id}
+                  onClick={() => {
+                    setSelectedChat(chat._id);
+
+                    const params = new URLSearchParams(searchParams.toString());
+                    params.set("chatId", chat._id);
+                    router.push(`?${params.toString()}`);
+                  }}
                 />
               ))
             )}
@@ -74,12 +86,29 @@ const ChatMain = () => {
                   ? "Loading more..."
                   : hasNextPage
                   ? "Scroll to load more"
-                  : "No more users"}
+                  : "No more chats"}
               </span>
             </div>
           </ScrollArea>
         </div>
-        <div>right side</div>
+
+        {/* chqt sidebar */}
+        {/* chqt sidebar */}
+        <div className="flex-1 flex flex-col">
+          {selectedChat ? (
+            <ChatArea selectedChat={selectedChat} />
+          ) : (
+            <div className="flex-1 flex items-center justify-center bg-muted/10">
+              <div className="text-center">
+                <div className="mb-4 text-6xl">💬</div>
+                <h2 className="text-xl font-semibold mb-2">Select a chat</h2>
+                <p className="text-muted-foreground">
+                  Choose a conversation to start messaging
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
