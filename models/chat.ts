@@ -8,6 +8,8 @@ const ChatSchema = new Schema(
     admins: [{ type: Schema.Types.ObjectId, ref: "Users" }],
     avatar: String,
     metadata: Schema.Types.Mixed,
+    isPinned: { type: Boolean, default: false },
+    isArchived: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
