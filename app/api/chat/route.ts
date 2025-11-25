@@ -36,23 +36,23 @@ export async function GET(request: Request) {
     const pipeline = [
       { $match: matchStage },
 
-      {
-        $lookup: {
-          from: "users",
-          localField: "members",
-          foreignField: "_id",
-          as: "members",
-        },
-      },
+      // {
+      //   $lookup: {
+      //     from: "users",
+      //     localField: "members",
+      //     foreignField: "_id",
+      //     as: "members",
+      //   },
+      // },
 
-      {
-        $lookup: {
-          from: "users",
-          localField: "admins",
-          foreignField: "_id",
-          as: "admins",
-        },
-      },
+      // {
+      //   $lookup: {
+      //     from: "users",
+      //     localField: "admins",
+      //     foreignField: "_id",
+      //     as: "admins",
+      //   },
+      // },
 
       { $skip: skip },
       { $limit: limit },
@@ -63,13 +63,20 @@ export async function GET(request: Request) {
           type: 1,
           avatar: 1,
           createdAt: 1,
-          members: { _id: 1, name: 1, email: 1 },
-          admins: { _id: 1, name: 1 },
+          // members: { _id: 1, name: 1, email: 1 },
+          // admins: { _id: 1, name: 1 },
         },
       },
     ];
 
     const list = await Chat.aggregate(pipeline);
+
+    if (!list) {
+      return NextResponse.json(
+        { error: "Failed to fetch chats" },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json(list, { status: 200 });
   } catch (err) {
