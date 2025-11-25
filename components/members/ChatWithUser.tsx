@@ -2,6 +2,7 @@ import { MessageSquarePlus } from "lucide-react";
 import { DropdownMenuItem } from "../ui/dropdown-menu";
 import { useCreateChat } from "@/hooks/useChat";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 type Props = {
   userId: string;
@@ -10,6 +11,7 @@ type Props = {
 
 const ChatWithUser = ({ userId, userName }: Props) => {
   const createChat = useCreateChat();
+  const router = useRouter();
 
   const onChatClick = () => {
     createChat.mutate(
@@ -20,7 +22,7 @@ const ChatWithUser = ({ userId, userName }: Props) => {
       },
       {
         onSuccess: () => {
-          window.location.href = `/chat`;
+          router.push(`/chat?chatId=${userId}`);
           toast.success("User created successfully");
         },
         onError: () => {
