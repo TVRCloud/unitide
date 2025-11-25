@@ -303,3 +303,8 @@ export const fetchChats = async ({
   const res = await apiClient.get(`/api/chat?${params.toString()}`);
   return res.data;
 };
+
+export const fetchSingleChat = async (id: string) => {
+  const res = await apiClient.get(`/api/chat/${id}`);
+  return res.data;
+};
