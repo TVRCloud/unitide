@@ -1,5 +1,5 @@
-import { createChat, fetchChats } from "@/lib/api-client";
-import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
+import { createChat, fetchChats, fetchSingleChat } from "@/lib/api-client";
+import { useInfiniteQuery, useMutation, useQuery } from "@tanstack/react-query";
 
 export const useCreateChat = () => {
   return useMutation({
@@ -19,5 +19,13 @@ export const useInfiniteChats = (search: string) => {
     initialPageParam: 0,
     getNextPageParam: (lastPage, allPages) =>
       lastPage.length < 20 ? undefined : allPages.length * 20,
+  });
+};
+
+export const useViewChat = (id: string) => {
+  return useQuery({
+    enabled: !!id,
+    queryKey: ["chat", id],
+    queryFn: () => fetchSingleChat(id),
   });
 };
