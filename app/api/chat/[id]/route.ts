@@ -6,30 +6,65 @@ import { NextResponse } from "next/server";
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
-
-    const { user, errorResponse } = await authenticateUser([
-      "admin",
-      "manager",
-      "lead",
-      "member",
-    ]);
+    const { id } = await context.params;
+    const { errorResponse } = await authenticateUser();
     if (errorResponse) return errorResponse;
 
-    const chatId = new mongoose.Types.ObjectId(params.id);
+    const chat = await Chat.aggregate([
+      {
+        $match: {
+          _id: mongoose.Types.ObjectId.createFromHexString(id),
+        },
+      },
 
-    const chat = await Chat.findById(chatId)
-      .populate("members", "_id name email")
-      .populate("admins", "_id name");
+      {
+        $lookup: {
+          from: "users",
+          localField: "members",
+          foreignField: "_id",
+          as: "members",
+        },
+      },
 
-    if (!chat) {
+      {
+        $lookup: {
+          from: "users",
+          localField: "admins",
+          foreignField: "_id",
+          as: "admins",
+        },
+      },
+
+      { $unwind: "$admins" },
+
+      {
+        $project: {
+          members: {
+            password: 0,
+            __v: 0,
+            createdAt: 0,
+            updatedAt: 0,
+          },
+          admins: {
+            password: 0,
+            __v: 0,
+            createdAt: 0,
+            updatedAt: 0,
+          },
+          __v: 0,
+        },
+      },
+    ]);
+
+    if (chat.length === 0) {
       return NextResponse.json({ error: "Chat not found" }, { status: 404 });
     }
 
-    return NextResponse.json(chat, { status: 200 });
+    return NextResponse.json(chat[0], { status: 200 });
   } catch (err) {
     console.error("CHAT GET BY ID ERROR:", err);
     return NextResponse.json(
