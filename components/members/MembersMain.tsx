@@ -43,6 +43,7 @@ import {
 import { DateTime } from "luxon";
 import AddMember from "./AddMember";
 import { useRouter } from "next/navigation";
+import ChatWithUser from "./ChatWithUser";
 
 const MembersMain = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -232,6 +233,11 @@ const MembersMain = () => {
                                       <User className="mr-2 h-4 w-4" />
                                       View User
                                     </DropdownMenuItem>
+
+                                    <ChatWithUser
+                                      userId={user._id}
+                                      userName={user.name}
+                                    />
                                   </DropdownMenuContent>
                                 </DropdownMenu>
                               </TableCell>
