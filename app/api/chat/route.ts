@@ -1,134 +1,108 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { authenticateUser } from "@/lib/authenticateUser";
-import connectDB from "@/lib/mongodb";
-import { Chat } from "@/models/chat";
-import mongoose from "mongoose";
+// app/api/chats/route.ts
 import { NextResponse } from "next/server";
+import mongoose from "mongoose";
+import connectDB from "@/lib/mongodb";
+import { authenticateUser } from "@/lib/authenticateUser";
+import { Chat } from "@/models/chat";
+import { createChatSchema } from "@/schemas/chat";
 
 export async function GET(request: Request) {
-  try {
-    await connectDB();
+  await connectDB();
+  const { user, errorResponse } = await authenticateUser([
+    "admin",
+    "manager",
+    "lead",
+    "member",
+  ]);
+  if (errorResponse) return errorResponse;
 
-    const { user, errorResponse } = await authenticateUser([
-      "admin",
-      "manager",
-      "lead",
-      "member",
-    ]);
-    if (errorResponse) return errorResponse;
+  const url = new URL(request.url);
+  const skip = parseInt(url.searchParams.get("skip") || "0");
+  const limit = parseInt(url.searchParams.get("limit") || "20");
+  const search = url.searchParams.get("search") || "";
 
-    const { searchParams } = new URL(request.url);
+  const userId = mongoose.Types.ObjectId.createFromHexString(user.id);
 
-    const search = searchParams.get("search") || "";
-    const skip = parseInt(searchParams.get("skip") || "0");
-    const limit = parseInt(searchParams.get("limit") || "20");
+  const match: any = { members: { $in: [userId] } };
+  if (search) match.title = { $regex: search, $options: "i" };
 
-    const userId = new mongoose.Types.ObjectId(user.id);
-
-    const matchStage: any = {
-      members: userId,
-    };
-
-    if (search) {
-      matchStage.title = { $regex: search, $options: "i" };
-    }
-
-    const pipeline = [
-      { $match: matchStage },
-
-      // {
-      //   $lookup: {
-      //     from: "users",
-      //     localField: "members",
-      //     foreignField: "_id",
-      //     as: "members",
-      //   },
-      // },
-
-      // {
-      //   $lookup: {
-      //     from: "users",
-      //     localField: "admins",
-      //     foreignField: "_id",
-      //     as: "admins",
-      //   },
-      // },
-
-      { $skip: skip },
-      { $limit: limit },
-
-      {
-        $project: {
-          title: 1,
-          type: 1,
-          avatar: 1,
-          createdAt: 1,
-          // members: { _id: 1, name: 1, email: 1 },
-          // admins: { _id: 1, name: 1 },
-        },
+  const chats = await Chat.aggregate([
+    { $match: match },
+    {
+      $lookup: {
+        from: "messages",
+        let: { chatId: "$_id" },
+        pipeline: [
+          { $match: { $expr: { $eq: ["$chatId", "$$chatId"] } } },
+          { $sort: { createdAt: -1 } },
+          { $limit: 1 },
+        ],
+        as: "lastMessage",
       },
-    ];
+    },
+    { $unwind: { path: "$lastMessage", preserveNullAndEmptyArrays: true } },
+    {
+      $project: {
+        title: 1,
+        type: 1,
+        members: 1,
+        lastMessage: 1,
+        updatedAt: 1,
+        unreadCounts: 1,
+      },
+    },
+    { $sort: { updatedAt: -1 } },
+    { $skip: skip },
+    { $limit: limit },
+  ]);
 
-    const list = await Chat.aggregate(pipeline);
-
-    if (!list) {
-      return NextResponse.json(
-        { error: "Failed to fetch chats" },
-        { status: 500 }
-      );
-    }
-
-    return NextResponse.json(list, { status: 200 });
-  } catch (err) {
-    console.error("CHAT GET ERROR:", err);
-    return NextResponse.json(
-      { error: "Failed to fetch chats" },
-      { status: 500 }
-    );
-  }
+  return NextResponse.json(chats, { status: 200 });
 }
 
 export async function POST(request: Request) {
-  try {
-    await connectDB();
+  await connectDB();
+  const { errorResponse } = await authenticateUser([
+    "admin",
+    "manager",
+    "lead",
+    "member",
+  ]);
+  if (errorResponse) return errorResponse;
 
-    const { user, errorResponse } = await authenticateUser([
-      "admin",
-      "manager",
-      "lead",
-      "member",
-    ]);
-    if (errorResponse) return errorResponse;
+  const body = await request.json();
+  const parsed = createChatSchema.parse(body);
 
-    const body = await request.json();
-
-    const loggedInId = user.id;
-
-    const members = Array.from(new Set([loggedInId, ...(body.members || [])]));
-
-    if (body.type === "DIRECT") {
-      const existingChat = await Chat.findOne({
-        type: "DIRECT",
-        members: { $all: members, $size: members.length },
-      });
-
-      if (existingChat) {
-        return NextResponse.json(existingChat, { status: 200 });
-      }
-    }
-
-    const newChat = await Chat.create({
-      ...body,
-      members,
-      admins: body.admins || [loggedInId],
-    });
-
-    return NextResponse.json(newChat, { status: 201 });
-  } catch (err) {
-    console.error("CHAT POST ERROR:", err);
+  if (!parsed.members || parsed.members.length < 2) {
     return NextResponse.json(
-      { error: "Failed to create chat" },
-      { status: 500 }
+      { error: "At least 2 members are required for a chat" },
+      { status: 400 }
     );
   }
+
+  // Convert member ids to ObjectId
+  const memberIds = parsed.members.map(
+    (id: string) => new mongoose.Types.ObjectId(id)
+  );
+
+  // Only check DIRECT chats
+  const existingChat = await Chat.findOne({
+    type: "DIRECT",
+    members: { $size: 2, $all: memberIds }, // exactly those 2 members
+  });
+
+  if (existingChat) {
+    // Chat already exists, return it
+    return NextResponse.json(existingChat, { status: 200 });
+  }
+
+  // Create a new chat
+  const chat = await Chat.create({
+    ...parsed,
+    type: "DIRECT",
+    members: memberIds,
+    admins: [], // DIRECT chats usually don't have admins
+  });
+
+  return NextResponse.json(chat, { status: 201 });
 }
