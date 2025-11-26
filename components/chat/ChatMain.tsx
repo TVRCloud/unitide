@@ -64,20 +64,25 @@ const ChatMain = () => {
             {isLoading ? (
               <div>Loading...</div>
             ) : (
-              filteredChats.map((chat, index) => (
-                <ChatListItem
-                  key={index}
-                  chat={chat}
-                  isActive={selectedChat === chat._id}
-                  onClick={() => {
-                    setSelectedChat(chat._id);
+              filteredChats.map((chat, index) => {
+                console.log(chat);
+                return (
+                  <ChatListItem
+                    key={index}
+                    chat={chat}
+                    isActive={selectedChat === chat._id}
+                    onClick={() => {
+                      setSelectedChat(chat._id);
 
-                    const params = new URLSearchParams(searchParams.toString());
-                    params.set("chatId", chat._id);
-                    router.push(`?${params.toString()}`);
-                  }}
-                />
-              ))
+                      const params = new URLSearchParams(
+                        searchParams.toString()
+                      );
+                      params.set("chatId", chat._id);
+                      router.push(`?${params.toString()}`);
+                    }}
+                  />
+                );
+              })
             )}
 
             <div className="flex justify-center" ref={ref}>
