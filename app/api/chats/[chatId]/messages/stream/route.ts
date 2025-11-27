@@ -7,14 +7,13 @@ import mongoose from "mongoose";
 
 export async function GET(
   req: Request,
-  { params }: { params: { chatId: string } }
+  context: { params: Promise<{ chatId: string }> }
 ) {
   try {
     await connectDB();
-    const { user: decoded, errorResponse } = await authenticateUser();
+    const { chatId } = await context.params;
+    const { errorResponse } = await authenticateUser();
     if (errorResponse) return errorResponse;
-
-    const { chatId } = await params;
 
     const encoder = new TextEncoder();
     const customReadable = new ReadableStream({
