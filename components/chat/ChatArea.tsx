@@ -1,12 +1,19 @@
-import { useViewChat, useViewChatMessages } from "@/hooks/useChat";
+import { useViewChat } from "@/hooks/useChat";
 import { Button } from "../ui/button";
-import { Menu, MoreVertical, Phone, Video } from "lucide-react";
+import {
+  Menu,
+  MoreVertical,
+  Paperclip,
+  Phone,
+  Send,
+  Smile,
+  Video,
+} from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { Input } from "../ui/input";
 import MessageBubble from "./MessageBubble";
 import { useRef, useState } from "react";
 import TypingIndicator from "./TypingIndicator";
-import { ScrollArea } from "../ui/scroll-area";
-import SendMessage from "./SendMessage";
 
 type Props = {
   selectedChat: string;
@@ -37,100 +44,12 @@ const messages = [
     time: "2 days ago 11:06 AM",
     seen: true,
   },
-  {
-    id: "m4",
-    from: "me",
-    type: "text",
-    content: "See you tomorrow!",
-    time: "2 days ago 11:06 AM",
-    seen: true,
-  },
-  {
-    id: "m5",
-    from: "them",
-    type: "text",
-    content: "See you tomorrow!",
-    time: "2 days ago 11:06 AM",
-    seen: true,
-  },
-  {
-    id: "m6",
-    from: "me",
-    type: "text",
-    content: "See you tomorrow!",
-    time: "2 days ago 11:06 AM",
-    seen: true,
-  },
-  {
-    id: "m7",
-    from: "them",
-    type: "text",
-    content: "See you tomorrow!",
-    time: "2 days ago 11:06 AM",
-    seen: true,
-  },
-  {
-    id: "m8",
-    from: "me",
-    type: "text",
-    content: "See you tomorrow!",
-    time: "2 days ago 11:06 AM",
-    seen: true,
-  },
-  {
-    id: "m9",
-    from: "them",
-    type: "text",
-    content: "See you tomorrow!",
-    time: "2 days ago 11:06 AM",
-    seen: true,
-  },
-  {
-    id: "m10",
-    from: "me",
-    type: "text",
-    content: "See you tomorrow!",
-    time: "2 days ago 11:06 AM",
-    seen: true,
-  },
-  {
-    id: "m11",
-    from: "them",
-    type: "text",
-    content: "See you tomorrow!",
-    time: "2 days ago 11:06 AM",
-    seen: true,
-  },
-  {
-    id: "m12",
-    from: "me",
-    type: "text",
-    content: "See you tomorrow!",
-    time: "2 days ago 11:06 AM",
-    seen: true,
-  },
-  {
-    id: "m13",
-    from: "them",
-    type: "text",
-    content: "See you tomorrow!",
-    time: "2 days ago 11:06 AM",
-    seen: true,
-  },
 ];
 const ChatArea = ({ selectedChat }: Props) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [isTyping, setIsTyping] = useState(false);
 
   const { data, isLoading } = useViewChat(selectedChat);
-
-  const {
-    data: messagesss,
-    fetchNextPage,
-    hasNextPage,
-    isLoading: isLoadingMessages,
-    isFetchingNextPage,
-  } = useViewChatMessages(selectedChat);
 
   if (isLoading) return <div>Loading...</div>;
 
@@ -168,7 +87,7 @@ const ChatArea = ({ selectedChat }: Props) => {
         </div>
       </div>
 
-      <ScrollArea className="flex-1 overflow-y-auto p-4 bg-muted/10">
+      <div className="flex-1 overflow-y-auto p-4 bg-muted/10">
         {messages.map((message) => (
           <MessageBubble
             key={message.id}
@@ -179,9 +98,33 @@ const ChatArea = ({ selectedChat }: Props) => {
 
         {isTyping || (1 === 1 && <TypingIndicator />)}
         <div ref={messagesEndRef} />
-      </ScrollArea>
+      </div>
 
-      <SendMessage chatId={selectedChat} />
+      <div className="p-4 border-t border-border bg-background">
+        <div className="flex items-center gap-2">
+          <button className="p-2 rounded-full hover:bg-accent transition-colors">
+            <Smile className="h-5 w-5 text-muted-foreground" />
+          </button>
+          <button className="p-2 rounded-full hover:bg-accent transition-colors">
+            <Paperclip className="h-5 w-5 text-muted-foreground" />
+          </button>
+          <Input
+            type="text"
+            placeholder="Type a message..."
+            //   value={message}
+            //   onChange={(e) => setMessage(e.target.value)}
+            //   onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
+            className="flex-1 px-4 py-2 bg-muted rounded-full focus:outline-none focus:ring-2 focus:ring-ring text-sm"
+          />
+          <button
+            //   onClick={handleSendMessage}
+            //   disabled={!message.trim()}
+            className="p-2 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <Send className="h-5 w-5" />
+          </button>
+        </div>
+      </div>
     </>
   );
 };
