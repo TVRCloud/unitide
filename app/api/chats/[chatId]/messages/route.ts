@@ -65,14 +65,14 @@ export async function GET(
 
 export async function POST(
   req: Request,
-  { params }: { params: { chatId: string } }
+  context: { params: Promise<{ chatId: string }> }
 ) {
   try {
     await connectDB();
     const { user: decoded, errorResponse } = await authenticateUser();
     if (errorResponse) return errorResponse;
 
-    const { chatId } = params;
+    const { chatId } = await context.params;
     const { content, attachments } = await req.json();
 
     const message = new Message({
