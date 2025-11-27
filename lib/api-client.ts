@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { TCreateChatSchema } from "@/schemas/chat";
 import { TCreateNotificationSchema } from "@/schemas/notification";
 import { TCreateTaskSchema } from "@/schemas/task";
@@ -307,31 +306,5 @@ export const fetchChats = async ({
 
 export const fetchSingleChat = async (id: string) => {
   const res = await apiClient.get(`/api/chat/${id}`);
-  return res.data;
-};
-
-export const fetchChatMessages = async (chatId: string, skip: number) => {
-  const params = new URLSearchParams({
-    skip: String(skip),
-    limit: "20",
-  });
-
-  const res = await apiClient.get(
-    `/api/chat/${chatId}/messages?${params.toString()}`
-  );
-  return res.data;
-};
-
-type TSendMessage = {
-  chatId: string;
-  content?: string;
-  attachments?: { url: string; type: string; size: number; name: string }[];
-  replyTo?: string;
-  meta?: Record<string, any>;
-};
-
-export const sendMessage = async (data: TSendMessage) => {
-  const { chatId, ...rest } = data;
-  const res = await apiClient.post(`/api/chat/${chatId}/messages`, rest);
   return res.data;
 };
