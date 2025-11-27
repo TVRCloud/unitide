@@ -1,8 +1,8 @@
 import { MessageSquarePlus } from "lucide-react";
 import { DropdownMenuItem } from "../ui/dropdown-menu";
-import { useCreateChat } from "@/hooks/useChat";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { useCreateChat } from "@/hooks/useChats";
 
 type Props = {
   userId: string;
