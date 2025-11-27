@@ -6,14 +6,14 @@ import { Types } from "mongoose";
 
 export async function GET(
   req: Request,
-  { params }: { params: { chatId: string } }
+  context: { params: Promise<{ chatId: string }> }
 ) {
   try {
     await connectDB();
-    const { user: decoded, errorResponse } = await authenticateUser();
+    const { chatId } = await context.params;
+    const { errorResponse } = await authenticateUser();
     if (errorResponse) return errorResponse;
 
-    const { chatId } = params;
     const url = new URL(req.url);
     const limit = Number.parseInt(url.searchParams.get("limit") || "30", 10);
     const skip = Number.parseInt(url.searchParams.get("skip") || "0", 10);
