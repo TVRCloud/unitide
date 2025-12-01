@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Card,
   CardContent,
@@ -31,12 +33,14 @@ import { TUpdateUserSchema, updateUserSchema } from "@/schemas/user";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEditProfile } from "@/hooks/useUser";
 import { toast } from "sonner";
+import Image from "next/image";
 
 type Props = {
   user: {
     name: string;
     email: string;
     role: string;
+    avatar?: string;
   };
   refetch: () => void;
 };
@@ -44,6 +48,7 @@ type Props = {
 const EditProfile = ({ user, refetch }: Props) => {
   const editProfile = useEditProfile();
   const [isEditing, setIsEditing] = useState(false);
+  const [avatarPreview, setAvatarPreview] = useState(user.avatar || "");
 
   const form = useForm<TUpdateUserSchema>({
     resolver: zodResolver(updateUserSchema),
@@ -51,21 +56,26 @@ const EditProfile = ({ user, refetch }: Props) => {
       name: user.name,
       email: user.email,
       role: user.role,
+      avatar: undefined,
     },
   });
 
   const onSubmit = (data: TUpdateUserSchema) => {
-    editProfile.mutate(data, {
+    const formData = new FormData();
+    formData.append("name", data.name);
+    formData.append("email", data.email);
+
+    if (data.avatar instanceof File) {
+      formData.append("avatar", data.avatar);
+    }
+
+    editProfile.mutate(formData, {
       onSuccess: () => {
         refetch();
         setIsEditing(false);
-        form.reset();
         toast.success("Profile updated successfully");
       },
-      onError: (error) => {
-        console.error(error);
-        toast.error("Something went wrong");
-      },
+      onError: () => toast.error("Something went wrong"),
     });
   };
 
@@ -80,11 +90,12 @@ const EditProfile = ({ user, refetch }: Props) => {
             Update your personal and account information.
           </CardDescription>
         </CardHeader>
+
         <CardContent>
           <AnimatePresence mode="wait">
             {!isEditing ? (
               <motion.div
-                key="password-prompt"
+                key="prompt"
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
                 exit={{ opacity: 0, height: 0 }}
@@ -101,7 +112,7 @@ const EditProfile = ({ user, refetch }: Props) => {
               </motion.div>
             ) : (
               <motion.div
-                key="password-form"
+                key="form"
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
                 exit={{ opacity: 0, height: 0 }}
@@ -112,7 +123,47 @@ const EditProfile = ({ user, refetch }: Props) => {
                     className="space-y-6"
                     onSubmit={form.handleSubmit(onSubmit)}
                   >
+                    {/* Avatar Upload */}
+                    <FormField
+                      control={form.control}
+                      name="avatar"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Avatar</FormLabel>
+                          <FormControl>
+                            <div className="flex items-center gap-4">
+                              <Image
+                                src={
+                                  avatarPreview ||
+                                  "https://via.placeholder.com/80?text=Avatar"
+                                }
+                                className="w-20 h-20 rounded-full object-cover"
+                                width={0}
+                                height={0}
+                                alt="Avatar"
+                                unoptimized
+                              />
+
+                              <Input
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0];
+                                  if (file) {
+                                    field.onChange(file);
+                                    setAvatarPreview(URL.createObjectURL(file));
+                                  }
+                                }}
+                              />
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {/* Name */}
                       <FormField
                         control={form.control}
                         name="name"
@@ -128,7 +179,6 @@ const EditProfile = ({ user, refetch }: Props) => {
                                 <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                                 <Input
                                   {...field}
-                                  disabled={!isEditing}
                                   placeholder="Your Name"
                                   className="pl-10"
                                 />
@@ -139,46 +189,41 @@ const EditProfile = ({ user, refetch }: Props) => {
                         )}
                       />
 
+                      {/* Email */}
                       <FormField
                         control={form.control}
                         name="email"
                         render={({ field }) => (
-                          <FormItem className="cursor-not-allowed">
+                          <FormItem>
                             <FormLabel>Email Address</FormLabel>
                             <FormControl>
                               <motion.div
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
-                                transition={{ delay: 0.1 }}
                                 className="relative"
                               >
                                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                                 <Input {...field} disabled className="pl-10" />
                               </motion.div>
                             </FormControl>
-                            <FormMessage />
                           </FormItem>
                         )}
                       />
 
+                      {/* Role */}
                       <FormField
                         control={form.control}
                         name="role"
                         render={({ field }) => (
-                          <FormItem className="cursor-not-allowed">
+                          <FormItem>
                             <FormLabel>User Role</FormLabel>
                             <motion.div
                               initial={{ opacity: 0 }}
                               animate={{ opacity: 1 }}
-                              transition={{ delay: 0.2 }}
                               className="relative"
                             >
                               <Settings className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                              <Input
-                                {...field}
-                                disabled
-                                className="pl-10 capitalize"
-                              />
+                              <Input {...field} disabled className="pl-10" />
                             </motion.div>
                           </FormItem>
                         )}
@@ -192,8 +237,7 @@ const EditProfile = ({ user, refetch }: Props) => {
                         onClick={() => setIsEditing(false)}
                         disabled={editProfile.isPending}
                       >
-                        <X className="w-4 h-4 mr-2" />
-                        Cancel
+                        <X className="w-4 h-4 mr-2" /> Cancel
                       </Button>
 
                       <Button type="submit" disabled={editProfile.isPending}>
