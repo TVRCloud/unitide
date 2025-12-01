@@ -39,8 +39,12 @@ export const fetchSingleUser = async (id: string) => {
   return res.data;
 };
 
-export const editProfile = async (data: { name: string; email: string }) => {
-  const res = await apiClient.patch(`/api/me`, data);
+export const editProfile = async (formData: FormData) => {
+  const res = await apiClient.patch(`/api/me`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
   return res.data;
 };
 
