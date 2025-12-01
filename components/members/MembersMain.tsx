@@ -30,7 +30,6 @@ import {
   TableRow,
 } from "../ui/table";
 import { Separator } from "../ui/separator";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Badge } from "../ui/badge";
 import { Skeleton } from "../ui/skeleton";
 import { Checkbox } from "../ui/checkbox";
@@ -44,6 +43,7 @@ import { DateTime } from "luxon";
 import AddMember from "./AddMember";
 import { useRouter } from "next/navigation";
 import ChatWithUser from "./ChatWithUser";
+import MemberAvatar from "./MemberAvatar";
 
 const MembersMain = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -172,12 +172,8 @@ const MembersMain = () => {
                               </TableCell>
                               <TableCell>
                                 <div className="flex items-center gap-3">
-                                  <Avatar className="h-9 w-9">
-                                    <AvatarImage src={user.avatar} />
-                                    <AvatarFallback className="bg-linear-to-br from-primary to-secondary text-primary-foreground font-semibold">
-                                      {user.avatar}
-                                    </AvatarFallback>
-                                  </Avatar>
+                                  <MemberAvatar user={user} />
+
                                   <div className="space-y-1">
                                     <p className="text-sm font-medium leading-none">
                                       {user.name}
