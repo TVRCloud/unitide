@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
 import users from "@/models/users";
 import { authenticateUser } from "@/lib/authenticateUser";
-import { updateUserSchema } from "@/schemas/user";
+import { getSignedUrl, uploadFile } from "@/lib/supabase";
 
 export async function GET() {
   try {
@@ -12,17 +13,13 @@ export async function GET() {
 
     const user = await users.findById(decoded.id).select("-password");
 
-    // const user = await users.aggregate([
-    //   {
-    //     $match: {
-    //       _id: mongoose.Types.ObjectId.createFromHexString(decoded.id),
-    //     },
-    //   },
-    //   { $project: { password: 0 } },
-    // ]);
-
     if (!user) {
       return NextResponse.json({ error: "Profile not found" }, { status: 404 });
+    }
+
+    if (user.avatar) {
+      const signedUrl = await getSignedUrl(user.avatar);
+      user.avatar = signedUrl || null;
     }
 
     return NextResponse.json(user, { status: 200 });
@@ -41,26 +38,36 @@ export async function PATCH(request: Request) {
     const { user: decoded, errorResponse } = await authenticateUser();
     if (errorResponse) return errorResponse;
 
-    const body = await request.json();
-    const validated = updateUserSchema.parse(body);
+    const form = await request.formData();
+    const name = form.get("name") as string | null;
+    const avatar = form.get("avatar") as File | null;
 
-    const allowedUpdates = {
-      name: validated.name,
-    };
+    const updates: any = {};
 
-    const updatedUser = await users.findByIdAndUpdate(
-      decoded.id,
-      allowedUpdates,
-      {
-        new: true,
+    if (name) updates.name = name;
+
+    if (avatar) {
+      const uploaded = await uploadFile("users", avatar);
+      if (uploaded.error) {
+        return NextResponse.json({ error: uploaded }, { status: 500 });
       }
-    );
+      updates.avatar = uploaded.fileName;
+    }
+
+    const updatedUser = await users.findByIdAndUpdate(decoded.id, updates, {
+      new: true,
+    });
 
     if (!updatedUser) {
       return NextResponse.json({ error: "Profile not found" }, { status: 404 });
     }
 
-    return NextResponse.json(updatedUser, { status: 200 });
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, ...userWithoutPassword } = updatedUser.toObject
+      ? updatedUser.toObject()
+      : updatedUser;
+
+    return NextResponse.json(userWithoutPassword, { status: 200 });
   } catch (error) {
     console.error("PATCH /api/me error:", error);
     return NextResponse.json(
