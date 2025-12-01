@@ -5,6 +5,7 @@ import users from "@/models/users";
 import { SignupSchema } from "@/schemas/auth";
 import { logActivity } from "@/utils/logger";
 import { authenticateUser } from "@/lib/authenticateUser";
+import { getSignedUrl } from "@/lib/supabase";
 
 export async function GET(request: Request) {
   try {
@@ -29,7 +30,24 @@ export async function GET(request: Request) {
         }
       : {};
 
-    const userList = await users.find(query).skip(skip).limit(limit).lean();
+    let userList = await users.find(query).skip(skip).limit(limit).lean();
+
+    if (!userList) {
+      return NextResponse.json(
+        { error: "Failed to fetch users" },
+        { status: 500 }
+      );
+    }
+
+    userList = await Promise.all(
+      userList.map(async (user) => {
+        if (user.avatar) {
+          const signedUrl = await getSignedUrl(user.avatar);
+          user.avatar = signedUrl || null;
+        }
+        return user;
+      })
+    );
 
     return NextResponse.json(userList, { status: 200 });
   } catch (error) {
