@@ -5,6 +5,7 @@ import { authenticateUser } from "@/lib/authenticateUser";
 import mongoose from "mongoose";
 import { updateUserSchema } from "@/schemas/user";
 import { logActivity } from "@/utils/logger";
+import { getSignedUrl } from "@/lib/supabase";
 
 export async function GET(
   request: NextRequest,
@@ -106,6 +107,11 @@ export async function GET(
 
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    if (user[0].avatar) {
+      const signedUrl = await getSignedUrl(user[0].avatar);
+      user[0].avatar = signedUrl || null;
     }
 
     return NextResponse.json(user[0], { status: 200 });
