@@ -1,14 +1,4 @@
-import { createClient } from "@supabase/supabase-js";
-
-export const supabaseServer = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SECRET_KEY!
-);
-
-export const supabaseBrowser = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!
-);
+import { supabaseServer } from "./supabase/server";
 
 async function getFileHash(file: File) {
   const arrayBuffer = await file.arrayBuffer();
@@ -40,4 +30,19 @@ export async function uploadFile(folder: string, file: File) {
   if (error) return { error: error.message };
 
   return { fileName };
+}
+
+export async function getSignedUrl(path: string) {
+  if (!path) return null;
+
+  const { data, error } = await supabaseServer.storage
+    .from("unitide")
+    .createSignedUrl(path, 60 * 60);
+
+  if (error) {
+    console.error("Supabase signed URL error:", error.message);
+    return null;
+  }
+
+  return data.signedUrl;
 }
