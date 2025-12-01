@@ -129,32 +129,95 @@ const EditProfile = ({ user, refetch }: Props) => {
                       name="avatar"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Avatar</FormLabel>
+                          <FormLabel className="text-base font-semibold">
+                            Profile Picture
+                          </FormLabel>
                           <FormControl>
-                            <div className="flex items-center gap-4">
-                              <Image
-                                src={
-                                  avatarPreview ||
-                                  "https://via.placeholder.com/80?text=Avatar"
-                                }
-                                className="w-20 h-20 rounded-full object-cover"
-                                width={0}
-                                height={0}
-                                alt="Avatar"
-                                unoptimized
-                              />
+                            <div className="flex flex-col sm:flex-row items-center gap-6">
+                              {/* Avatar Preview */}
+                              <motion.div
+                                className="relative group"
+                                whileHover={{ scale: 1.05 }}
+                                transition={{ duration: 0.2 }}
+                              >
+                                <div className="w-24 h-24 rounded-full overflow-hidden ring-4 ring-primary/20 ring-offset-4 ring-offset-background">
+                                  <Image
+                                    src={
+                                      avatarPreview ||
+                                      "https://via.placeholder.com/96?text=Avatar"
+                                    }
+                                    className="w-full h-full object-cover"
+                                    width={96}
+                                    height={96}
+                                    alt="Avatar"
+                                    unoptimized
+                                  />
+                                </div>
+                                {avatarPreview && (
+                                  <motion.div
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    className="absolute inset-0 bg-black/60 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                                  >
+                                    <User className="w-8 h-8 text-white" />
+                                  </motion.div>
+                                )}
+                              </motion.div>
 
-                              <Input
-                                type="file"
-                                accept="image/*"
-                                onChange={(e) => {
-                                  const file = e.target.files?.[0];
-                                  if (file) {
-                                    field.onChange(file);
-                                    setAvatarPreview(URL.createObjectURL(file));
-                                  }
-                                }}
-                              />
+                              {/* Upload Button */}
+                              <div className="flex-1 w-full">
+                                <label
+                                  htmlFor="avatar-upload"
+                                  className="flex flex-col items-center justify-center w-full h-32 px-4 transition-all border-2 border-dashed rounded-lg cursor-pointer bg-muted/50 hover:bg-muted border-muted-foreground/25 hover:border-primary/50 group"
+                                >
+                                  <div className="flex flex-col items-center justify-center pt-5 pb-6 text-center">
+                                    <motion.div
+                                      whileHover={{ y: -4 }}
+                                      transition={{ duration: 0.2 }}
+                                    >
+                                      <User className="w-10 h-10 mb-3 text-muted-foreground group-hover:text-primary transition-colors" />
+                                    </motion.div>
+                                    <p className="mb-2 text-sm text-muted-foreground">
+                                      <span className="font-semibold text-primary">
+                                        Click to upload
+                                      </span>{" "}
+                                      or drag and drop
+                                    </p>
+                                    <p className="text-xs text-muted-foreground">
+                                      PNG, JPG, GIF up to 10MB
+                                    </p>
+                                  </div>
+                                  <Input
+                                    id="avatar-upload"
+                                    type="file"
+                                    accept="image/*"
+                                    className="hidden"
+                                    onChange={(e) => {
+                                      const file = e.target.files?.[0];
+                                      if (file) {
+                                        field.onChange(file);
+                                        setAvatarPreview(
+                                          URL.createObjectURL(file)
+                                        );
+                                      }
+                                    }}
+                                  />
+                                </label>
+                                {avatarPreview && (
+                                  <motion.button
+                                    initial={{ opacity: 0, y: -10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    type="button"
+                                    onClick={() => {
+                                      setAvatarPreview("");
+                                      field.onChange(undefined);
+                                    }}
+                                    className="mt-2 text-xs text-muted-foreground hover:text-destructive transition-colors"
+                                  >
+                                    Remove image
+                                  </motion.button>
+                                )}
+                              </div>
                             </div>
                           </FormControl>
                           <FormMessage />
