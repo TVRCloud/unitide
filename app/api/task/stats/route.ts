@@ -217,7 +217,7 @@ export async function GET() {
       },
     ]);
 
-    return NextResponse.json(stats, { status: 200 });
+    return NextResponse.json(stats[0], { status: 200 });
   } catch (error) {
     console.error("GET /api/task/stats error:", error);
     return NextResponse.json(
