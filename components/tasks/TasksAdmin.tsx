@@ -5,8 +5,7 @@ import { HeaderSection } from "../ui/header-section";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { StatsCard } from "../ui/stats-card";
-import { AlertTriangle, CheckCircle2, ListTodo, PlayIcon } from "lucide-react";
-import { Play } from "next/font/google";
+import { AlertTriangle, CheckCircle2, ListTodo, Play } from "lucide-react";
 
 const TasksAdmin = () => {
   const router = useRouter();
@@ -41,44 +40,14 @@ const TasksAdmin = () => {
         transition={{ delay: 0.1 }}
         className="grid gap-4 grid-cols-2 lg:grid-cols-4"
       >
-        <StatsCard
-          title={"Total Tasks"}
-          isLoading={isLoading}
-          value={data?.overview[0].total}
-          icon={ListTodo}
-          index={0}
-        />
-
-        <StatsCard
-          title={"In Progress"}
-          isLoading={isLoading}
-          value={data?.overview[0].inProgress}
-          icon={PlayIcon}
-          index={1}
-        />
-        <StatsCard
-          title={"Completed"}
-          isLoading={isLoading}
-          value={data?.overview[0].completed}
-          icon={ListTodo}
-          index={2}
-        />
-        <StatsCard
-          title={"Blocked"}
-          isLoading={isLoading}
-          value={data?.overview[0].blocked}
-          icon={ListTodo}
-          index={3}
-        />
-
-        {/* {[
-          { l: "Total Tasks", v: 196, i: ListTodo },
-          { l: "In Progress", v: 32, i: Play },
-          { l: "Completed", v: 89, i: CheckCircle2 },
-          { l: "Blocked", v: 12, i: AlertTriangle },
+        {[
+          { l: "Total Tasks", v: data?.overview[0].total, i: ListTodo },
+          { l: "In Progress", v: data?.overview[0].inProgress, i: Play },
+          { l: "Completed", v: data?.overview[0].completed, i: CheckCircle2 },
+          { l: "Blocked", v: data?.overview[0].blocked, i: AlertTriangle },
         ].map((s, i) => (
-         
-        ))} */}
+          <StatsCard key={i} title={s.l} value={s.v} icon={s.i} index={i} />
+        ))}
       </motion.div>
     </div>
   );
