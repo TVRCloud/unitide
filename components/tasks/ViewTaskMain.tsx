@@ -4,7 +4,6 @@ import { Badge } from "@/components/ui/badge";
 import {
   FolderKanban,
   Flag,
-  Edit,
   MoreHorizontal,
   Copy,
   Trash2,
@@ -31,6 +30,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { Separator } from "../ui/separator";
 import { DateTime } from "luxon";
+import EditTask from "./EditTask";
 
 export default function ViewTaskPage() {
   const params = useParams<{ id: string }>();
@@ -110,11 +110,19 @@ export default function ViewTaskPage() {
           </div>
 
           {/* Edit + Menu */}
-          <div>
-            <Button variant="outline" size="sm">
-              <Edit className="mr-2 h-4 w-4" />
-              Edit
-            </Button>
+          <div className="inline-flex gap-2">
+            <EditTask
+              defaultValue={{
+                id: data._id,
+                title: data.title,
+                description: data.description,
+                status: data.status,
+                priority: data.priority,
+                type: data.type,
+                dueDate: data.dueDate,
+                tags: data.tags,
+              }}
+            />
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
