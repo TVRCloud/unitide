@@ -4,7 +4,6 @@ import { Badge } from "@/components/ui/badge";
 import {
   FolderKanban,
   Flag,
-  Edit,
   MoreHorizontal,
   Copy,
   Trash2,
@@ -31,6 +30,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { Separator } from "../ui/separator";
 import { DateTime } from "luxon";
+import EditTask from "./EditTask";
+import TaskAssignees from "./TaskAssignees";
 
 export default function ViewTaskPage() {
   const params = useParams<{ id: string }>();
@@ -110,11 +111,19 @@ export default function ViewTaskPage() {
           </div>
 
           {/* Edit + Menu */}
-          <div>
-            <Button variant="outline" size="sm">
-              <Edit className="mr-2 h-4 w-4" />
-              Edit
-            </Button>
+          <div className="inline-flex gap-2">
+            <EditTask
+              defaultValue={{
+                id: data._id,
+                title: data.title,
+                description: data.description,
+                status: data.status,
+                priority: data.priority,
+                type: data.type,
+                dueDate: data.dueDate,
+                tags: data.tags,
+              }}
+            />
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -284,35 +293,8 @@ export default function ViewTaskPage() {
         {/* RIGHT SIDE */}
         <div className="lg:col-span-1 space-y-6">
           {/* Assignees */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Assignees</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {data.assignedTo.length === 0 && (
-                <p className="text-muted-foreground">No assignees</p>
-              )}
 
-              {data.assignedTo.map((u, i) => (
-                <div key={i} className="flex items-center gap-3">
-                  <Avatar>
-                    <AvatarFallback>
-                      {u.name
-                        ?.split(" ")
-                        .map((w) => w[0])
-                        .join("")}
-                    </AvatarFallback>
-                  </Avatar>
-                  <span className="font-medium">{u.name}</span>
-                </div>
-              ))}
-
-              <Button variant="outline" className="w-full mt-2">
-                <Plus className="h-4 w-4 mr-2" />
-                Add Assignee
-              </Button>
-            </CardContent>
-          </Card>
+          <TaskAssignees id={data._id} assignees={data.assignedTo} />
 
           {/* Extra details */}
           <Card>

@@ -103,7 +103,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json(taskList, { status: 200 });
   } catch (error) {
-    console.error("TASK GET ERROR:", error);
+    console.error("GET /api/task error:", error);
     return NextResponse.json(
       { error: "Failed to fetch tasks" },
       { status: 500 }

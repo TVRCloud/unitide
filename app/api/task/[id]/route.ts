@@ -1,6 +1,7 @@
 import { authenticateUser } from "@/lib/authenticateUser";
 import connectDB from "@/lib/mongodb";
 import tasks from "@/models/tasks";
+import { updateTaskSchema } from "@/schemas/task";
 import mongoose from "mongoose";
 import { NextResponse } from "next/server";
 
@@ -205,6 +206,45 @@ export async function GET(
     console.error("GET /api/task/[id] error:", error);
     return NextResponse.json(
       { error: "Failed to fetch task" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PATCH(
+  request: Request,
+  context: { params: Promise<{ id: string }> }
+) {
+  try {
+    await connectDB();
+    const { id } = await context.params;
+    const { errorResponse } = await authenticateUser([
+      "admin",
+      "manager",
+      "lead",
+      "user",
+    ]);
+    if (errorResponse) return errorResponse;
+
+    const body = await request.json();
+    const validated = updateTaskSchema.safeParse(body);
+
+    if (!validated.success) {
+      return NextResponse.json(
+        { error: validated.error.flatten() },
+        { status: 400 }
+      );
+    }
+
+    const task = await tasks.findByIdAndUpdate(id, validated.data, {
+      new: true,
+    });
+
+    return NextResponse.json(task, { status: 200 });
+  } catch (error) {
+    console.error("PATCH /api/task/[id] error:", error);
+    return NextResponse.json(
+      { error: "Failed to update task" },
       { status: 500 }
     );
   }

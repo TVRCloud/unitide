@@ -38,9 +38,15 @@ export type TTask = {
   assignedTo: TUser[];
   createdBy: TUser[];
   watchers: TUser[];
-  status: string;
-  priority: string;
-  type: string;
+  status:
+    | "todo"
+    | "in-progress"
+    | "review"
+    | "completed"
+    | "blocked"
+    | "cancelled";
+  priority: "low" | "medium" | "high" | "urgent";
+  type: "task" | "bug" | "story" | "feature";
   tags: string[];
   startDate: string;
   subtasks: any[];
@@ -58,4 +64,22 @@ export type TTask = {
   updatedBy: TUser[];
   attachmentUsers: TUser[];
   timeLogUsers: TUser[];
+  dueDate: string;
+};
+
+export type TaskBasicDetails = {
+  id: string;
+  title: string;
+  description: string;
+  status:
+    | "todo"
+    | "in-progress"
+    | "review"
+    | "completed"
+    | "blocked"
+    | "cancelled";
+  priority?: "low" | "medium" | "high" | "urgent";
+  type?: "task" | "bug" | "story" | "feature";
+  dueDate: string;
+  tags: string[];
 };
