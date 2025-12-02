@@ -1,5 +1,6 @@
 import {
   createTask,
+  editAssignees,
   editTask,
   fetchSingleTask,
   fetchTasks,
@@ -64,6 +65,17 @@ export const useEditTask = (id: string) => {
 
   return useMutation({
     mutationFn: (updatedData: TaskBasicDetails) => editTask(id, updatedData),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["task", id] });
+    },
+  });
+};
+
+export const useEditAssignees = (id: string) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (assignees: string[]) => editAssignees(id, assignees),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["task", id] });
     },
