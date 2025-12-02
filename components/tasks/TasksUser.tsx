@@ -311,7 +311,7 @@ const TasksUser = () => {
                               <Button
                                 size="icon"
                                 onClick={() => {
-                                  router.push(`tasks/${task._id}`);
+                                  router.push(`/tasks/${task._id}`);
                                 }}
                               >
                                 <Eye className=" h-4 w-4" />
