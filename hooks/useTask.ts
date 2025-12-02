@@ -1,10 +1,11 @@
 import {
   createTask,
+  editTask,
   fetchSingleTask,
   fetchTasks,
   fetchTaskStats,
 } from "@/lib/api-client";
-import { TTask } from "@/types/task";
+import { TaskBasicDetails, TTask } from "@/types/task";
 import {
   useInfiniteQuery,
   useMutation,
@@ -55,6 +56,17 @@ export const useViewTask = (id: string) => {
   return useQuery<TTask>({
     queryKey: ["task", id],
     queryFn: () => fetchSingleTask(id),
+  });
+};
+
+export const useEditTask = (id: string) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (updatedData: TaskBasicDetails) => editTask(id, updatedData),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["task", id] });
+    },
   });
 };
 
