@@ -1,5 +1,5 @@
 import { TCreateNotificationSchema } from "@/schemas/notification";
-import { TCreateTaskSchema } from "@/schemas/task";
+import { TCreateTaskSchema, TUpdateTaskSchema } from "@/schemas/task";
 import { apiClient } from "@/utils/axios";
 
 type FetchTasksParams = {
@@ -282,6 +282,10 @@ export const fetchSingleTask = async (id: string) => {
   return res.data;
 };
 
+export const editTask = async (id: string, data: TUpdateTaskSchema) => {
+  const res = await apiClient.patch(`/api/task/${id}`, data);
+  return res.data;
+};
 export const fetchTaskStats = async () => {
   const res = await apiClient.get(`/api/task/stats`);
   return res.data;
