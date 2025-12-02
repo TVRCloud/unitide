@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+"use client";
 import { useInfiniteTasks } from "@/hooks/useTask";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
