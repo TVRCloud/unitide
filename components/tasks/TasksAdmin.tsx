@@ -3,6 +3,7 @@ import { useViewTaskStats } from "@/hooks/useTask";
 import { Button } from "../ui/button";
 import { HeaderSection } from "../ui/header-section";
 import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 
 const TasksAdmin = () => {
   const router = useRouter();
@@ -30,6 +31,15 @@ const TasksAdmin = () => {
           </div>
         }
       />
+
+      <div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="grid gap-4 grid-cols-2 lg:grid-cols-4"
+        ></motion.div>
+      </div>
     </div>
   );
 };
