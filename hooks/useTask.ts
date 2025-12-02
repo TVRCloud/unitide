@@ -1,4 +1,9 @@
-import { createTask, fetchSingleTask, fetchTasks } from "@/lib/api-client";
+import {
+  createTask,
+  fetchSingleTask,
+  fetchTasks,
+  fetchTaskStats,
+} from "@/lib/api-client";
 import { TTask } from "@/types/task";
 import {
   useInfiniteQuery,
@@ -50,5 +55,12 @@ export const useViewTask = (id: string) => {
   return useQuery<TTask>({
     queryKey: ["task", id],
     queryFn: () => fetchSingleTask(id),
+  });
+};
+
+export const useViewTaskStats = () => {
+  return useQuery({
+    queryKey: ["task-stats"],
+    queryFn: () => fetchTaskStats(),
   });
 };
