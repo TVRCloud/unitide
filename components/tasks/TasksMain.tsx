@@ -6,14 +6,14 @@ import TasksUser from "./TasksUser";
 
 const TasksMain = () => {
   return (
-    <div>
+    <>
       <RoleGuard roles={["lead", "member"]}>
         <TasksUser />
       </RoleGuard>
       <RoleGuard roles={["admin", "manager"]}>
         <TasksAdmin />
       </RoleGuard>
-    </div>
+    </>
   );
 };
 
