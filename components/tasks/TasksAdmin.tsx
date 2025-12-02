@@ -5,7 +5,7 @@ import { HeaderSection } from "../ui/header-section";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { StatsCard } from "../ui/stats-card";
-import { AlertTriangle, CheckCircle2, ListTodo } from "lucide-react";
+import { AlertTriangle, CheckCircle2, ListTodo, PlayIcon } from "lucide-react";
 import { Play } from "next/font/google";
 
 const TasksAdmin = () => {
@@ -43,9 +43,32 @@ const TasksAdmin = () => {
       >
         <StatsCard
           title={"Total Tasks"}
-          value={data?.totalTasks}
+          isLoading={isLoading}
+          value={data?.overview[0].total}
           icon={ListTodo}
           index={0}
+        />
+
+        <StatsCard
+          title={"In Progress"}
+          isLoading={isLoading}
+          value={data?.overview[0].inProgress}
+          icon={PlayIcon}
+          index={1}
+        />
+        <StatsCard
+          title={"Completed"}
+          isLoading={isLoading}
+          value={data?.overview[0].completed}
+          icon={ListTodo}
+          index={2}
+        />
+        <StatsCard
+          title={"Blocked"}
+          isLoading={isLoading}
+          value={data?.overview[0].blocked}
+          icon={ListTodo}
+          index={3}
         />
 
         {/* {[
