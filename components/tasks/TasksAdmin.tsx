@@ -2,8 +2,10 @@
 import { useViewTaskStats } from "@/hooks/useTask";
 import { Button } from "../ui/button";
 import { HeaderSection } from "../ui/header-section";
+import { useRouter } from "next/navigation";
 
 const TasksAdmin = () => {
+  const router = useRouter();
   const { data, isLoading } = useViewTaskStats();
 
   if (isLoading) {
@@ -17,7 +19,14 @@ const TasksAdmin = () => {
         subtitle="Overview of all tasks and team performance"
         actions={
           <div>
-            <Button variant="secondary">View all</Button>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                router.push("/tasks/all");
+              }}
+            >
+              View all
+            </Button>
           </div>
         }
       />
