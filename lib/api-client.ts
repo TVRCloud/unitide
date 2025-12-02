@@ -286,6 +286,11 @@ export const editTask = async (id: string, data: TUpdateTaskSchema) => {
   const res = await apiClient.patch(`/api/task/${id}`, data);
   return res.data;
 };
+
+export const editAssignees = async (id: string, data: string[]) => {
+  const res = await apiClient.patch(`/api/task/${id}/assignees`, data);
+  return res.data;
+};
 export const fetchTaskStats = async () => {
   const res = await apiClient.get(`/api/task/stats`);
   return res.data;
