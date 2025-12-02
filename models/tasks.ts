@@ -83,15 +83,7 @@ const TaskSchema = new Schema(
       interval: { type: Number, default: 1 },
       nextRun: { type: Date },
     },
-    customFields: [
-      {
-        key: String,
-        value: Schema.Types.Mixed,
-      },
-    ],
     isDeleted: { type: Boolean, default: false },
-    stage: { type: String },
-    order: { type: Number, default: 0 },
   },
   { timestamps: true }
 );
