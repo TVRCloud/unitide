@@ -40,6 +40,7 @@ import {
 import { DateTime } from "luxon";
 import { Separator } from "../ui/separator";
 import CreateTask from "../tasks/CreateTask";
+import { useState } from "react";
 
 const milestones = [
   { name: "Project Kickoff", date: "2025-10-01", status: "completed" },
@@ -81,6 +82,7 @@ const activities = [
 ];
 
 const ViewProjectMain = () => {
+  const [open, setOpen] = useState(false);
   const params = useParams<{ id: string }>();
   const { data, isLoading } = useViewProject(params.id);
 
@@ -158,7 +160,7 @@ const ViewProjectMain = () => {
             </motion.div>
           </div>
           <div className="flex items-center gap-2 self-start md:self-auto">
-            <CreateTask projectId={data._id} />
+            <CreateTask projectId={data._id} open={open} setOpen={setOpen} />
 
             <Button variant="outline" size="sm" className="gap-2">
               <Edit className="h-4 w-4" />
@@ -330,14 +332,7 @@ const ViewProjectMain = () => {
                         >
                           <div className="flex items-center gap-3">
                             <Avatar className="h-10 w-10">
-                              <AvatarFallback
-                                className="
-                bg-linear-to-br
-                from-primary 
-                to-secondary 
-                text-primary-foreground
-              "
-                              >
+                              <AvatarFallback className="bg-linear-to-br from-primary to-secondary text-primary-foreground">
                                 {member.name?.[0]}
                               </AvatarFallback>
                             </Avatar>
