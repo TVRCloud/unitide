@@ -35,8 +35,8 @@ import {
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import TaskPieChart from "./TaskPieChart";
 import TaskPriorityChart from "./TaskPriorityChart";
+import TaskStatusChart from "./TaskStatusChart";
 
 const TasksAdmin = () => {
   const router = useRouter();
@@ -83,7 +83,6 @@ const TasksAdmin = () => {
       >
         {/* Tasks by Status Pie */}
 
-        <TaskPieChart data={data.tasksByStatus} />
         <TaskStatusChart data={data.tasksByStatus} />
 
         {/* Tasks by Priority */}
