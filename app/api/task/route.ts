@@ -61,7 +61,11 @@ export async function GET(request: Request) {
     if (user.role === "manager") {
       pipeline.push({
         $match: {
-          $or: [{ "project.manager": userId }, { "project.createdBy": userId }],
+          $or: [
+            { "project.manager": userId },
+            { "project.createdBy": userId },
+            { assignedTo: userId },
+          ],
         },
       });
     }
@@ -69,7 +73,11 @@ export async function GET(request: Request) {
     if (user.role === "lead") {
       pipeline.push({
         $match: {
-          $or: [{ "team.lead": userId }, { createdBy: userId }],
+          $or: [
+            { "team.lead": userId },
+            { createdBy: userId },
+            { assignedTo: userId },
+          ],
         },
       });
     }
@@ -83,6 +91,7 @@ export async function GET(request: Request) {
     }
 
     pipeline.push(
+      { $sort: { createdAt: -1 } },
       { $skip: skip },
       { $limit: limit },
       {

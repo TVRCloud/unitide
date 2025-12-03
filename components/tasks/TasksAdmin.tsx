@@ -27,22 +27,10 @@ import {
 } from "../ui/card";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
-import {
-  PieChart,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Pie,
-} from "recharts";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
+import TaskPriorityChart from "./TaskPriorityChart";
+import TaskStatusChart from "./TaskStatusChart";
 
 const TasksAdmin = () => {
   const router = useRouter();
@@ -51,24 +39,6 @@ const TasksAdmin = () => {
   if (isLoading) return <div>Loading Task Data...</div>;
 
   const overview = data?.overview?.[0] ?? {};
-  const chartConfig = {
-    todo: {
-      label: "To Do",
-      color: "var(--chart-1)",
-    },
-    inProgress: {
-      label: "In Progress",
-      color: "var(--chart-2)",
-    },
-    completed: {
-      label: "Completed",
-      color: "var(--chart-3)",
-    },
-    blocked: {
-      label: "Blocked",
-      color: "var(--chart-4)",
-    },
-  };
 
   return (
     <div className="flex flex-col gap-6">
@@ -106,50 +76,11 @@ const TasksAdmin = () => {
         className="grid gap-4 lg:grid-cols-2"
       >
         {/* Tasks by Status Pie */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Task Distribution</CardTitle>
-            <CardDescription>Tasks grouped by status</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ChartContainer className="h-[300px] w-full" config={chartConfig}>
-              <PieChart>
-                <ChartTooltip content={<ChartTooltipContent />} />
-                <Pie
-                  data={data.tasksByStatus}
-                  dataKey="value"
-                  nameKey="_id"
-                  innerRadius={60}
-                  paddingAngle={2}
-                  labelLine={false}
-                />
-              </PieChart>
-            </ChartContainer>
-          </CardContent>
-        </Card>
+
+        <TaskStatusChart data={data.tasksByStatus} />
 
         {/* Tasks by Priority */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Tasks by Priority</CardTitle>
-            <CardDescription>Distribution of priority levels</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ChartContainer className="h-[300px] w-full" config={{}}>
-              <BarChart data={data.tasksByPriority}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="_id" />
-                <YAxis />
-                <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar
-                  dataKey="count"
-                  fill="var(--secondary)"
-                  radius={[6, 6, 0, 0]}
-                />
-              </BarChart>
-            </ChartContainer>
-          </CardContent>
-        </Card>
+        <TaskPriorityChart data={data.tasksByPriority} />
       </motion.div>
 
       {/* Top Performers + Project Stats */}
