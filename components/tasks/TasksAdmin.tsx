@@ -87,27 +87,6 @@ const TasksAdmin = () => {
 
         {/* Tasks by Priority */}
         <TaskPriorityChart data={data.tasksByPriority} />
-        <Card>
-          <CardHeader>
-            <CardTitle>Tasks by Priority</CardTitle>
-            <CardDescription>Distribution of priority levels</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ChartContainer className="h-[300px] w-full" config={{}}>
-              <BarChart data={data.tasksByPriority}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="_id" />
-                <YAxis />
-                <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar
-                  dataKey="count"
-                  fill="var(--secondary)"
-                  radius={[6, 6, 0, 0]}
-                />
-              </BarChart>
-            </ChartContainer>
-          </CardContent>
-        </Card>
       </motion.div>
 
       {/* Top Performers + Project Stats */}
