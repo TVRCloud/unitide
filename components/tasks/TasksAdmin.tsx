@@ -32,17 +32,10 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import {
-  PieChart,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Pie,
-} from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
+import TaskPieChart from "./TaskPieChart";
 
 const TasksAdmin = () => {
   const router = useRouter();
@@ -51,24 +44,6 @@ const TasksAdmin = () => {
   if (isLoading) return <div>Loading Task Data...</div>;
 
   const overview = data?.overview?.[0] ?? {};
-  const chartConfig = {
-    todo: {
-      label: "To Do",
-      color: "var(--chart-1)",
-    },
-    inProgress: {
-      label: "In Progress",
-      color: "var(--chart-2)",
-    },
-    completed: {
-      label: "Completed",
-      color: "var(--chart-3)",
-    },
-    blocked: {
-      label: "Blocked",
-      color: "var(--chart-4)",
-    },
-  };
 
   return (
     <div className="flex flex-col gap-6">
@@ -106,27 +81,8 @@ const TasksAdmin = () => {
         className="grid gap-4 lg:grid-cols-2"
       >
         {/* Tasks by Status Pie */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Task Distribution</CardTitle>
-            <CardDescription>Tasks grouped by status</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ChartContainer className="h-[300px] w-full" config={chartConfig}>
-              <PieChart>
-                <ChartTooltip content={<ChartTooltipContent />} />
-                <Pie
-                  data={data.tasksByStatus}
-                  dataKey="value"
-                  nameKey="_id"
-                  innerRadius={60}
-                  paddingAngle={2}
-                  labelLine={false}
-                />
-              </PieChart>
-            </ChartContainer>
-          </CardContent>
-        </Card>
+
+        <TaskPieChart data={data.tasksByStatus} />
 
         {/* Tasks by Priority */}
         <Card>
