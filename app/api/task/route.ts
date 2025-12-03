@@ -91,6 +91,7 @@ export async function GET(request: Request) {
     }
 
     pipeline.push(
+      { $sort: { createdAt: -1 } },
       { $skip: skip },
       { $limit: limit },
       {
