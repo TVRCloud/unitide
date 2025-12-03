@@ -27,12 +27,6 @@ import {
 } from "../ui/card";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import TaskPriorityChart from "./TaskPriorityChart";
