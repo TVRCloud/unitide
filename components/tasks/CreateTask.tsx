@@ -29,12 +29,15 @@ import {
 } from "../ui/select";
 import { Button } from "../ui/button";
 import { useCreateTask } from "@/hooks/useTask";
+import { toast } from "sonner";
 
 type Props = {
   projectId: string;
+  open: boolean;
+  setOpen: (open: boolean) => void;
 };
 
-const CreateTask = ({ projectId }: Props) => {
+const CreateTask = ({ projectId, open, setOpen }: Props) => {
   const addTask = useCreateTask();
 
   const form = useForm<TCreateTaskSchema>({
@@ -53,11 +56,20 @@ const CreateTask = ({ projectId }: Props) => {
   });
 
   const onSubmit = (values: TCreateTaskSchema) => {
-    addTask.mutate(values);
+    addTask.mutate(values, {
+      onSuccess: () => {
+        form.reset();
+        setOpen(false);
+        toast.success("Task created successfully");
+      },
+      onError: () => {
+        toast.error("Something went wrong");
+      },
+    });
   };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger className="bg-primary text-primary-foreground hover:bg-primary/90 h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5 cursor-pointer inline-flex items-center justify-center whitespace-nowrap text-sm font-medium">
         <PlusIcon className="h-4 w-4" />
         Add Task
@@ -127,7 +139,11 @@ const CreateTask = ({ projectId }: Props) => {
               )}
             />
 
-            <Button type="submit" className="w-full">
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={addTask.isPending}
+            >
               Create Task
             </Button>
           </form>
