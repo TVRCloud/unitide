@@ -1,4 +1,4 @@
-# 🧩 Task Management CRM
+# 🧩 UniTide
 
 A modern **Task Management & Team Collaboration CRM** built using **Next.js 16 (App Router)**, **TypeScript**, **MongoDB (Mongoose)**, and **shadcn/ui**.
 
