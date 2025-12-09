@@ -295,3 +295,12 @@ export const fetchTaskStats = async () => {
   const res = await apiClient.get(`/api/task/stats`);
   return res.data;
 };
+
+// ---------------------------
+// ----------UTILS------------
+// ---------------------------
+export async function getSignedUrl(path: string) {
+  const res = await fetch(`/api/utils/sign-url?path=${path}`);
+  const data = await res.json();
+  return data.url as string;
+}
