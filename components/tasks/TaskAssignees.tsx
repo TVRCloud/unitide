@@ -12,11 +12,13 @@ import {
 } from "../ui/dialog";
 import AssigneeSelector from "./AssigneeSelector";
 import { useState } from "react";
+import { SignedAvatar } from "../ui/signed-avatar";
 
 type Props = {
   assignees: {
     _id: string;
     name: string;
+    avatar?: string;
   }[];
   id: string;
 };
@@ -35,16 +37,14 @@ const TaskAssignees = ({ assignees, id }: Props) => {
           <p className="text-muted-foreground">No assignees</p>
         )}
 
-        {assignees.map((u) => (
-          <div key={u._id} className="flex items-center gap-3">
-            <Avatar>
-              <AvatarFallback>
-                {u.name?.slice(0, 2).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-            <span className="font-medium">{u.name}</span>
-          </div>
-        ))}
+        {assignees.map((u) => {
+          return (
+            <div key={u._id} className="flex items-center gap-3">
+              <SignedAvatar src={u.avatar} name={u.name} />
+              <span className="font-medium">{u.name}</span>
+            </div>
+          );
+        })}
 
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
