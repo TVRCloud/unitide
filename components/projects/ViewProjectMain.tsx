@@ -41,6 +41,7 @@ import { DateTime } from "luxon";
 import { Separator } from "../ui/separator";
 import CreateTask from "../tasks/CreateTask";
 import { useState } from "react";
+import { SignedAvatar } from "../ui/signed-avatar";
 
 const milestones = [
   { name: "Project Kickoff", date: "2025-10-01", status: "completed" },
@@ -331,11 +332,11 @@ const ViewProjectMain = () => {
                           className="flex items-center justify-between p-3 rounded-lg border hover:bg-muted/50 transition-colors"
                         >
                           <div className="flex items-center gap-3">
-                            <Avatar className="h-10 w-10">
-                              <AvatarFallback className="bg-linear-to-br from-primary to-secondary text-primary-foreground">
-                                {member.name?.[0]}
-                              </AvatarFallback>
-                            </Avatar>
+                            <SignedAvatar
+                              src={member.avatar}
+                              name={member.name}
+                              avatarClassName="h-10 w-10"
+                            />
 
                             <div>
                               <p className="font-medium">{member.name}</p>
@@ -516,11 +517,11 @@ const ViewProjectMain = () => {
               </CardHeader>
               <CardContent>
                 <div className="flex items-center gap-3">
-                  <Avatar className="h-12 w-12">
-                    <AvatarFallback className="bg-linear-to-br from-primary to-secondary text-primary-foreground text-lg">
-                      {data.manager.avatar}
-                    </AvatarFallback>
-                  </Avatar>
+                  <SignedAvatar
+                    src={data.manager.avatar}
+                    name={data.manager.name}
+                    avatarClassName="h-12 w-12"
+                  />
                   <div>
                     <p className="font-semibold">{data.manager.name}</p>
                     <p className="text-sm text-muted-foreground">

@@ -1,3 +1,4 @@
+import { useSignedImage } from "@/hooks/useSignedImage";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 interface Props {
@@ -8,9 +9,11 @@ interface Props {
 }
 
 const MemberAvatar = ({ user }: Props) => {
+  const { data: url } = useSignedImage(user?.avatar);
+
   return (
     <Avatar className="h-9 w-9">
-      <AvatarImage src={user.avatar} />
+      <AvatarImage src={url} />
       <AvatarFallback className="bg-linear-to-br from-primary to-secondary text-primary-foreground font-semibold">
         {user.name
           ?.split(" ")

@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
 import users from "@/models/users";
 import { authenticateUser } from "@/lib/authenticateUser";
-import { getSignedUrl, uploadFile } from "@/lib/supabase";
+import { uploadFile } from "@/lib/supabase";
 
 export async function GET() {
   try {
@@ -15,11 +15,6 @@ export async function GET() {
 
     if (!user) {
       return NextResponse.json({ error: "Profile not found" }, { status: 404 });
-    }
-
-    if (user.avatar) {
-      const signedUrl = await getSignedUrl(user.avatar);
-      user.avatar = signedUrl || null;
     }
 
     return NextResponse.json(user, { status: 200 });

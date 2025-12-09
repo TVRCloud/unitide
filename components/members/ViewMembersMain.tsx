@@ -17,6 +17,7 @@ import { Button } from "../ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import ProfileInformation from "./ProfileInfo";
+import { useSignedImage } from "@/hooks/useSignedImage";
 
 interface Team {
   _id: string;
@@ -97,6 +98,7 @@ const ProjectItem = ({
 const ViewMembersMain = () => {
   const params = useParams<{ id: string }>();
   const { data, isLoading } = useViewUser(params.id);
+  const { data: url } = useSignedImage(data?.avatar);
 
   if (isLoading) return <div>Loading...</div>;
   if (!data) return <div>User not found.</div>;
@@ -117,7 +119,7 @@ const ViewMembersMain = () => {
               className="relative"
             >
               <Avatar className="w-20 h-20 sm:w-24 sm:h-24 border-4 border-background shadow-lg">
-                <AvatarImage src={data.avatar || ""} />
+                <AvatarImage src={url || ""} />
                 <AvatarFallback className="text-xl sm:text-2xl font-bold bg-linear-to-br from-primary to-secondary text-primary-foreground">
                   {data.name
                     .split(" ")

@@ -37,7 +37,7 @@ export async function getSignedUrl(path: string) {
 
   const { data, error } = await supabaseServer.storage
     .from("unitide")
-    .createSignedUrl(path, 60 * 60);
+    .createSignedUrl(path, 60);
 
   if (error) {
     console.error("Supabase signed URL error:", error.message);

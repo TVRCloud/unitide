@@ -28,6 +28,7 @@ import { MobileMenu } from "./MobileMenu";
 import { useQueryClient } from "@tanstack/react-query";
 import { useUserStore } from "@/store/useUserStore";
 import NavNotification from "./NavNotification";
+import { useSignedImage } from "@/hooks/useSignedImage";
 
 export function Header() {
   const { setTheme } = useTheme();
@@ -35,6 +36,8 @@ export function Header() {
   const { user, isLoading } = useAuth();
   const queryClient = useQueryClient();
   const { clearUser } = useUserStore();
+
+  const { data: url } = useSignedImage(user?.avatar);
 
   const onLogout = async () => {
     await logoutAction();
@@ -96,7 +99,7 @@ export function Header() {
                   className="relative h-8 w-8 rounded-full"
                 >
                   <Avatar className="h-8 w-8">
-                    <AvatarImage src={user?.avatar || ""} alt={user?.name} />
+                    <AvatarImage src={url || ""} alt={user?.name} />
                     <AvatarFallback>
                       {user?.name ? user.name.charAt(0).toUpperCase() : "?"}
                     </AvatarFallback>

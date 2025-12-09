@@ -10,9 +10,11 @@ import { useAuth } from "@/hooks/useUser";
 import EditProfile from "./EditProfile";
 import ChangePassword from "./ChangePassword";
 import { DateTime } from "luxon";
+import { useSignedImage } from "@/hooks/useSignedImage";
 
 const ProfileMain = () => {
   const { user, isLoading, refetch } = useAuth();
+  const { data: url } = useSignedImage(user?.avatar);
 
   if (isLoading) return <div>Loading Profile...</div>;
   if (!user) return <div>Could not load profile data.</div>;
@@ -29,7 +31,7 @@ const ProfileMain = () => {
           <CardContent className="flex flex-col items-center pt-6">
             <div className="relative mb-4">
               <Avatar className="w-28 h-28 border-4 border-primary/50 shadow-xl">
-                <AvatarImage src={user.avatar || ""} />
+                <AvatarImage src={url || ""} />
                 <AvatarFallback className="text-3xl font-bold bg-primary text-primary-foreground">
                   {user.name
                     ?.split(" ")
@@ -99,7 +101,7 @@ const ProfileMain = () => {
         </Card>
 
         <div className="lg:col-span-2 space-y-8">
-          <EditProfile user={user} refetch={refetch} />
+          <EditProfile user={{ ...user, avatar: url }} refetch={refetch} />
 
           <ChangePassword />
         </div>
