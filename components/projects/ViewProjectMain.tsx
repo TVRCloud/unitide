@@ -41,6 +41,7 @@ import { DateTime } from "luxon";
 import { Separator } from "../ui/separator";
 import CreateTask from "../tasks/CreateTask";
 import { useState } from "react";
+import { SignedAvatar } from "../ui/signed-avatar";
 
 const milestones = [
   { name: "Project Kickoff", date: "2025-10-01", status: "completed" },
@@ -516,6 +517,11 @@ const ViewProjectMain = () => {
               </CardHeader>
               <CardContent>
                 <div className="flex items-center gap-3">
+                  <SignedAvatar
+                    src={data.manager.avatar}
+                    name={data.manager.name}
+                    AvatarClassName="h-12 w-12"
+                  />
                   <Avatar className="h-12 w-12">
                     <AvatarFallback className="bg-linear-to-br from-primary to-secondary text-primary-foreground text-lg">
                       {data.manager.avatar}
