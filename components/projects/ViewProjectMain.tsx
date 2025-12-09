@@ -522,9 +522,6 @@ const ViewProjectMain = () => {
                     name={data.manager.name}
                     AvatarClassName="h-12 w-12"
                   />
-                  <Avatar className="h-12 w-12">
-                    <AvatarFallback>{data.manager.avatar}</AvatarFallback>
-                  </Avatar>
                   <div>
                     <p className="font-semibold">{data.manager.name}</p>
                     <p className="text-sm text-muted-foreground">
