@@ -523,9 +523,7 @@ const ViewProjectMain = () => {
                     AvatarClassName="h-12 w-12"
                   />
                   <Avatar className="h-12 w-12">
-                    <AvatarFallback className="bg-linear-to-br from-primary to-secondary text-primary-foreground text-lg">
-                      {data.manager.avatar}
-                    </AvatarFallback>
+                    <AvatarFallback>{data.manager.avatar}</AvatarFallback>
                   </Avatar>
                   <div>
                     <p className="font-semibold">{data.manager.name}</p>
