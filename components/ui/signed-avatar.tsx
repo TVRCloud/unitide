@@ -18,7 +18,9 @@ export function SignedAvatar({ src, name = "", ...props }: SignedAvatarProps) {
   return (
     <Avatar className={cn("rounded-full", props?.AvatarClassName)}>
       {url && <AvatarImage src={url} alt={name} />}
-      <AvatarFallback>{initials}</AvatarFallback>
+      <AvatarFallback className="bg-linear-to-br from-primary to-secondary text-primary-foreground text-lg">
+        {initials}
+      </AvatarFallback>
     </Avatar>
   );
 }
