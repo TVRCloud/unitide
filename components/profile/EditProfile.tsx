@@ -56,7 +56,7 @@ const EditProfile = ({ user, refetch }: Props) => {
       name: user.name,
       email: user.email,
       role: user.role,
-      avatar: undefined,
+      avatar: user.avatar,
     },
   });
 
