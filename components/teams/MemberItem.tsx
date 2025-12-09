@@ -3,6 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { MoreVertical } from "lucide-react";
+import { useSignedImage } from "@/hooks/useSignedImage";
 
 interface TeamMember {
   _id: string;
@@ -19,6 +20,8 @@ const MemberItem = ({
   member: TeamMember;
   index: number;
 }) => {
+  const { data: url } = useSignedImage(member?.avatar);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -27,7 +30,7 @@ const MemberItem = ({
       className="flex items-center space-x-4 p-3 border rounded-lg bg-background hover:bg-muted/50 transition-colors"
     >
       <Avatar className="w-10 h-10">
-        <AvatarImage src={member.avatar || ""} />
+        <AvatarImage src={url || ""} />
         <AvatarFallback className="text-xs font-semibold">
           {member.name
             .split(" ")
