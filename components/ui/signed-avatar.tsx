@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 interface SignedAvatarProps {
   src?: string | null;
   name?: string;
-  AvatarClassName?: string;
+  avatarClassName?: string;
 }
 
 export function SignedAvatar({ src, name = "", ...props }: SignedAvatarProps) {
@@ -16,7 +16,7 @@ export function SignedAvatar({ src, name = "", ...props }: SignedAvatarProps) {
   const initials = name.slice(0, 2).toUpperCase();
 
   return (
-    <Avatar className={cn("rounded-full", props?.AvatarClassName)}>
+    <Avatar className={cn("rounded-full", props?.avatarClassName)}>
       {url && <AvatarImage src={url} alt={name} />}
       <AvatarFallback className="bg-linear-to-br from-primary to-secondary text-primary-foreground text-lg">
         {initials}
