@@ -332,11 +332,11 @@ const ViewProjectMain = () => {
                           className="flex items-center justify-between p-3 rounded-lg border hover:bg-muted/50 transition-colors"
                         >
                           <div className="flex items-center gap-3">
-                            <Avatar className="h-10 w-10">
-                              <AvatarFallback className="bg-linear-to-br from-primary to-secondary text-primary-foreground">
-                                {member.name?.[0]}
-                              </AvatarFallback>
-                            </Avatar>
+                            <SignedAvatar
+                              src={member.avatar}
+                              name={member.name}
+                              avatarClassName="h-10 w-10"
+                            />
 
                             <div>
                               <p className="font-medium">{member.name}</p>
@@ -520,7 +520,7 @@ const ViewProjectMain = () => {
                   <SignedAvatar
                     src={data.manager.avatar}
                     name={data.manager.name}
-                    AvatarClassName="h-12 w-12"
+                    avatarClassName="h-12 w-12"
                   />
                   <div>
                     <p className="font-semibold">{data.manager.name}</p>
