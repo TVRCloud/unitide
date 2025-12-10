@@ -11,8 +11,6 @@ export async function GET() {
     const { user: decoded, errorResponse } = await authenticateUser();
     if (errorResponse) return errorResponse;
 
-    console.log("decoded", decoded);
-
     const user = await users.findById(decoded.id).select("-password");
 
     if (!user) {
