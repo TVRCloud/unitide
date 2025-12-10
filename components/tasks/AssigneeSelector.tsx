@@ -50,7 +50,7 @@ const AssigneeSelector = ({ assignees, setOpen, id }: Props) => {
   };
 
   const onError = (error: any) => {
-    console.log(error);
+    console.error(error);
   };
   return (
     <div>

@@ -6,8 +6,12 @@ import { cookies, headers } from "next/headers";
 import crypto from "crypto";
 import userSession from "@/models/session";
 
-const SECRET_KEY = new TextEncoder().encode(config.jwt.secret);
-const EXPIRES_IN = config.jwt.expiresIn;
+const ACCESS_SECRET_KEY = new TextEncoder().encode(
+  config.jwt.accessToken.secret
+);
+const REFRESH_SECRET_KEY = new TextEncoder().encode(
+  config.jwt.refreshToken.secret
+);
 
 export interface DecodedToken {
   id: string;
@@ -29,35 +33,63 @@ export async function verifyPassword(
   return bcrypt.compare(password, hashedPassword);
 }
 
-export async function createToken(
+// Generic token creation
+async function createJWT(
   payload: Record<string, any>,
-  expiresIn = EXPIRES_IN
+  secretKey: Uint8Array,
+  expiresIn: string
 ) {
   return new SignJWT(payload)
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime(expiresIn)
-    .sign(SECRET_KEY);
+    .sign(secretKey);
 }
 
-export async function verifyToken(token: string) {
+// Create tokens
+export async function createAccessToken(payload: Record<string, any>) {
+  return createJWT(
+    payload,
+    ACCESS_SECRET_KEY,
+    config.jwt.accessToken.expiresIn
+  );
+}
+export async function createRefreshToken(payload: Record<string, any>) {
+  return createJWT(
+    payload,
+    REFRESH_SECRET_KEY,
+    config.jwt.refreshToken.expiresIn
+  );
+}
+
+// Verify tokens
+export async function verifyAccessToken(token: string) {
   try {
-    const { payload } = await jwtVerify(token, SECRET_KEY);
+    const { payload } = await jwtVerify(token, ACCESS_SECRET_KEY);
+    return payload as unknown as DecodedToken;
+  } catch {
+    return null;
+  }
+}
+export async function verifyRefreshToken(token: string) {
+  try {
+    const { payload } = await jwtVerify(token, REFRESH_SECRET_KEY);
     return payload as unknown as DecodedToken;
   } catch {
     return null;
   }
 }
 
+// Get session from refresh token
 export async function getSession() {
   const cookieStore = await cookies();
-  const token = cookieStore.get(config.session.cookieName)?.value;
-
+  const token = cookieStore.get("refresh-token")?.value;
   if (!token) return null;
 
-  return await verifyToken(token);
+  return await verifyRefreshToken(token);
 }
 
+// Set both tokens in cookies
 export async function setSession(user: Record<string, any>) {
   const jti = crypto.randomUUID();
   const hdrs = await headers();
@@ -69,20 +101,29 @@ export async function setSession(user: Record<string, any>) {
     hdrs.get("cf-connecting-ip") ??
     "";
 
-  const token = await createToken({
+  const accessToken = await createAccessToken({
     id: user.id,
-    // email: user.email,
-    // name: user.name,
+    jti,
+  });
+  const refreshToken = await createRefreshToken({
+    id: user.id,
     role: user.role,
     jti,
   });
 
   const cookieStore = await cookies();
-  cookieStore.set(config.session.cookieName, token, {
+  cookieStore.set("access-token", accessToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: config.app.nodeEnv === "production",
     sameSite: "lax",
-    maxAge: config.session.timeout,
+    maxAge: config.jwt.accessToken.maxAge,
+  });
+
+  cookieStore.set("refresh-token", refreshToken, {
+    httpOnly: true,
+    secure: config.app.nodeEnv === "production",
+    sameSite: "lax",
+    maxAge: config.jwt.refreshToken.maxAge, // 10 days
   });
 
   await userSession.create({
@@ -92,18 +133,24 @@ export async function setSession(user: Record<string, any>) {
     ip,
     userAgent,
     loggedInAt: new Date(),
-    expiresAt: new Date(Date.now() + config.session.timeout * 1000),
+    expiresAt: new Date(Date.now() + config.jwt.refreshToken.maxAge * 1000),
   });
+
+  return { accessToken, refreshToken };
 }
 
+// Clear session
 export async function clearSession() {
   const cookieStore = await cookies();
-  const token = cookieStore.get(config.session.cookieName)?.value;
+  const refreshToken = cookieStore.get("refresh-token")?.value;
+  const jti = refreshToken
+    ? (await verifyRefreshToken(refreshToken))?.jti
+    : null;
 
-  const jti = token ? (await verifyToken(token))?.jti : null;
-
-  if (token && jti) {
+  if (refreshToken && jti) {
     await userSession.updateOne({ jti }, { isActive: false });
   }
-  cookieStore.delete(config.session.cookieName);
+
+  cookieStore.delete("access-token");
+  cookieStore.delete("refresh-token");
 }

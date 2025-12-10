@@ -50,8 +50,6 @@ const EditTask = ({ defaultValue }: Props) => {
   });
 
   const onSubmit = (data: any) => {
-    console.log(data);
-
     editTask.mutate(data, {
       onSuccess: () => {
         setOpen(false);

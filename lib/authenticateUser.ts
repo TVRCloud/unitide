@@ -2,7 +2,11 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { config } from "@/lib/config";
-import { clearSession, verifyToken } from "@/utils/auth";
+import {
+  verifyAccessToken,
+  verifyRefreshToken,
+  createAccessToken,
+} from "@/utils/auth";
 import userSession from "@/models/session";
 
 type AuthResult =
@@ -13,9 +17,19 @@ export async function authenticateUser(
   allowedRoles?: string[]
 ): Promise<AuthResult> {
   const cookieStore = await cookies();
-  const token = cookieStore.get(config.session.cookieName)?.value;
+  const accessToken = cookieStore.get("access-token")?.value;
+  const refreshToken = cookieStore.get("refresh-token")?.value;
 
-  if (!token) {
+  const refreshDecoded = refreshToken
+    ? await verifyRefreshToken(refreshToken)
+    : null;
+  const accessDecoded = accessToken
+    ? await verifyAccessToken(accessToken)
+    : null;
+
+  if (!refreshDecoded) {
+    await cookieStore.delete("access-token");
+    await cookieStore.delete("refresh-token");
     return {
       errorResponse: NextResponse.json(
         { error: "Unauthorized" },
@@ -24,20 +38,13 @@ export async function authenticateUser(
     };
   }
 
-  const decoded = await verifyToken(token);
-  if (!decoded) {
-    return {
-      errorResponse: NextResponse.json(
-        { error: "Invalid token" },
-        { status: 401 }
-      ),
-    };
-  }
-
-  const session = await userSession.findOne({ jti: decoded.jti });
+  const session = await userSession.findOne({
+    jti: refreshDecoded.jti,
+  });
 
   if (!session || !session.isActive || session.expiresAt < new Date()) {
-    await clearSession();
+    await cookieStore.delete("access-token");
+    await cookieStore.delete("refresh-token");
     return {
       errorResponse: NextResponse.json(
         { error: "Session expired" },
@@ -46,11 +53,36 @@ export async function authenticateUser(
     };
   }
 
-  if (allowedRoles && !allowedRoles.includes(decoded.role)) {
+  if (!accessDecoded) {
+    if (refreshDecoded) {
+      const newAccessToken = await createAccessToken({
+        id: refreshDecoded.id,
+        jti: refreshDecoded.jti,
+      });
+
+      cookieStore.set("access-token", newAccessToken, {
+        httpOnly: true,
+        secure: config.app.nodeEnv === "production",
+        sameSite: "lax",
+        maxAge: config.jwt.accessToken.maxAge,
+      });
+    }
+  }
+
+  if (!refreshDecoded || !accessDecoded) {
+    return {
+      errorResponse: NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      ),
+    };
+  }
+
+  if (allowedRoles && !allowedRoles.includes(refreshDecoded?.role ?? "guest")) {
     return {
       errorResponse: NextResponse.json({ error: "Forbidden" }, { status: 403 }),
     };
   }
 
-  return { user: decoded };
+  return { user: refreshDecoded };
 }
