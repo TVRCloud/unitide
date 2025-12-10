@@ -18,32 +18,18 @@ export async function authenticateUser(
 ): Promise<AuthResult> {
   const cookieStore = await cookies();
   const accessToken = cookieStore.get("access-token")?.value;
+  const refreshToken = cookieStore.get("refresh-token")?.value;
 
-  const decoded = accessToken ? await verifyAccessToken(accessToken) : null;
+  const refreshDecoded = refreshToken
+    ? await verifyRefreshToken(refreshToken)
+    : null;
+  const accessDecoded = accessToken
+    ? await verifyAccessToken(accessToken)
+    : null;
 
-  // // If access token is missing or expired, try refresh token
-  // if (!decoded ) {
-  //   const refreshDecoded = await verifyRefreshToken(refreshToken);
-  //   if (refreshDecoded) {
-  //     // Issue new access token
-  //     const newAccessToken = await createAccessToken({
-  //       id: refreshDecoded.id,
-  //       role: refreshDecoded.role,
-  //       jti: refreshDecoded.jti,
-  //     });
-
-  //     cookieStore.set("access-token", newAccessToken, {
-  //       httpOnly: true,
-  //       secure: process.env.NODE_ENV === "production",
-  //       sameSite: "lax",
-  //       maxAge: 60 * 5, // 5 minutes
-  //     });
-
-  //     decoded = refreshDecoded;
-  //   }
-  // }
-
-  if (!decoded) {
+  if (!refreshDecoded) {
+    await cookieStore.delete("access-token");
+    await cookieStore.delete("refresh-token");
     return {
       errorResponse: NextResponse.json(
         { error: "Unauthorized" },
@@ -52,7 +38,9 @@ export async function authenticateUser(
     };
   }
 
-  const session = await userSession.findOne({ jti: decoded.jti });
+  const session = await userSession.findOne({
+    jti: refreshDecoded.jti,
+  });
 
   if (!session || !session.isActive || session.expiresAt < new Date()) {
     await cookieStore.delete("access-token");
@@ -65,11 +53,36 @@ export async function authenticateUser(
     };
   }
 
-  if (allowedRoles && !allowedRoles.includes(decoded.role)) {
+  if (!accessDecoded) {
+    if (refreshDecoded) {
+      const newAccessToken = await createAccessToken({
+        id: refreshDecoded.id,
+        jti: refreshDecoded.jti,
+      });
+
+      cookieStore.set("access-token", newAccessToken, {
+        httpOnly: true,
+        secure: config.app.nodeEnv === "production",
+        sameSite: "lax",
+        maxAge: config.jwt.accessToken.maxAge,
+      });
+    }
+  }
+
+  if (!refreshDecoded || !accessDecoded) {
+    return {
+      errorResponse: NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      ),
+    };
+  }
+
+  if (allowedRoles && !allowedRoles.includes(refreshDecoded?.role ?? "guest")) {
     return {
       errorResponse: NextResponse.json({ error: "Forbidden" }, { status: 403 }),
     };
   }
 
-  return { user: decoded };
+  return { user: refreshDecoded };
 }
