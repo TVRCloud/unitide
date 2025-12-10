@@ -114,16 +114,16 @@ export async function setSession(user: Record<string, any>) {
   const cookieStore = await cookies();
   cookieStore.set("access-token", accessToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: config.app.nodeEnv === "production",
     sameSite: "lax",
-    maxAge: 60 * 5, // 5 minutes
+    maxAge: config.jwt.accessToken.maxAge,
   });
 
   cookieStore.set("refresh-token", refreshToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: config.app.nodeEnv === "production",
     sameSite: "lax",
-    maxAge: config.session.timeout, // 10 days
+    maxAge: config.jwt.refreshToken.maxAge, // 10 days
   });
 
   await userSession.create({
@@ -133,7 +133,7 @@ export async function setSession(user: Record<string, any>) {
     ip,
     userAgent,
     loggedInAt: new Date(),
-    expiresAt: new Date(Date.now() + config.session.timeout * 1000),
+    expiresAt: new Date(Date.now() + config.jwt.refreshToken.maxAge * 1000),
   });
 
   return { accessToken, refreshToken };
