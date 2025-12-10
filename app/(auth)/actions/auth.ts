@@ -42,35 +42,49 @@ export async function registerAction(formData: FormData) {
     message: `${user.email} registered`,
   });
 
+  // Set session (saves access + refresh token cookies)
   await setSession(user);
 
   return { success: true, message: "Account created successfully" };
 }
 
 export async function loginAction(formData: FormData) {
-  const email = (formData.get("email") as string)?.toLowerCase();
-  const password = formData.get("password") as string;
+  try {
+    const email = (formData.get("email") as string)?.toLowerCase();
+    const password = formData.get("password") as string;
 
-  if (!email || !password) {
-    return { message: "Email and password are required" };
+    if (!email || !password) {
+      return { message: "Email and password are required" };
+    }
+
+    await connectDB();
+
+    const user = await users.findOne({ email });
+    if (!user) {
+      return { message: "User not found" };
+    }
+
+    const isValid = await verifyPassword(password, user.password.trim());
+    if (!isValid) {
+      return { message: "Invalid password" };
+    }
+
+    // Set session (saves access + refresh token cookies)
+    await setSession(user);
+
+    await logActivity({
+      userId: user._id.toString(),
+      action: "login",
+      entityType: "user",
+      entityId: user._id.toString(),
+      message: `${user.email} logged in`,
+    });
+
+    return { success: true, message: "Login successful" };
+  } catch (error) {
+    console.error("Login error:", error);
+    return { message: "Internal server error" };
   }
-
-  await connectDB();
-
-  const user = await users.findOne({ email });
-  if (!user) {
-    return { message: "User not found" };
-  }
-
-  const isValid = await verifyPassword(password, user.password.trim());
-
-  if (!isValid) {
-    return { message: "Invalid password" };
-  }
-
-  await setSession(user);
-
-  return { success: true, message: "Login successful" };
 }
 
 export async function logoutAction() {
