@@ -2,7 +2,11 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { config } from "@/lib/config";
-import { clearSession, verifyToken } from "@/utils/auth";
+import {
+  verifyAccessToken,
+  verifyRefreshToken,
+  createAccessToken,
+} from "@/utils/auth";
 import userSession from "@/models/session";
 
 type AuthResult =
@@ -13,9 +17,33 @@ export async function authenticateUser(
   allowedRoles?: string[]
 ): Promise<AuthResult> {
   const cookieStore = await cookies();
-  const token = cookieStore.get(config.session.cookieName)?.value;
+  const accessToken = cookieStore.get("access-token")?.value;
 
-  if (!token) {
+  const decoded = accessToken ? await verifyAccessToken(accessToken) : null;
+
+  // // If access token is missing or expired, try refresh token
+  // if (!decoded ) {
+  //   const refreshDecoded = await verifyRefreshToken(refreshToken);
+  //   if (refreshDecoded) {
+  //     // Issue new access token
+  //     const newAccessToken = await createAccessToken({
+  //       id: refreshDecoded.id,
+  //       role: refreshDecoded.role,
+  //       jti: refreshDecoded.jti,
+  //     });
+
+  //     cookieStore.set("access-token", newAccessToken, {
+  //       httpOnly: true,
+  //       secure: process.env.NODE_ENV === "production",
+  //       sameSite: "lax",
+  //       maxAge: 60 * 5, // 5 minutes
+  //     });
+
+  //     decoded = refreshDecoded;
+  //   }
+  // }
+
+  if (!decoded) {
     return {
       errorResponse: NextResponse.json(
         { error: "Unauthorized" },
@@ -24,20 +52,11 @@ export async function authenticateUser(
     };
   }
 
-  const decoded = await verifyToken(token);
-  if (!decoded) {
-    return {
-      errorResponse: NextResponse.json(
-        { error: "Invalid token" },
-        { status: 401 }
-      ),
-    };
-  }
-
   const session = await userSession.findOne({ jti: decoded.jti });
 
   if (!session || !session.isActive || session.expiresAt < new Date()) {
-    await clearSession();
+    await cookieStore.delete("access-token");
+    await cookieStore.delete("refresh-token");
     return {
       errorResponse: NextResponse.json(
         { error: "Session expired" },
