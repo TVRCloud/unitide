@@ -111,6 +111,8 @@ export async function setSession(user: Record<string, any>) {
     jti,
   });
 
+  const hashedRefresh = await bcrypt.hash(refreshToken, 12);
+
   const cookieStore = await cookies();
   cookieStore.set("access-token", accessToken, {
     httpOnly: true,
@@ -134,6 +136,10 @@ export async function setSession(user: Record<string, any>) {
     userAgent,
     loggedInAt: new Date(),
     expiresAt: new Date(Date.now() + config.jwt.refreshToken.maxAge * 1000),
+
+    // 🔥 NEW
+    refreshToken: hashedRefresh,
+    tokenVersion: 1,
   });
 
   return { accessToken, refreshToken };
