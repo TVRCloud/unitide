@@ -8,4 +8,4 @@ export const protectedRoutes = [
   "/logs",
 ];
 export const authRoutes = ["/login", "/register"];
-export const publicRoutes = ["/welcome"];
+export const publicRoutes = ["/"];
