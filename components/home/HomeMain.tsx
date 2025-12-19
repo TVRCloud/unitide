@@ -317,6 +317,12 @@ const HomeMain = () => {
           </div>
         </motion.div>
       </section>
+
+      <footer className="border-t border-border py-12 px-6">
+        <div className="max-w-7xl mx-auto text-center text-muted-foreground">
+          <p>© 2025 UniTide. Empowering teams worldwide.</p>
+        </div>
+      </footer>
     </div>
   );
 };
