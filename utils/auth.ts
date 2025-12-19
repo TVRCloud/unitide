@@ -5,6 +5,7 @@ import bcrypt from "bcryptjs";
 import { cookies, headers } from "next/headers";
 import crypto from "crypto";
 import userSession from "@/models/session";
+import connectDB from "@/lib/mongodb";
 
 const ACCESS_SECRET_KEY = new TextEncoder().encode(
   config.jwt.accessToken.secret
@@ -147,6 +148,7 @@ export async function setSession(user: Record<string, any>) {
 
 // Clear session
 export async function clearSession() {
+  await connectDB();
   const cookieStore = await cookies();
   const refreshToken = cookieStore.get("refresh-token")?.value;
   const jti = refreshToken
