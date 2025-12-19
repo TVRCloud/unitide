@@ -2,9 +2,9 @@ import { authenticateUser } from "@/lib/authenticateUser";
 import connectDB from "@/lib/mongodb";
 import chats from "@/models/chats";
 import mongoose from "mongoose";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     await connectDB();
     const { user, errorResponse } = await authenticateUser(["admin"]);
