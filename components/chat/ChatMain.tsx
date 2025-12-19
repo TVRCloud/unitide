@@ -4,12 +4,11 @@ import { Button } from "../ui/button";
 import { MessageSquarePlus } from "lucide-react";
 import ChatList from "./ChatList";
 import { useState } from "react";
-import { usePresence } from "@/hooks/useChats";
 
 const ChatMain = () => {
   const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
 
-  usePresence();
+  // usePresence();
 
   return (
     <div className="flex h-[calc(100vh-144px)]">
