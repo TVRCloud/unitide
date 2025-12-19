@@ -28,7 +28,7 @@ export async function proxy(request: NextRequest) {
 
   if (isAuthRoute && session) {
     if (role === "guest") {
-      return NextResponse.redirect(new URL("/welcome", request.nextUrl));
+      return NextResponse.redirect(new URL("/", request.nextUrl));
     }
     return NextResponse.redirect(new URL("/dashboard", request.nextUrl));
   }

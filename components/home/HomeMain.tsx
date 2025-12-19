@@ -1,25 +1,24 @@
 "use client";
-import { useState, useEffect } from "react";
+
 import {
+  AnimatePresence,
   motion,
   useScroll,
   useTransform,
-  AnimatePresence,
 } from "framer-motion";
 import {
-  Users,
   ArrowRight,
-  CheckCircle2,
-  Calendar,
   BarChart3,
-  Menu,
-  X,
-  Sparkles,
+  Calendar,
+  CheckCircle2,
   Loader2,
   LogOut,
+  Menu,
+  Sparkles,
+  Users,
+  X,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useAuth } from "@/hooks/useUser";
+import { useEffect, useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,18 +26,22 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { logoutAction } from "../(auth)/actions/auth";
+} from "../ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { Button } from "../ui/button";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/hooks/useUser";
+import { logoutAction } from "@/app/(auth)/actions/auth";
 import { toast } from "sonner";
+import { useSignedImage } from "@/hooks/useSignedImage";
 
-export default function LandingPage() {
+const HomeMain = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const { scrollYProgress } = useScroll();
   const router = useRouter();
   const { user, isLoading } = useAuth();
+  const { data: url } = useSignedImage(user?.avatar);
 
   const backgroundY = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
   const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
@@ -158,10 +161,7 @@ export default function LandingPage() {
                         </div>
                       ) : (
                         <>
-                          <AvatarImage
-                            src={user?.image || ""}
-                            alt={user?.name}
-                          />
+                          <AvatarImage src={url || ""} alt={user?.name} />
                           <AvatarFallback>
                             {user?.name
                               ? user.name.charAt(0).toUpperCase()
@@ -407,4 +407,6 @@ export default function LandingPage() {
       `}</style>
     </div>
   );
-}
+};
+
+export default HomeMain;

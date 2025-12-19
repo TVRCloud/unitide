@@ -1,5 +1,9 @@
-import { redirect } from "next/navigation";
+import HomeMain from "@/components/home/HomeMain";
 
 export default function Home() {
-  redirect("/login");
+  return (
+    <div>
+      <HomeMain />
+    </div>
+  );
 }
