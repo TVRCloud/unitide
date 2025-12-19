@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { Loader2, LogOut, Menu, Sparkles, X } from "lucide-react";
 import { useState } from "react";
 import {
@@ -140,6 +140,42 @@ const HomeMain = () => {
           </div>
         </div>
       </motion.nav>
+
+      <AnimatePresence>
+        {isMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, x: "100%" }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: "100%" }}
+            className="fixed inset-0 z-40 bg-background md:hidden"
+          >
+            <div className="flex flex-col items-center justify-center h-full gap-8">
+              {["Features", "Solutions", "Pricing", "Resources"].map(
+                (item, i) => (
+                  <motion.a
+                    key={item}
+                    href="#"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.1 }}
+                    className="text-2xl font-medium"
+                  >
+                    {item}
+                  </motion.a>
+                )
+              )}
+              <motion.button
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+                className="px-8 py-3 rounded-lg bg-primary text-primary-foreground font-medium"
+              >
+                Try for Free
+              </motion.button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
