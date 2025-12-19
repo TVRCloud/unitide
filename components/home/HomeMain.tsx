@@ -323,6 +323,22 @@ const HomeMain = () => {
           <p>© 2025 UniTide. Empowering teams worldwide.</p>
         </div>
       </footer>
+
+      <style jsx>{`
+        @keyframes gradient {
+          0%,
+          100% {
+            background-position: 0% 50%;
+          }
+          50% {
+            background-position: 100% 50%;
+          }
+        }
+        .animate-gradient {
+          background-size: 200% auto;
+          animation: gradient 3s linear infinite;
+        }
+      `}</style>
     </div>
   );
 };
