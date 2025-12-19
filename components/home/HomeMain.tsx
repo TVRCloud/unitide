@@ -1,8 +1,24 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
-import { ArrowRight, Loader2, LogOut, Menu, Sparkles, X } from "lucide-react";
-import { useState } from "react";
+import {
+  AnimatePresence,
+  motion,
+  useScroll,
+  useTransform,
+} from "framer-motion";
+import {
+  ArrowRight,
+  BarChart3,
+  Calendar,
+  CheckCircle2,
+  Loader2,
+  LogOut,
+  Menu,
+  Sparkles,
+  Users,
+  X,
+} from "lucide-react";
+import { useEffect, useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,10 +29,61 @@ import {
 } from "../ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/hooks/useUser";
+import { logoutAction } from "@/app/(auth)/actions/auth";
+import { toast } from "sonner";
 
 const HomeMain = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const { scrollYProgress } = useScroll();
+  const router = useRouter();
+  const { user, isLoading } = useAuth();
+
+  const backgroundY = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
+  const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePosition({ x: e.clientX, y: e.clientY });
+    };
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, []);
+
+  const features = [
+    {
+      icon: <Users className="w-6 h-6" />,
+      title: "Collaborate Effortlessly",
+      description:
+        "Bring your entire team together with shared workspaces, live updates, and transparent task ownership.",
+    },
+    {
+      icon: <Calendar className="w-6 h-6" />,
+      title: "Plan with Clarity",
+      description:
+        "Visualize deadlines, milestones, and schedules to ensure every project stays on track.",
+    },
+    {
+      icon: <CheckCircle2 className="w-6 h-6" />,
+      title: "Automate Task Workflows",
+      description:
+        "Set rules, reminders, and approvals to automate repetitive management tasks with ease.",
+    },
+    {
+      icon: <BarChart3 className="w-6 h-6" />,
+      title: "Track Team Performance",
+      description:
+        "Real-time insights and analytics help you identify bottlenecks and improve productivity across teams.",
+    },
+  ];
+
+  const onLogout = async () => {
+    await logoutAction();
+    toast.success("Logged out successfully");
+    router.push("/login");
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
