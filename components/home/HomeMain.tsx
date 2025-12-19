@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { Loader2, LogOut, Menu, Sparkles, X } from "lucide-react";
+import { ArrowRight, Loader2, LogOut, Menu, Sparkles, X } from "lucide-react";
 import { useState } from "react";
 import {
   DropdownMenu,
@@ -176,6 +176,76 @@ const HomeMain = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <section className="relative pt-32 pb-20 px-6">
+        <motion.div
+          style={{ y: backgroundY, opacity }}
+          className="max-w-5xl mx-auto text-center"
+        >
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-muted/50 border border-border mb-8"
+          >
+            <Sparkles className="w-4 h-4 text-primary" />
+            <span className="text-sm font-medium">
+              Empower your team collaboration
+            </span>
+          </motion.div>
+
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.1 }}
+            className="text-5xl md:text-7xl font-bold mb-6 tracking-tight"
+          >
+            Manage teams,{" "}
+            <span className="bg-linear-to-r from-primary via-secondary to-primary bg-clip-text text-transparent animate-gradient">
+              deliver results
+            </span>
+          </motion.h1>
+
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="text-xl md:text-2xl text-muted-foreground mb-12 max-w-3xl mx-auto"
+          >
+            UniTide helps you organize projects, track progress, and keep
+            everyone aligned — all in one intuitive platform.
+          </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.3 }}
+            className="flex flex-col sm:flex-row gap-4 justify-center items-center"
+          >
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="px-8 py-4 rounded-xl bg-primary text-primary-foreground font-semibold text-lg flex items-center gap-2 hover:shadow-2xl hover:shadow-primary/30 transition-all group"
+              onClick={() => {
+                router.push("/login");
+              }}
+            >
+              Get Started
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="px-8 py-4 rounded-xl border-2 border-border bg-background/50 backdrop-blur font-semibold text-lg hover:border-primary/50 transition-all"
+              onClick={() => {
+                router.push("/register");
+              }}
+            >
+              Get Demo
+            </motion.button>
+          </motion.div>
+        </motion.div>
+      </section>
     </div>
   );
 };
