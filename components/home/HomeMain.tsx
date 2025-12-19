@@ -1,7 +1,18 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { Loader2, LogOut, Menu, Sparkles, X } from "lucide-react";
 import { useState } from "react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { Button } from "../ui/button";
 
 const HomeMain = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -25,6 +36,110 @@ const HomeMain = () => {
           }}
         />
       </div>
+
+      <motion.nav
+        initial={{ y: -100 }}
+        animate={{ y: 0 }}
+        className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-background/70 border-b border-border/50"
+      >
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+          <motion.div
+            className="flex items-center gap-2"
+            whileHover={{ scale: 1.05 }}
+          >
+            <div className="w-10 h-10 rounded-xl bg-linear-to-br from-primary to-secondary flex items-center justify-center">
+              <Sparkles className="w-5 h-5 text-primary-foreground" />
+            </div>
+            <span className="text-xl font-bold tracking-tight">UniTide</span>
+          </motion.div>
+
+          <div className="hidden md:flex items-center gap-8">
+            {["Features", "Solutions", "Pricing", "Resources"].map((item) => (
+              <motion.a
+                key={item}
+                href="#"
+                className="text-muted-foreground hover:text-foreground transition-colors"
+                whileHover={{ y: -2 }}
+              >
+                {item}
+              </motion.a>
+            ))}
+          </div>
+
+          <div className="flex items-center gap-4">
+            {!user ? (
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className=" px-6 py-2 rounded-lg bg-primary text-primary-foreground font-medium hover:shadow-lg hover:shadow-primary/20 transition-all"
+                onClick={() => {
+                  router.push("/register");
+                }}
+              >
+                Try for Free
+              </motion.button>
+            ) : (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="relative h-8 w-8 rounded-full"
+                  >
+                    <Avatar className="h-8 w-8">
+                      {isLoading ? (
+                        <div className="flex items-center justify-center h-8 w-8">
+                          <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                        </div>
+                      ) : (
+                        <>
+                          <AvatarImage
+                            src={user?.image || ""}
+                            alt={user?.name}
+                          />
+                          <AvatarFallback>
+                            {user?.name
+                              ? user.name.charAt(0).toUpperCase()
+                              : "?"}
+                          </AvatarFallback>
+                        </>
+                      )}
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56" align="end" forceMount>
+                  <DropdownMenuLabel className="font-normal">
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-sm font-medium leading-none">
+                        {user?.name || "Unknown"}
+                      </p>
+                      <p className="text-xs leading-none text-muted-foreground truncate">
+                        {user?.email || ""}
+                      </p>
+                      {user?.role && (
+                        <span className="text-[10px] text-muted-foreground uppercase tracking-wider">
+                          {user.role}
+                        </span>
+                      )}
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={onLogout} variant="destructive">
+                    <LogOut />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+
+            <button
+              className="md:hidden"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+            >
+              {isMenuOpen ? <X /> : <Menu />}
+            </button>
+          </div>
+        </div>
+      </motion.nav>
     </div>
   );
 };
