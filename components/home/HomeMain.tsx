@@ -246,6 +246,34 @@ const HomeMain = () => {
           </motion.div>
         </motion.div>
       </section>
+
+      <section className="relative py-32 px-6">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          className="max-w-5xl mx-auto text-center relative"
+        >
+          <div className="absolute inset-0 bg-linear-to-r from-primary to-secondary rounded-3xl blur-3xl opacity-20" />
+          <div className="relative bg-linear-to-br from-primary/10 to-secondary/10 rounded-3xl p-12 md:p-16 border border-primary/20">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              Lead better. Together.
+            </h2>
+            <p className="text-xl text-muted-foreground mb-8">
+              Transform how your team collaborates — start your free trial
+              today.
+            </p>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="px-10 py-5 rounded-xl bg-primary text-primary-foreground font-semibold text-lg hover:shadow-2xl hover:shadow-primary/40 transition-all inline-flex items-center gap-2 group"
+            >
+              Start Free Trial
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </motion.button>
+          </div>
+        </motion.div>
+      </section>
     </div>
   );
 };
