@@ -33,6 +33,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useUser";
 import { logoutAction } from "@/app/(auth)/actions/auth";
 import { toast } from "sonner";
+import { useSignedImage } from "@/hooks/useSignedImage";
 
 const HomeMain = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -40,6 +41,7 @@ const HomeMain = () => {
   const { scrollYProgress } = useScroll();
   const router = useRouter();
   const { user, isLoading } = useAuth();
+  const { data: url } = useSignedImage(user?.avatar);
 
   const backgroundY = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
   const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
@@ -159,10 +161,7 @@ const HomeMain = () => {
                         </div>
                       ) : (
                         <>
-                          <AvatarImage
-                            src={user?.image || ""}
-                            alt={user?.name}
-                          />
+                          <AvatarImage src={url || ""} alt={user?.name} />
                           <AvatarFallback>
                             {user?.name
                               ? user.name.charAt(0).toUpperCase()
