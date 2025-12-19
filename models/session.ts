@@ -8,6 +8,17 @@ const SessionSchema = new Schema(
       required: true,
       unique: true,
     },
+
+    refreshToken: {
+      type: String,
+      required: true,
+    },
+
+    tokenVersion: {
+      type: Number,
+      default: 1,
+    },
+
     ip: { type: String },
     userAgent: { type: String },
     isActive: {
@@ -27,10 +38,10 @@ const SessionSchema = new Schema(
 );
 
 // 🧹 Auto-delete sessions after 3 months (90 days)
-// SessionSchema.index(
-//   { createdAt: 1 },
-//   { expireAfterSeconds: 60 * 60 * 24 * 90 }
-// );
+SessionSchema.index(
+  { createdAt: 1 },
+  { expireAfterSeconds: 60 * 60 * 24 * 90 }
+);
 
 export default models.UserSession ||
   model("UserSession", SessionSchema, "userSession");
