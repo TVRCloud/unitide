@@ -149,7 +149,7 @@ const EditProfile = ({ user, refetch }: Props) => {
                                     className="w-full h-full object-cover"
                                     width={96}
                                     height={96}
-                                    alt="Avatar"
+                                    alt="user Avatar"
                                     unoptimized
                                   />
                                 </div>
