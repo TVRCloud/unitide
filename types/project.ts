@@ -3,6 +3,8 @@ export type Project = {
   name: string;
   description?: string;
   status?: string;
+  priority?: string;
+  color?: string;
   teams?: {
     name: string;
   }[];
