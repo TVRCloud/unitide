@@ -326,8 +326,24 @@ export const fetchChatDetails = async (id: string) => {
   return res.data;
 };
 
-export const fetchChatMessages = async (id: string) => {
-  const res = await apiClient.get(`/api/chats/${id}/messages`);
+export const fetchChatMessages = async ({
+  id,
+  skip,
+  search,
+}: {
+  id: string;
+  skip: number;
+  search: string;
+}) => {
+  const params = new URLSearchParams({
+    skip: String(skip),
+    limit: "20",
+    search,
+  });
+
+  const res = await apiClient.get(
+    `/api/chats/${id}/messages?${params.toString()}`
+  );
   return res.data;
 };
 
