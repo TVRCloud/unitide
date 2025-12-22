@@ -330,6 +330,17 @@ export const fetchChatMessages = async (id: string) => {
   const res = await apiClient.get(`/api/chats/${id}/messages`);
   return res.data;
 };
+
+export const sendMessage = async (
+  chatId: string,
+  data: {
+    content: string;
+    type: string;
+  }
+) => {
+  const res = await apiClient.post(`/api/chats/${chatId}/messages`, data);
+  return res.data;
+};
 // ---------------------------
 // ----------UTILS------------
 // ---------------------------
