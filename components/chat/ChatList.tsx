@@ -9,6 +9,7 @@ import { useInfiniteChats } from "@/hooks/useChats";
 import { useInView } from "react-intersection-observer";
 import { DateTime } from "luxon";
 import { motion, AnimatePresence } from "framer-motion";
+import { Skeleton } from "../ui/skeleton";
 
 interface Chat {
   _id: string;
@@ -85,71 +86,73 @@ const ChatList = ({ selectedChatId, onSelectChat }: ChatListProps) => {
     return messageDate.toLocaleString(DateTime.DATE_SHORT);
   }
 
-  if (isLoading) return <div>Loading...</div>;
-
   return (
     <ScrollArea className="h-full">
       <motion.div className="space-y-1 p-2" initial="hidden" animate="visible">
         <AnimatePresence>
-          {filteredChats.map((chat) => (
-            <motion.button
-              key={chat._id}
-              variants={itemVariants}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              transition={{ duration: 0.2, ease: "easeOut" }}
-              layout
-              whileTap={{ scale: 0.97 }}
-              onClick={() => onSelectChat(chat._id)}
-              className={cn(
-                "flex w-full items-center gap-3 rounded-lg p-3 text-left transition-colors hover:bg-accent",
-                selectedChatId === chat._id && "bg-accent"
-              )}
-            >
-              <Avatar className="h-12 w-12">
-                <AvatarImage
-                  src={getChatAvatar(chat) || "/placeholder.svg"}
-                  alt={getChatName(chat)}
-                />
-                <AvatarFallback>
-                  {getInitials(getChatName(chat))}
-                </AvatarFallback>
-              </Avatar>
+          {isLoading
+            ? [...Array(5)].map((_, i) => (
+                <Skeleton key={i} className="h-12 w-full rounded-lg"></Skeleton>
+              ))
+            : filteredChats.map((chat) => (
+                <motion.button
+                  key={chat._id}
+                  variants={itemVariants}
+                  initial="hidden"
+                  animate="visible"
+                  exit="exit"
+                  transition={{ duration: 0.2, ease: "easeOut" }}
+                  layout
+                  whileTap={{ scale: 0.97 }}
+                  onClick={() => onSelectChat(chat._id)}
+                  className={cn(
+                    "flex w-full items-center gap-3 rounded-lg p-3 text-left transition-colors hover:bg-accent",
+                    selectedChatId === chat._id && "bg-accent"
+                  )}
+                >
+                  <Avatar className="h-12 w-12">
+                    <AvatarImage
+                      src={getChatAvatar(chat) || "/placeholder.svg"}
+                      alt={getChatName(chat)}
+                    />
+                    <AvatarFallback>
+                      {getInitials(getChatName(chat))}
+                    </AvatarFallback>
+                  </Avatar>
 
-              <div className="flex-1 overflow-hidden">
-                <div className="flex items-center justify-between gap-2">
-                  <h3 className="truncate font-semibold">
-                    {getChatName(chat)}
-                  </h3>
-                  <span className="text-xs text-muted-foreground">
-                    {formatTime(chat.lastMessageAt)}
-                  </span>
-                </div>
+                  <div className="flex-1 overflow-hidden">
+                    <div className="flex items-center justify-between gap-2">
+                      <h3 className="truncate font-semibold">
+                        {getChatName(chat)}
+                      </h3>
+                      <span className="text-xs text-muted-foreground">
+                        {formatTime(chat.lastMessageAt)}
+                      </span>
+                    </div>
 
-                <div className="flex items-center justify-between gap-2">
-                  <p className="truncate text-sm text-muted-foreground">
-                    {chat.lastMessagePreview || "No messages yet"}
-                  </p>
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="truncate text-sm text-muted-foreground">
+                        {chat.lastMessagePreview || "No messages yet"}
+                      </p>
 
-                  <AnimatePresence>
-                    {chat.unreadCount && chat.unreadCount > 0 ? (
-                      <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        exit={{ scale: 0 }}
-                        transition={{ type: "spring", stiffness: 300 }}
-                      >
-                        <Badge className="h-5 min-w-5 rounded-full px-1.5 text-xs">
-                          {chat.unreadCount > 99 ? "99+" : chat.unreadCount}
-                        </Badge>
-                      </motion.div>
-                    ) : null}
-                  </AnimatePresence>
-                </div>
-              </div>
-            </motion.button>
-          ))}
+                      <AnimatePresence>
+                        {chat.unreadCount && chat.unreadCount > 0 ? (
+                          <motion.div
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            exit={{ scale: 0 }}
+                            transition={{ type: "spring", stiffness: 300 }}
+                          >
+                            <Badge className="h-5 min-w-5 rounded-full px-1.5 text-xs">
+                              {chat.unreadCount > 99 ? "99+" : chat.unreadCount}
+                            </Badge>
+                          </motion.div>
+                        ) : null}
+                      </AnimatePresence>
+                    </div>
+                  </div>
+                </motion.button>
+              ))}
         </AnimatePresence>
 
         <div className="flex justify-center" ref={ref}>
