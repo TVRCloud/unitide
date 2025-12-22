@@ -32,6 +32,30 @@ import { Badge } from "@/components/ui/badge";
 import TaskPriorityChart from "./TaskPriorityChart";
 import TaskStatusChart from "./TaskStatusChart";
 
+const upcomingDeadlines = [
+  {
+    task: "Implement user authentication",
+    project: "E-commerce Platform",
+    dueDate: "2024-12-05",
+    assignee: "SC",
+    priority: "urgent",
+  },
+  {
+    task: "Design review for homepage",
+    project: "Mobile App Redesign",
+    dueDate: "2024-12-06",
+    assignee: "MJ",
+    priority: "high",
+  },
+  {
+    task: "Database optimization",
+    project: "Data Analytics Dashboard",
+    dueDate: "2024-12-07",
+    assignee: "ED",
+    priority: "high",
+  },
+];
+
 const TasksAdmin = () => {
   const router = useRouter();
   const { data, isLoading } = useViewTaskStats();
@@ -200,11 +224,13 @@ const TasksAdmin = () => {
           </CardHeader>
 
           <CardContent>
-            {data.upcomingDeadlines.length === 0 ? (
+            {/* {data.upcomingDeadlines.length === 0 ? ( */}
+            {upcomingDeadlines.length === 0 ? (
               <p className="text-sm text-muted-foreground">No upcoming tasks</p>
             ) : (
               <div className="space-y-4">
-                {data.upcomingDeadlines.map((item: any, index: number) => (
+                {/* {data.upcomingDeadlines.map((item: any, index: number) => ( */}
+                {upcomingDeadlines.map((item: any, index: number) => (
                   <div
                     key={index}
                     className="flex items-center justify-between p-3 rounded-lg border"
@@ -222,7 +248,16 @@ const TasksAdmin = () => {
                     </div>
 
                     <div className="flex items-center gap-3">
-                      <Badge variant="outline">{item.priority}</Badge>
+                      <Badge
+                        variant="outline"
+                        className={
+                          item.priority === "urgent"
+                            ? "border-red-500 text-red-500"
+                            : "border-orange-500 text-orange-500"
+                        }
+                      >
+                        {item.priority}
+                      </Badge>
                       <span className="text-sm text-muted-foreground">
                         {item.dueDate}
                       </span>
