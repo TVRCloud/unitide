@@ -7,7 +7,7 @@ import { NextResponse } from "next/server";
 export async function GET() {
   try {
     await connectDB();
-    const { user, errorResponse } = await authenticateUser(["admin"]);
+    const { user, errorResponse } = await authenticateUser();
     if (errorResponse) return errorResponse;
 
     const userId = new mongoose.Types.ObjectId(user.id);
