@@ -3,7 +3,6 @@ import { useAuth } from "@/hooks/useUser";
 import { useEffect } from "react";
 import { ScrollArea } from "../ui/scroll-area";
 import { cn } from "@/lib/utils";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Badge } from "../ui/badge";
 import { useInfiniteChats } from "@/hooks/useChats";
 import { useInView } from "react-intersection-observer";
@@ -61,15 +60,6 @@ const ChatList = ({ selectedChatId, onSelectChat }: ChatListProps) => {
     if (chat.type === "group") return chat.avatar;
     const otherParticipant = chat.participants.find((p) => p._id !== user?._id);
     return otherParticipant?.avatar;
-  }
-
-  function getInitials(name: string): string {
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
   }
 
   function formatTime(date?: string): string {
