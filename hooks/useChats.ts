@@ -44,10 +44,14 @@ export const useGetChatById = (id: string) => {
   });
 };
 
-export const useGetMessagesByChatId = (id: string) => {
-  return useQuery({
+export const useInfiniteMessagesByChatId = (id: string, search: string) => {
+  return useInfiniteQuery({
     queryKey: ["messages", id],
-    queryFn: () => fetchChatMessages(id),
+    queryFn: ({ pageParam = 0 }) =>
+      fetchChatMessages({ id, skip: pageParam, search }),
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, allPages) =>
+      lastPage.length < 20 ? undefined : allPages.length * 20,
   });
 };
 
