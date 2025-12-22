@@ -37,7 +37,7 @@ const MessageBubble = ({ message, isOwn, chatType }: Props) => {
 
   return (
     <div className={cn("flex gap-2", isOwn ? "flex-row-reverse" : "flex-row")}>
-      {!isOwn && (
+      {!isOwn && chatType === "group" && (
         <SignedAvatar
           src={message.senderId.avatar}
           name={message.senderId.name}
@@ -50,7 +50,7 @@ const MessageBubble = ({ message, isOwn, chatType }: Props) => {
           isOwn ? "items-end" : "items-start"
         )}
       >
-        {!isOwn && (
+        {!isOwn && chatType === "group" && (
           <span className="text-xs font-semibold text-foreground">
             {message.senderId.name}
           </span>
