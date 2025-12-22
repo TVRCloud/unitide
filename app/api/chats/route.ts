@@ -1,143 +1,211 @@
-import { NextResponse } from "next/server";
-import connectDB from "@/lib/mongodb";
-import { Chat } from "@/models/chat";
 import { authenticateUser } from "@/lib/authenticateUser";
-import { Types } from "mongoose";
+import connectDB from "@/lib/mongodb";
+import chats from "@/models/chats";
+import mongoose from "mongoose";
+import { NextResponse } from "next/server";
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     await connectDB();
-    const { user: decoded, errorResponse } = await authenticateUser();
+
+    const { user, errorResponse } = await authenticateUser();
     if (errorResponse) return errorResponse;
 
-    const chats = await Chat.aggregate([
+    const { searchParams } = new URL(request.url);
+
+    const skip = Number(searchParams.get("skip") ?? 0);
+    const limit = Number(searchParams.get("limit") ?? 20);
+    const search = searchParams.get("search")?.trim() ?? "";
+
+    const userId = new mongoose.Types.ObjectId(user.id);
+
+    const pipeline: mongoose.PipelineStage[] = [
+      // 1️⃣ Only chats where user is a participant
       {
-        $match: { members: new Types.ObjectId(decoded.id) },
+        $match: {
+          participants: userId,
+        },
       },
+
+      // 2️⃣ Fetch participant details
       {
         $lookup: {
           from: "users",
-          localField: "members",
+          localField: "participants",
           foreignField: "_id",
-          as: "members",
+          as: "participantDetails",
+          pipeline: [
+            {
+              $project: {
+                name: 1,
+                email: 1,
+                avatar: 1,
+                isOnline: 1,
+                lastSeen: 1,
+              },
+            },
+          ],
         },
       },
+
+      // 3️⃣ Search by participant name
+      ...(search
+        ? [
+            {
+              $match: {
+                "participantDetails.name": {
+                  $regex: search,
+                  $options: "i",
+                },
+              },
+            },
+          ]
+        : []),
+
+      // 4️⃣ Last message lookup
       {
         $lookup: {
-          from: "users",
-          localField: "admins",
+          from: "messages",
+          localField: "lastMessage",
           foreignField: "_id",
-          as: "admins",
+          as: "lastMessageDetails",
         },
       },
+
+      // 5️⃣ Unread message count
+      {
+        $lookup: {
+          from: "messages",
+          let: { chatId: "$_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ["$chatId", "$$chatId"] },
+                    { $ne: ["$senderId", userId] },
+                    {
+                      $not: {
+                        $in: [userId, { $ifNull: ["$deletedFor", []] }],
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+            { $count: "count" },
+          ],
+          as: "unreadMessages",
+        },
+      },
+
+      // 6️⃣ Computed fields
+      {
+        $addFields: {
+          participants: "$participantDetails",
+          lastMessage: { $arrayElemAt: ["$lastMessageDetails", 0] },
+          unreadCount: {
+            $ifNull: [{ $arrayElemAt: ["$unreadMessages.count", 0] }, 0],
+          },
+          lastMessagePreview: {
+            $switch: {
+              branches: [
+                {
+                  case: {
+                    $eq: [
+                      { $arrayElemAt: ["$lastMessageDetails.type", 0] },
+                      "text",
+                    ],
+                  },
+                  then: { $arrayElemAt: ["$lastMessageDetails.content", 0] },
+                },
+                {
+                  case: {
+                    $eq: [
+                      { $arrayElemAt: ["$lastMessageDetails.type", 0] },
+                      "image",
+                    ],
+                  },
+                  then: "📷 Image",
+                },
+                {
+                  case: {
+                    $eq: [
+                      { $arrayElemAt: ["$lastMessageDetails.type", 0] },
+                      "video",
+                    ],
+                  },
+                  then: "🎥 Video",
+                },
+                {
+                  case: {
+                    $eq: [
+                      { $arrayElemAt: ["$lastMessageDetails.type", 0] },
+                      "audio",
+                    ],
+                  },
+                  then: "🎤 Audio",
+                },
+                {
+                  case: {
+                    $eq: [
+                      { $arrayElemAt: ["$lastMessageDetails.type", 0] },
+                      "file",
+                    ],
+                  },
+                  then: "📎 File",
+                },
+              ],
+              default: "",
+            },
+          },
+          isArchived: {
+            $ifNull: [
+              {
+                $getField: {
+                  field: { $toString: userId },
+                  input: "$isArchived",
+                },
+              },
+              false,
+            ],
+          },
+          isMuted: {
+            $ifNull: [
+              {
+                $getField: {
+                  field: { $toString: userId },
+                  input: "$isMuted",
+                },
+              },
+              false,
+            ],
+          },
+        },
+      },
+
+      // 7️⃣ Cleanup
       {
         $project: {
-          title: 1,
-          type: 1,
-          avatar: 1,
-          isPinned: 1,
-          isArchived: 1,
-          createdAt: 1,
-          updatedAt: 1,
-          members: {
-            $map: {
-              input: "$members",
-              as: "member",
-              in: {
-                _id: "$$member._id",
-                name: "$$member.name",
-                avatar: "$$member.avatar",
-                email: "$$member.email",
-                status: "$$member.status",
-              },
-            },
-          },
-          admins: {
-            $map: {
-              input: "$admins",
-              as: "admin",
-              in: {
-                _id: "$$admin._id",
-                name: "$$admin.name",
-                avatar: "$$admin.avatar",
-              },
-            },
-          },
+          participantDetails: 0,
+          lastMessageDetails: 0,
+          unreadMessages: 0,
         },
       },
-      { $sort: { updatedAt: -1 } },
-    ]);
 
-    return NextResponse.json(chats, { status: 200 });
+      // 8️⃣ Sort + pagination
+      { $sort: { lastMessageAt: -1 } },
+      { $skip: skip },
+      { $limit: limit },
+    ];
+
+    const data = await chats.aggregate(pipeline);
+
+    return NextResponse.json(data, { status: 200 });
   } catch (error) {
-    console.error("GET /api/chats error:", error);
+    console.error("[Chats GET] Error:", error);
     return NextResponse.json(
-      { error: "Failed to fetch chats" },
-      { status: 500 }
-    );
-  }
-}
-
-export async function POST(req: Request) {
-  try {
-    await connectDB();
-    const { user: decoded, errorResponse } = await authenticateUser();
-    if (errorResponse) return errorResponse;
-
-    const { title, type, members, avatar } = await req.json();
-
-    const chat = new Chat({
-      title,
-      type,
-      members: [...members, decoded.id],
-      admins: [decoded.id],
-      avatar,
-    });
-
-    await chat.save();
-
-    const populatedChat = await Chat.aggregate([
-      { $match: { _id: chat._id } },
-      {
-        $lookup: {
-          from: "users",
-          localField: "members",
-          foreignField: "_id",
-          as: "members",
-        },
-      },
-      {
-        $project: {
-          title: 1,
-          type: 1,
-          avatar: 1,
-          isPinned: 1,
-          isArchived: 1,
-          createdAt: 1,
-          updatedAt: 1,
-          members: {
-            $map: {
-              input: "$members",
-              as: "member",
-              in: {
-                _id: "$$member._id",
-                name: "$$member.name",
-                avatar: "$$member.avatar",
-                email: "$$member.email",
-                status: "$$member.status",
-              },
-            },
-          },
-          admins: 1,
-        },
-      },
-    ]);
-
-    return NextResponse.json(populatedChat[0], { status: 201 });
-  } catch (error) {
-    console.error("POST /api/chats error:", error);
-    return NextResponse.json(
-      { error: "Failed to create chat" },
+      { success: false, error: "Internal server error" },
       { status: 500 }
     );
   }

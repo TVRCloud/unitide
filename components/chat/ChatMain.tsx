@@ -1,49 +1,68 @@
 "use client";
-import { Plus } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
-import { useState } from "react";
-import { ChatHeader } from "./ChatHeader";
-import { MessageList } from "./MessageList";
-import { MessageInput } from "./MessageInput";
-import { ChatList } from "./ChatList";
+import { MessageSquarePlus } from "lucide-react";
+import ChatList from "./ChatList";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const ChatMain = () => {
-  const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const selectedChatId = searchParams.get("chatId");
+
+  const handleSelectChat = (chatId: string) => {
+    router.push(`?chatId=${chatId}`, { scroll: false });
+  };
+
+  // const handleClearChat = () => {
+  //   router.push("", { scroll: false });
+  // };
 
   return (
-    <div className="flex h-screen bg-background">
+    <div className="flex h-[calc(100vh-144px)]">
       {/* Sidebar */}
-      <div className="w-64 border-r border-border bg-sidebar flex flex-col">
-        <div className="flex items-center justify-between p-4 border-b border-sidebar-border">
-          <h1 className="font-bold text-lg text-sidebar-foreground">Chats</h1>
-          <Button size="icon" variant="ghost" className="h-8 w-8">
-            <Plus className="h-5 w-5" />
+      <div
+        className={cn(
+          "w-full border-r bg-background md:w-96",
+          selectedChatId && "hidden md:block"
+        )}
+      >
+        <div className="flex h-16 items-center justify-between border-b px-4">
+          <h1 className="text-xl font-bold">Chats</h1>
+          <Button variant="ghost" size="icon">
+            <MessageSquarePlus className="h-5 w-5" />
           </Button>
         </div>
+
         <ChatList
           selectedChatId={selectedChatId}
-          onSelectChat={setSelectedChatId}
+          onSelectChat={handleSelectChat}
         />
       </div>
 
       {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col bg-background">
-        {selectedChatId ? (
-          <>
-            <ChatHeader chatId={selectedChatId} />
-            <MessageList chatId={selectedChatId} />
-            <MessageInput chatId={selectedChatId} />
-          </>
+      <div
+        className={cn(
+          "flex-1 bg-muted/30",
+          !selectedChatId && "hidden md:flex"
+        )}
+      >
+        {/* {selectedChatId ? (
+          <ChatWindow
+            chatId={selectedChatId}
+            onBack={handleClearChat}
+          />
         ) : (
-          <div className="flex-1 flex items-center justify-center text-muted-foreground">
+          <div className="flex h-full items-center justify-center">
             <div className="text-center">
-              <p className="text-lg font-medium mb-2">No chat selected</p>
-              <p className="text-sm">
-                Select a chat to start messaging or create a new one
+              <h2 className="text-2xl font-bold">Welcome to Chat</h2>
+              <p className="text-muted-foreground">
+                Select a chat to start messaging
               </p>
             </div>
           </div>
-        )}
+        )} */}
       </div>
     </div>
   );

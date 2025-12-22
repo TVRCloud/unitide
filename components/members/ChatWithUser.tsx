@@ -1,8 +1,8 @@
 import { MessageSquarePlus } from "lucide-react";
 import { DropdownMenuItem } from "../ui/dropdown-menu";
-import { toast } from "sonner";
-import { useRouter } from "next/navigation";
 import { useCreateChat } from "@/hooks/useChats";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 type Props = {
   userId: string;
@@ -10,20 +10,17 @@ type Props = {
 };
 
 const ChatWithUser = ({ userId, userName }: Props) => {
-  const createChat = useCreateChat();
   const router = useRouter();
+  const createChat = useCreateChat();
 
   const onChatClick = () => {
     createChat.mutate(
+      { participantId: userId },
       {
-        title: userName,
-        type: "DIRECT",
-        members: [userId],
-      },
-      {
-        onSuccess: () => {
-          router.push(`/chat?chatId=${userId}`);
-          toast.success("User created successfully");
+        onSuccess: (res) => {
+          const chatId = res.data.data._id;
+          toast.success("Chat with " + userName + " created successfully");
+          router.push(`/chat?chatId=${chatId}`);
         },
         onError: () => {
           toast.error("Something went wrong");
