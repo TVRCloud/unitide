@@ -3,6 +3,7 @@ import {
   fetchChatDetails,
   fetchChatMessages,
   fetchChats,
+  sendMessage,
 } from "@/lib/api-client";
 import {
   useInfiniteQuery,
@@ -47,5 +48,17 @@ export const useGetMessagesByChatId = (id: string) => {
   return useQuery({
     queryKey: ["messages", id],
     queryFn: () => fetchChatMessages(id),
+  });
+};
+
+export const useSendMessage = (chatId: string) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: { content: string; type: string }) =>
+      sendMessage(chatId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["messages", chatId] });
+    },
   });
 };
