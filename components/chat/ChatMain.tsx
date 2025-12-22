@@ -3,12 +3,21 @@ import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
 import { MessageSquarePlus } from "lucide-react";
 import ChatList from "./ChatList";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const ChatMain = () => {
-  const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
-  // usePresence();
+  const selectedChatId = searchParams.get("chatId");
+
+  const handleSelectChat = (chatId: string) => {
+    router.push(`?chatId=${chatId}`, { scroll: false });
+  };
+
+  // const handleClearChat = () => {
+  //   router.push("", { scroll: false });
+  // };
 
   return (
     <div className="flex h-[calc(100vh-144px)]">
@@ -28,7 +37,7 @@ const ChatMain = () => {
 
         <ChatList
           selectedChatId={selectedChatId}
-          onSelectChat={setSelectedChatId}
+          onSelectChat={handleSelectChat}
         />
       </div>
 
@@ -42,7 +51,7 @@ const ChatMain = () => {
         {/* {selectedChatId ? (
           <ChatWindow
             chatId={selectedChatId}
-            onBack={() => setSelectedChatId(null)}
+            onBack={handleClearChat}
           />
         ) : (
           <div className="flex h-full items-center justify-center">
