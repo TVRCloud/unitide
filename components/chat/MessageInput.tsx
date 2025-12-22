@@ -6,12 +6,15 @@ import { Paperclip, Send, Smile } from "lucide-react";
 import { Textarea } from "../ui/textarea";
 import { sendMessageSchema, TSendMessageInput } from "@/schemas/chats";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useSendMessage } from "@/hooks/useChats";
 
 type Props = {
   chatId: string;
 };
 
 const MessageInput = ({ chatId }: Props) => {
+  const sendMessage = useSendMessage(chatId);
+
   const form = useForm<TSendMessageInput>({
     resolver: zodResolver(sendMessageSchema),
     defaultValues: {
@@ -20,7 +23,9 @@ const MessageInput = ({ chatId }: Props) => {
     },
   });
 
-  const onSubmit = (data: any) => console.log(data);
+  const onSubmit = (data: any) => {
+    sendMessage.mutate(data);
+  };
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="flex gap-1">
