@@ -10,6 +10,7 @@ import { useInView } from "react-intersection-observer";
 import { DateTime } from "luxon";
 import { motion, AnimatePresence } from "framer-motion";
 import { Skeleton } from "../ui/skeleton";
+import { SignedAvatar } from "../ui/signed-avatar";
 
 interface Chat {
   _id: string;
@@ -110,15 +111,11 @@ const ChatList = ({ selectedChatId, onSelectChat }: ChatListProps) => {
                     selectedChatId === chat._id && "bg-accent"
                   )}
                 >
-                  <Avatar className="h-12 w-12">
-                    <AvatarImage
-                      src={getChatAvatar(chat) || "/placeholder.svg"}
-                      alt={getChatName(chat)}
-                    />
-                    <AvatarFallback>
-                      {getInitials(getChatName(chat))}
-                    </AvatarFallback>
-                  </Avatar>
+                  <SignedAvatar
+                    src={getChatAvatar(chat)}
+                    name={getChatName(chat)}
+                    avatarClassName="h-12 w-12"
+                  />
 
                   <div className="flex-1 overflow-hidden">
                     <div className="flex items-center justify-between gap-2">
