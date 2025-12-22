@@ -22,7 +22,7 @@ export function useAuth() {
   const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ["me"],
     enabled: !user,
-    retry: false,
+    // retry: false,
     queryFn: async () => {
       const res = await apiClient.get("/api/me");
       setUser(res.data);
