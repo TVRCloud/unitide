@@ -297,6 +297,15 @@ export const fetchTaskStats = async () => {
 };
 
 // ---------------------------
+// ----------CHATS------------
+// ---------------------------
+
+export const createPrivateChat = async (data: { participantId: string }) => {
+  const res = await apiClient.post("/api/chats/private", data);
+  return res;
+};
+
+// ---------------------------
 // ----------UTILS------------
 // ---------------------------
 export async function getSignedUrl(path: string) {
