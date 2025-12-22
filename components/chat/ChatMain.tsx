@@ -16,9 +16,9 @@ const ChatMain = () => {
     router.push(`?chatId=${chatId}`, { scroll: false });
   };
 
-  const handleClearChat = () => {
-    router.push("", { scroll: false });
-  };
+  // const handleClearChat = () => {
+  //   router.push("", { scroll: false });
+  // };
 
   return (
     <div className="flex h-[calc(100vh-144px)]">
@@ -50,7 +50,7 @@ const ChatMain = () => {
         )}
       >
         {selectedChatId ? (
-          <ChatWindow chatId={selectedChatId} onBack={handleClearChat} />
+          <ChatWindow chatId={selectedChatId} />
         ) : (
           <div className="flex h-full items-center justify-center">
             <div className="text-center">
