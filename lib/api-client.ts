@@ -325,6 +325,11 @@ export const fetchChatDetails = async (id: string) => {
   const res = await apiClient.get(`/api/chats/${id}`);
   return res.data;
 };
+
+export const fetchChatMessages = async (id: string) => {
+  const res = await apiClient.get(`/api/chats/${id}/messages`);
+  return res.data;
+};
 // ---------------------------
 // ----------UTILS------------
 // ---------------------------
