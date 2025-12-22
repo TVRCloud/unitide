@@ -1,6 +1,7 @@
 import {
   createPrivateChat,
   fetchChatDetails,
+  fetchChatMessages,
   fetchChats,
 } from "@/lib/api-client";
 import {
@@ -39,5 +40,12 @@ export const useGetChatById = (id: string) => {
   return useQuery({
     queryKey: ["chat", id],
     queryFn: () => fetchChatDetails(id),
+  });
+};
+
+export const useGetMessagesByChatId = (id: string) => {
+  return useQuery({
+    queryKey: ["messages", id],
+    queryFn: () => fetchChatMessages(id),
   });
 };
