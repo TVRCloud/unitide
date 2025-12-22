@@ -300,6 +300,23 @@ export const fetchTaskStats = async () => {
 // ----------CHATS------------
 // ---------------------------
 
+export const fetchChats = async ({
+  skip,
+  search,
+}: {
+  skip: number;
+  search: string;
+}) => {
+  const params = new URLSearchParams({
+    skip: String(skip),
+    limit: "20",
+    search,
+  });
+
+  const res = await apiClient.get(`/api/chats?${params.toString()}`);
+  return res.data;
+};
+
 export const createPrivateChat = async (data: { participantId: string }) => {
   const res = await apiClient.post("/api/chats/private", data);
   return res;
