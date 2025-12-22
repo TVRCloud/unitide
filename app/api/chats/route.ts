@@ -4,22 +4,30 @@ import chats from "@/models/chats";
 import mongoose from "mongoose";
 import { NextResponse } from "next/server";
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     await connectDB();
+
     const { user, errorResponse } = await authenticateUser();
     if (errorResponse) return errorResponse;
 
+    const { searchParams } = new URL(request.url);
+
+    const skip = Number(searchParams.get("skip") ?? 0);
+    const limit = Number(searchParams.get("limit") ?? 20);
+    const search = searchParams.get("search")?.trim() ?? "";
+
     const userId = new mongoose.Types.ObjectId(user.id);
 
-    const data = await chats.aggregate([
-      // Match chats where user is a participant
+    const pipeline: mongoose.PipelineStage[] = [
+      // 1️⃣ Only chats where user is a participant
       {
         $match: {
           participants: userId,
         },
       },
-      // Lookup participants details
+
+      // 2️⃣ Fetch participant details
       {
         $lookup: {
           from: "users",
@@ -39,7 +47,22 @@ export async function GET() {
           ],
         },
       },
-      // Lookup last message
+
+      // 3️⃣ Search by participant name
+      ...(search
+        ? [
+            {
+              $match: {
+                "participantDetails.name": {
+                  $regex: search,
+                  $options: "i",
+                },
+              },
+            },
+          ]
+        : []),
+
+      // 4️⃣ Last message lookup
       {
         $lookup: {
           from: "messages",
@@ -48,7 +71,8 @@ export async function GET() {
           as: "lastMessageDetails",
         },
       },
-      // Lookup unread count
+
+      // 5️⃣ Unread message count
       {
         $lookup: {
           from: "messages",
@@ -61,20 +85,21 @@ export async function GET() {
                     { $eq: ["$chatId", "$$chatId"] },
                     { $ne: ["$senderId", userId] },
                     {
-                      $not: { $in: [userId, { $ifNull: ["$deletedFor", []] }] },
+                      $not: {
+                        $in: [userId, { $ifNull: ["$deletedFor", []] }],
+                      },
                     },
                   ],
                 },
               },
             },
-            {
-              $count: "count",
-            },
+            { $count: "count" },
           ],
           as: "unreadMessages",
         },
       },
-      // Add computed fields
+
+      // 6️⃣ Computed fields
       {
         $addFields: {
           participants: "$participantDetails",
@@ -148,14 +173,18 @@ export async function GET() {
           isMuted: {
             $ifNull: [
               {
-                $getField: { field: { $toString: userId }, input: "$isMuted" },
+                $getField: {
+                  field: { $toString: userId },
+                  input: "$isMuted",
+                },
               },
               false,
             ],
           },
         },
       },
-      // Remove temporary fields
+
+      // 7️⃣ Cleanup
       {
         $project: {
           participantDetails: 0,
@@ -163,23 +192,20 @@ export async function GET() {
           unreadMessages: 0,
         },
       },
-      // Sort by last message time
-      {
-        $sort: { lastMessageAt: -1 },
-      },
-    ]);
 
-    return NextResponse.json({
-      success: true,
-      data,
-    });
+      // 8️⃣ Sort + pagination
+      { $sort: { lastMessageAt: -1 } },
+      { $skip: skip },
+      { $limit: limit },
+    ];
+
+    const data = await chats.aggregate(pipeline);
+
+    return NextResponse.json(data, { status: 200 });
   } catch (error) {
     console.error("[Chats GET] Error:", error);
     return NextResponse.json(
-      {
-        success: false,
-        error: "Internal server error",
-      },
+      { success: false, error: "Internal server error" },
       { status: 500 }
     );
   }
