@@ -1,9 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { type NextRequest, NextResponse } from "next/server";
 import mongoose from "mongoose";
 import connectDB from "@/lib/mongodb";
 import { authenticateUser } from "@/lib/authenticateUser";
 import chats from "@/models/chats";
 import message from "@/models/message";
+import { sendMessageSchema } from "@/schemas/chats";
+import messageStatus from "@/models/messageStatus";
 
 export async function GET(
   request: NextRequest,
@@ -199,7 +202,7 @@ export async function GET(
       },
     ]);
 
-    const totalCount = result[0]?.metadata[0]?.totalCount || 0;
+    // const totalCount = result[0]?.metadata[0]?.totalCount || 0;
     const messages = result[0]?.messages || [];
 
     return NextResponse.json(messages.reverse(), { status: 200 });
@@ -225,8 +228,82 @@ export async function POST(
 
     const { id } = await params;
     const body = await request.json();
+
+    const validatedData = sendMessageSchema.safeParse(body);
+    if (!validatedData.success) {
+      return NextResponse.json(
+        { error: validatedData.error.flatten() },
+        { status: 400 }
+      );
+    }
+
+    const chatId = id;
+    const userId = user.id;
+    const { content, type, replyTo } = validatedData.data;
+
+    // Verify chat exists and user is a participant
+    const chat = await chats.findOne({
+      _id: chatId,
+      participants: userId,
+    });
+
+    if (!chat) {
+      return NextResponse.json(
+        {
+          error: "Chat not found",
+        },
+        { status: 404 }
+      );
+    }
+
+    // Validate content for text messages
+    if (type === "text" && (!content || content.trim().length === 0)) {
+      return NextResponse.json(
+        {
+          error: "Text messages must have content",
+        },
+        { status: 400 }
+      );
+    }
+
+    // Create message
+    const messageData = await message.create({
+      chatId,
+      senderId: userId,
+      content,
+      type,
+      replyTo,
+    });
+
+    // Create message status for all other participants
+    const otherParticipants = chat.participants.filter(
+      (id: any) => id.toString() !== userId
+    );
+
+    await messageStatus.insertMany(
+      otherParticipants.map((participantId: any) => ({
+        messageId: messageData._id,
+        userId: participantId,
+        status: "sent",
+      }))
+    );
+
+    // Update chat's last message
+    await chats.findByIdAndUpdate(chatId, {
+      lastMessage: messageData._id,
+      lastMessageAt: messageData.createdAt,
+    });
+
+    // Populate message for response
+    const populatedMessage = await message
+      .findById(messageData._id)
+      .populate("senderId", "name email avatar")
+      .populate("replyTo")
+      .lean();
+
+    return NextResponse.json(populatedMessage, { status: 201 });
   } catch (error) {
-    console.error("POST /api/messages/[id] error:", error);
+    console.error("POST /api/chats/[id]/messages error:", error);
     return NextResponse.json(
       {
         error: "Failed to send message",
