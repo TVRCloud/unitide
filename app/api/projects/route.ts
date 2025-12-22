@@ -86,6 +86,7 @@ export async function GET(request: Request) {
           name: 1,
           status: 1,
           priority: 1,
+          color: 1,
           createdAt: 1,
           updatedAt: 1,
           "createdBy.name": 1,
