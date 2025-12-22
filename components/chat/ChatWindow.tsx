@@ -5,7 +5,7 @@ import { SignedAvatar } from "../ui/signed-avatar";
 import { getChatAvatar, getChatName } from "@/utils/chats";
 import { useAuth } from "@/hooks/useUser";
 import { ScrollArea } from "../ui/scroll-area";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import MessageInput from "./MessageInput";
 import MessageBubble from "./MessageBubble";
 import { useInView } from "react-intersection-observer";
@@ -16,7 +16,6 @@ type Props = {
 const ChatWindow = ({ chatId }: Props) => {
   const { user } = useAuth();
   const { ref, inView } = useInView();
-  const scrollRef = useRef<HTMLDivElement>(null);
 
   const { data: chat, isLoading } = useGetChatById(chatId);
   const {
@@ -33,18 +32,7 @@ const ChatWindow = ({ chatId }: Props) => {
     }
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const messages = data?.pages.flatMap((page) => page) || [];
-
-  function scrollToBottom() {
-    if (scrollRef.current) {
-      scrollRef.current.scrollIntoView({ behavior: "smooth" });
-    }
-  }
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
 
   if (isLoading || isLoadingMessages) return <div>Loading...</div>;
 
@@ -99,9 +87,9 @@ const ChatWindow = ({ chatId }: Props) => {
               key={message._id}
               message={message}
               isOwn={message.senderId._id === user?._id}
+              chatType={chat?.type}
             />
           ))}
-          <div ref={scrollRef} />
         </div>
 
         {messages.length === 0 && (
