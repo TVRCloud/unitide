@@ -202,24 +202,34 @@ export async function GET(
     const totalCount = result[0]?.metadata[0]?.totalCount || 0;
     const messages = result[0]?.messages || [];
 
-    return NextResponse.json({
-      data: {
-        messages: messages.reverse(), // Reverse to show oldest first
-        pagination: {
-          page,
-          limit,
-          totalCount,
-          totalPages: Math.ceil(totalCount / limit),
-          hasMore: skip + messages.length < totalCount,
-        },
-      },
-    });
+    return NextResponse.json(messages.reverse(), { status: 200 });
   } catch (error) {
     console.error("GET /api/messages/[id] error:", error);
     return NextResponse.json(
       {
-        success: false,
-        error: "Internal server error",
+        error: "Failed to fetch messages",
+      },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    await connectDB();
+    const { user, errorResponse } = await authenticateUser();
+    if (errorResponse) return errorResponse;
+
+    const { id } = await params;
+    const body = await request.json();
+  } catch (error) {
+    console.error("POST /api/messages/[id] error:", error);
+    return NextResponse.json(
+      {
+        error: "Failed to send message",
       },
       { status: 500 }
     );
