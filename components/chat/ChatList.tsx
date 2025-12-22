@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useAuth } from "@/hooks/useUser";
 import { useEffect } from "react";
 import { ScrollArea } from "../ui/scroll-area";
@@ -10,19 +9,7 @@ import { DateTime } from "luxon";
 import { motion, AnimatePresence } from "framer-motion";
 import { Skeleton } from "../ui/skeleton";
 import { SignedAvatar } from "../ui/signed-avatar";
-
-interface Chat {
-  _id: string;
-  type: "private" | "group";
-  name?: string;
-  avatar?: string;
-  participants: any[];
-  lastMessagePreview?: string;
-  lastMessageAt?: string;
-  unreadCount?: number;
-  isArchived?: boolean;
-  isMuted?: boolean;
-}
+import { getChatAvatar, getChatName } from "@/utils/chats";
 
 interface ChatListProps {
   selectedChatId: string | null;
@@ -49,18 +36,6 @@ const ChatList = ({ selectedChatId, onSelectChat }: ChatListProps) => {
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const filteredChats = data?.pages.flat() || [];
-
-  function getChatName(chat: Chat): string {
-    if (chat.type === "group") return chat.name || "Group Chat";
-    const otherParticipant = chat.participants.find((p) => p._id !== user?._id);
-    return otherParticipant?.name || "Unknown";
-  }
-
-  function getChatAvatar(chat: Chat): string | undefined {
-    if (chat.type === "group") return chat.avatar;
-    const otherParticipant = chat.participants.find((p) => p._id !== user?._id);
-    return otherParticipant?.avatar;
-  }
 
   function formatTime(date?: string): string {
     if (!date) return "";
@@ -102,15 +77,15 @@ const ChatList = ({ selectedChatId, onSelectChat }: ChatListProps) => {
                   )}
                 >
                   <SignedAvatar
-                    src={getChatAvatar(chat)}
-                    name={getChatName(chat)}
+                    src={getChatAvatar(chat, user)}
+                    name={getChatName(chat, user)}
                     avatarClassName="h-12 w-12"
                   />
 
                   <div className="flex-1 overflow-hidden">
                     <div className="flex items-center justify-between gap-2">
                       <h3 className="truncate font-semibold">
-                        {getChatName(chat)}
+                        {getChatName(chat, user)}
                       </h3>
                       <span className="text-xs text-muted-foreground">
                         {formatTime(chat.lastMessageAt)}

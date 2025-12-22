@@ -7,7 +7,6 @@ import { NextResponse } from "next/server";
 export async function GET(request: Request) {
   try {
     await connectDB();
-
     const { user, errorResponse } = await authenticateUser();
     if (errorResponse) return errorResponse;
 
@@ -17,7 +16,7 @@ export async function GET(request: Request) {
     const limit = Number(searchParams.get("limit") ?? 20);
     const search = searchParams.get("search")?.trim() ?? "";
 
-    const userId = new mongoose.Types.ObjectId(user.id);
+    const userId = mongoose.Types.ObjectId.createFromHexString(user.id);
 
     const pipeline: mongoose.PipelineStage[] = [
       // 1️⃣ Only chats where user is a participant

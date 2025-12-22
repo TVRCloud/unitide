@@ -87,3 +87,68 @@ export async function GET(
     );
   }
 }
+
+// export async function DELETE(
+//   request: NextRequest,
+//   { params }: { params: Promise<{ chatId: string }> }
+// ) {
+//   try {
+//     await connectDB();
+//     const { user, errorResponse } = await authenticateUser();
+//     if (errorResponse) return errorResponse;
+
+//     const { chatId } = await params;
+//     const userId = user.id;
+
+//     const chat = await chats.findOne({
+//       _id: chatId,
+//       participants: userId,
+//     });
+
+//     if (!chat) {
+//       return NextResponse.json(
+//         {
+//           success: false,
+//           error: "Chat not found",
+//         },
+//         { status: 404 }
+//       );
+//     }
+
+//     // For group chats, only creator or admin can delete
+//     if (chat.type === "group") {
+//       const isAdmin = chat.admins.some(
+//         (adminId: string) => adminId.toString() === userId
+//       );
+//       if (!isAdmin && chat.createdBy.toString() !== userId) {
+//         return NextResponse.json(
+//           {
+//             success: false,
+//             error: "Only admins can delete group chats",
+//           },
+//           { status: 403 }
+//         );
+//       }
+//     }
+
+//     // Delete all messages in the chat
+//     await Message.deleteMany({ chatId });
+
+//     // Delete the chat
+//     await Chat.findByIdAndDelete(chatId);
+
+//     return NextResponse.json<ApiResponse>({
+//       success: true,
+//       message: "Chat deleted successfully",
+//     });
+//   } catch (error) {
+//     console.error("[Chat DELETE] Error:", error);
+//     return NextResponse.json<ApiResponse>(
+//       {
+//         success: false,
+//         error: "Internal server error",
+//       },
+//       { status: 500 }
+//     );
+//   }
+// }

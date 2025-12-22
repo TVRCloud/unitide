@@ -4,6 +4,7 @@ import { Button } from "../ui/button";
 import { MessageSquarePlus } from "lucide-react";
 import ChatList from "./ChatList";
 import { useRouter, useSearchParams } from "next/navigation";
+import ChatWindow from "./ChatWindow";
 
 const ChatMain = () => {
   const router = useRouter();
@@ -48,11 +49,8 @@ const ChatMain = () => {
           !selectedChatId && "hidden md:flex"
         )}
       >
-        {/* {selectedChatId ? (
-          <ChatWindow
-            chatId={selectedChatId}
-            onBack={handleClearChat}
-          />
+        {selectedChatId ? (
+          <ChatWindow chatId={selectedChatId} />
         ) : (
           <div className="flex h-full items-center justify-center">
             <div className="text-center">
@@ -62,7 +60,7 @@ const ChatMain = () => {
               </p>
             </div>
           </div>
-        )} */}
+        )}
       </div>
     </div>
   );
