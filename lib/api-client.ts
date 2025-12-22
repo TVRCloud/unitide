@@ -299,6 +299,10 @@ export const fetchTaskStats = async () => {
 // ---------------------------
 // ----------CHATS------------
 // ---------------------------
+export const createPrivateChat = async (data: { participantId: string }) => {
+  const res = await apiClient.post("/api/chats/private", data);
+  return res;
+};
 
 export const fetchChats = async ({
   skip,
@@ -317,11 +321,10 @@ export const fetchChats = async ({
   return res.data;
 };
 
-export const createPrivateChat = async (data: { participantId: string }) => {
-  const res = await apiClient.post("/api/chats/private", data);
-  return res;
+export const fetchChatDetails = async (id: string) => {
+  const res = await apiClient.get(`/api/chats/${id}`);
+  return res.data;
 };
-
 // ---------------------------
 // ----------UTILS------------
 // ---------------------------
