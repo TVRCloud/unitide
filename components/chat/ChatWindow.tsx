@@ -1,4 +1,4 @@
-import { useGetChatById, useGetMessagesByChatId } from "@/hooks/useChats";
+import { useGetChatById, useInfiniteMessagesByChatId } from "@/hooks/useChats";
 import { Button } from "../ui/button";
 import { MoreVertical, Phone, Video } from "lucide-react";
 import { SignedAvatar } from "../ui/signed-avatar";
@@ -7,16 +7,34 @@ import { useAuth } from "@/hooks/useUser";
 import { ScrollArea } from "../ui/scroll-area";
 import { useEffect, useRef } from "react";
 import MessageInput from "./MessageInput";
+import MessageBubble from "./MessageBubble";
+import { useInView } from "react-intersection-observer";
 
 type Props = {
   chatId: string;
 };
 const ChatWindow = ({ chatId }: Props) => {
   const { user } = useAuth();
+  const { ref, inView } = useInView();
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const { data: chat, isLoading } = useGetChatById(chatId);
-  const { data: messages } = useGetMessagesByChatId(chatId);
+  const {
+    data,
+    isLoading: isLoadingMessages,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteMessagesByChatId(chatId, "");
+
+  useEffect(() => {
+    if (inView && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const messages = data?.pages.flatMap((page) => page) || [];
 
   function scrollToBottom() {
     if (scrollRef.current) {
@@ -28,7 +46,7 @@ const ChatWindow = ({ chatId }: Props) => {
     scrollToBottom();
   }, [messages]);
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading || isLoadingMessages) return <div>Loading...</div>;
 
   return (
     <div className="flex h-full flex-col">
@@ -66,29 +84,33 @@ const ChatWindow = ({ chatId }: Props) => {
 
       <ScrollArea className="flex-1 p-4 h-[calc(100vh-240px)]">
         <div className="space-y-4">
-          <pre>{JSON.stringify(messages, null, 2)}</pre>
-          {Array.from({ length: 30 }).map((_, index) => (
-            <h1 key={index} className="text-2xl">
-              helloooo
-            </h1>
-          ))}
-          {/* {messages.map((message) => (
+          <div className="flex justify-center" ref={ref}>
+            <span className="p-4 text-center text-muted-foreground text-xs">
+              {isFetchingNextPage
+                ? "Loading more..."
+                : hasNextPage
+                ? "Scroll to load more"
+                : "No more chats"}
+            </span>
+          </div>
+
+          {messages.map((message) => (
             <MessageBubble
               key={message._id}
               message={message}
-              isOwn={message.senderId._id === user?.id}
+              isOwn={message.senderId._id === user?._id}
             />
-          ))} */}
+          ))}
           <div ref={scrollRef} />
         </div>
 
-        {/* {messages.length === 0 && (
+        {messages.length === 0 && (
           <div className="flex h-full items-center justify-center">
             <p className="text-muted-foreground">
               No messages yet. Start the conversation!
             </p>
           </div>
-        )} */}
+        )}
       </ScrollArea>
 
       {/* typing indicator */}
