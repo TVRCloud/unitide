@@ -1,8 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { AnimatePresence, motion } from "framer-motion";
-import { useInfiniteProjects } from "@/hooks/useProjects";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { useInView } from "react-intersection-observer";
 import { HeaderSection } from "../ui/header-section";
 import CreateProject from "./CreateProject";
 import {
@@ -25,39 +23,28 @@ import {
 } from "../ui/table";
 import { Skeleton } from "../ui/skeleton";
 import { Button } from "../ui/button";
+import { Project } from "@/types/project";
 
-type Project = {
-  _id: string;
-  name: string;
-  description?: string;
-  status?: string;
-  teams?: {
-    name: string;
-  }[];
-  createdBy?: {
-    _id: string;
-    name: string;
-    email: string;
-    role: string;
-  };
-  createdAt: string;
+type Props = {
+  searchTerm: string;
+  setSearchTerm: (value: string) => void;
+  isLoading?: boolean;
+  filteredProjects: Project[];
+  isFetchingNextPage: boolean;
+  hasNextPage: boolean;
+  ref: any;
 };
 
-const ProjectUser = () => {
+const ProjectUser = ({
+  searchTerm,
+  setSearchTerm,
+  isLoading,
+  filteredProjects,
+  isFetchingNextPage,
+  hasNextPage,
+  ref,
+}: Props) => {
   const router = useRouter();
-  const [searchTerm, setSearchTerm] = useState("");
-  const { ref, inView } = useInView();
-
-  const { data, fetchNextPage, hasNextPage, isLoading, isFetchingNextPage } =
-    useInfiniteProjects(searchTerm);
-
-  useEffect(() => {
-    if (inView && hasNextPage && !isFetchingNextPage) {
-      fetchNextPage();
-    }
-  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
-
-  const filteredProjects: Project[] = data?.pages.flat() || [];
 
   return (
     <div className="flex flex-col gap-3">
