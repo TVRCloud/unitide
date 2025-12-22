@@ -7,6 +7,7 @@ import { Textarea } from "../ui/textarea";
 import { sendMessageSchema, TSendMessageInput } from "@/schemas/chats";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSendMessage } from "@/hooks/useChats";
+import { toast } from "sonner";
 
 type Props = {
   chatId: string;
@@ -24,7 +25,14 @@ const MessageInput = ({ chatId }: Props) => {
   });
 
   const onSubmit = (data: any) => {
-    sendMessage.mutate(data);
+    sendMessage.mutate(data, {
+      onSuccess: () => {
+        form.reset();
+      },
+      onError: () => {
+        toast.error("Something went wrong");
+      },
+    });
   };
   return (
     <Form {...form}>
