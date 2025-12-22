@@ -31,7 +31,7 @@ export const chatActionSchema = z.object({
   action: z.enum(["archive", "unarchive", "mute", "unmute"]),
 });
 
-export type CreatePrivateChatInput = z.infer<typeof createPrivateChatSchema>;
+export type TCreatePrivateChatInput = z.infer<typeof createPrivateChatSchema>;
 export type CreateGroupChatInput = z.infer<typeof createGroupChatSchema>;
 export type UpdateGroupChatInput = z.infer<typeof updateGroupChatSchema>;
 export type AddParticipantsInput = z.infer<typeof addParticipantsSchema>;
@@ -39,9 +39,8 @@ export type RemoveParticipantInput = z.infer<typeof removeParticipantSchema>;
 export type ChatActionInput = z.infer<typeof chatActionSchema>;
 
 export const sendMessageSchema = z.object({
-  chatId: z.string().min(1, "Chat ID is required"),
   content: z.string().optional(),
-  type: z.enum(["text", "image", "video", "audio", "file"]).default("text"),
+  type: z.enum(["text", "image", "video", "audio", "file"]),
   replyTo: z.string().optional(),
 });
 
@@ -49,5 +48,5 @@ export const markAsReadSchema = z.object({
   messageIds: z.array(z.string()).min(1, "At least one message ID is required"),
 });
 
-export type SendMessageInput = z.infer<typeof sendMessageSchema>;
-export type MarkAsReadInput = z.infer<typeof markAsReadSchema>;
+export type TSendMessageInput = z.infer<typeof sendMessageSchema>;
+export type TMarkAsReadInput = z.infer<typeof markAsReadSchema>;
