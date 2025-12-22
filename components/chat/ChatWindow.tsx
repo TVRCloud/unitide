@@ -5,7 +5,8 @@ import { SignedAvatar } from "../ui/signed-avatar";
 import { getChatAvatar, getChatName } from "@/utils/chats";
 import { useAuth } from "@/hooks/useUser";
 import { ScrollArea } from "../ui/scroll-area";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
+import MessageInput from "./MessageInput";
 
 type Props = {
   chatId: string;
@@ -17,12 +18,22 @@ const ChatWindow = ({ chatId }: Props) => {
   const { data: chat, isLoading } = useGetChatById(chatId);
   const { data: messages } = useGetMessagesByChatId(chatId);
 
+  function scrollToBottom() {
+    if (scrollRef.current) {
+      scrollRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
   if (isLoading) return <div>Loading...</div>;
 
   return (
     <div className="flex h-full flex-col">
       {/* header */}
-      <div className="flex items-center gap-3 border-b bg-background p-4">
+      <div className="flex items-center gap-3 border-b bg-background p-2">
         <SignedAvatar
           src={getChatAvatar(chat, user)}
           name={getChatName(chat, user)}
@@ -53,8 +64,14 @@ const ChatWindow = ({ chatId }: Props) => {
 
       {/* Messages */}
 
-      <ScrollArea className="flex-1 p-4">
+      <ScrollArea className="flex-1 p-4 h-[calc(100vh-240px)]">
         <div className="space-y-4">
+          <pre>{JSON.stringify(messages, null, 2)}</pre>
+          {Array.from({ length: 30 }).map((_, index) => (
+            <h1 key={index} className="text-2xl">
+              helloooo
+            </h1>
+          ))}
           {/* {messages.map((message) => (
             <MessageBubble
               key={message._id}
@@ -73,6 +90,12 @@ const ChatWindow = ({ chatId }: Props) => {
           </div>
         )} */}
       </ScrollArea>
+
+      {/* typing indicator */}
+
+      {/* input */}
+
+      <MessageInput chatId={chatId} />
     </div>
   );
 };
