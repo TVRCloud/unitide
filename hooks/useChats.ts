@@ -1,9 +1,25 @@
-import { createPrivateChat, fetchChats } from "@/lib/api-client";
+import {
+  createPrivateChat,
+  fetchChatDetails,
+  fetchChats,
+} from "@/lib/api-client";
 import {
   useInfiniteQuery,
   useMutation,
+  useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
+
+export const useCreateChat = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: createPrivateChat,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["all-chats"] });
+    },
+  });
+};
 
 export const useInfiniteChats = (search: string) => {
   return useInfiniteQuery({
@@ -19,13 +35,9 @@ export const useInfiniteChats = (search: string) => {
   });
 };
 
-export const useCreateChat = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: createPrivateChat,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["all-chats"] });
-    },
+export const useGetChatById = (id: string) => {
+  return useQuery({
+    queryKey: ["chat", id],
+    queryFn: () => fetchChatDetails(id),
   });
 };
