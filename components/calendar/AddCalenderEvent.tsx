@@ -1,11 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { Plus, Calendar as CalendarIcon } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { format } from "date-fns";
 
 import { eventSchema, TEventFormData } from "@/schemas/events";
 import { useInfiniteUsers } from "@/hooks/useUser";
@@ -32,22 +31,13 @@ import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 import { Button } from "../ui/button";
 
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-
-import { Calendar } from "../ui/calendar";
 import MultiSelect from "../ui/multiselect";
 
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../ui/select";
-
-import { cn } from "@/lib/utils";
+import { DatePicker } from "../ui/date-picker";
+import { TimeField } from "./TimeField";
 
 const AddCalendarEvent = () => {
+  const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const { data, isLoading } = useInfiniteUsers(searchQuery);
 
@@ -63,16 +53,21 @@ const AddCalendarEvent = () => {
       startTime: { hour: 9, minute: 0 },
       endDate: new Date(),
       endTime: { hour: 10, minute: 0 },
-      color: "blue",
     },
   });
 
   const onSubmit = (values: TEventFormData) => {
     console.log(values);
+    setOpen(false);
+    form.reset();
+  };
+
+  const onError = (error: any) => {
+    console.error(error);
   };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button size="sm">
           <Plus className="mr-2 h-4 w-4" />
@@ -89,14 +84,17 @@ const AddCalendarEvent = () => {
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
+          <form
+            onSubmit={form.handleSubmit(onSubmit, onError)}
+            className="grid gap-4"
+          >
             {/* USERS */}
             <FormField
               control={form.control}
               name="users"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Members</FormLabel>
+                  <FormLabel>Assignees</FormLabel>
                   <FormControl>
                     <MultiSelect
                       value={field.value}
@@ -107,9 +105,9 @@ const AddCalendarEvent = () => {
                       }))}
                       isLoading={isLoading}
                       onSearchChange={setSearchQuery}
-                      placeholder="Select members..."
-                      searchPlaceholder="Search members..."
-                      emptyText="No members found"
+                      placeholder="Select assignees..."
+                      searchPlaceholder="Search assignees..."
+                      emptyText="No users found"
                     />
                   </FormControl>
                   <FormMessage />
@@ -134,11 +132,24 @@ const AddCalendarEvent = () => {
 
             {/* START */}
             <div className="grid grid-cols-2 gap-2">
-              <DatePickerField
+              <FormField
                 control={form.control}
                 name="startDate"
-                label="Start Date"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Start Date</FormLabel>
+                    <FormControl>
+                      <DatePicker
+                        value={field.value}
+                        onChange={field.onChange}
+                        placeholder="Pick start date"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
+
               <TimeField
                 control={form.control}
                 name="startTime"
@@ -148,65 +159,30 @@ const AddCalendarEvent = () => {
 
             {/* END */}
             <div className="grid grid-cols-2 gap-2">
-              <DatePickerField
+              <FormField
                 control={form.control}
                 name="endDate"
-                label="End Date"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>End Date</FormLabel>
+                    <FormControl>
+                      <DatePicker
+                        value={field.value}
+                        onChange={field.onChange}
+                        placeholder="Pick end date"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
+
               <TimeField
                 control={form.control}
                 name="endTime"
                 label="End Time"
               />
             </div>
-
-            {/* COLOR */}
-            <FormField
-              control={form.control}
-              name="color"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Color</FormLabel>
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select color" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {[
-                        "blue",
-                        "green",
-                        "red",
-                        "yellow",
-                        "purple",
-                        "orange",
-                        "gray",
-                      ].map((c) => (
-                        <SelectItem key={c} value={c}>
-                          <div className="flex items-center gap-2">
-                            <div
-                              className={cn(
-                                "h-3.5 w-3.5 rounded-full",
-                                c === "blue" && "bg-blue-600",
-                                c === "green" && "bg-green-600",
-                                c === "red" && "bg-red-600",
-                                c === "yellow" && "bg-yellow-600",
-                                c === "purple" && "bg-purple-600",
-                                c === "orange" && "bg-orange-600",
-                                c === "gray" && "bg-neutral-600"
-                              )}
-                            />
-                            {c}
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
 
             {/* DESCRIPTION */}
             <FormField
@@ -232,94 +208,3 @@ const AddCalendarEvent = () => {
 };
 
 export default AddCalendarEvent;
-
-import { Control } from "react-hook-form";
-
-const DatePickerField = ({
-  control,
-  name,
-  label,
-}: {
-  control: Control<any>;
-  name: "startDate" | "endDate";
-  label: string;
-}) => (
-  <FormField
-    control={control}
-    name={name}
-    render={({ field }) => (
-      <FormItem>
-        <FormLabel>{label}</FormLabel>
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              className="w-full justify-start text-left"
-            >
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              {field.value ? format(field.value, "PPP") : "Pick a date"}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
-            <Calendar
-              mode="single"
-              selected={field.value}
-              onSelect={field.onChange}
-              initialFocus
-            />
-          </PopoverContent>
-        </Popover>
-        <FormMessage />
-      </FormItem>
-    )}
-  />
-);
-
-const TimeField = ({
-  control,
-  name,
-  label,
-}: {
-  control: Control<any>;
-  name: "startTime" | "endTime";
-  label: string;
-}) => (
-  <FormField
-    control={control}
-    name={name}
-    render={({ field }) => (
-      <FormItem>
-        <FormLabel>{label}</FormLabel>
-        <div className="flex gap-2">
-          <Input
-            type="number"
-            min={0}
-            max={23}
-            value={field.value.hour}
-            onChange={(e) =>
-              field.onChange({
-                ...field.value,
-                hour: Number(e.target.value),
-              })
-            }
-            placeholder="HH"
-          />
-          <Input
-            type="number"
-            min={0}
-            max={59}
-            value={field.value.minute}
-            onChange={(e) =>
-              field.onChange({
-                ...field.value,
-                minute: Number(e.target.value),
-              })
-            }
-            placeholder="MM"
-          />
-        </div>
-        <FormMessage />
-      </FormItem>
-    )}
-  />
-);
