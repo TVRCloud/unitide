@@ -16,6 +16,7 @@ const EventSchema = new Schema(
     title: { type: String, required: true },
     description: { type: String, required: true },
 
+    tasks: { type: Schema.Types.ObjectId, ref: "Task" },
     startDate: { type: Date, required: true },
     startTime: {
       hour: { type: Number, required: true, min: 0, max: 23 },
