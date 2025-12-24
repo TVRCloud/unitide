@@ -17,13 +17,13 @@ const EventSchema = new Schema(
     description: { type: String, required: true },
 
     tasks: { type: Schema.Types.ObjectId, ref: "Task" },
-    startDate: { type: Date, required: true },
+    startDate: { type: String, required: true },
     startTime: {
       hour: { type: Number, required: true, min: 0, max: 23 },
       minute: { type: Number, required: true, min: 0, max: 59 },
     },
 
-    endDate: { type: Date, required: true },
+    endDate: { type: String, required: true },
     endTime: {
       hour: { type: Number, required: true, min: 0, max: 23 },
       minute: { type: Number, required: true, min: 0, max: 59 },
