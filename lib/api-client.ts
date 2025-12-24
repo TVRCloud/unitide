@@ -358,6 +358,39 @@ export const sendMessage = async (
   return res.data;
 };
 // ---------------------------
+// ----------EVENTS-----------
+// ---------------------------
+export const fetchEvents = async ({
+  skip,
+  search,
+  userId,
+  date,
+}: {
+  skip: number;
+  search: string;
+  userId?: string;
+  date?: string;
+}) => {
+  const params = new URLSearchParams({
+    skip: String(skip),
+    limit: "20",
+    search,
+  });
+
+  if (userId) params.set("userId", userId);
+  if (date) params.set("date", date);
+
+  const res = await apiClient.get(`/api/events?${params.toString()}`);
+  return res.data;
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const createEvent = async (data: any) => {
+  const res = await apiClient.post(`/api/events`, data);
+  return res.data;
+};
+
+// ---------------------------
 // ----------UTILS------------
 // ---------------------------
 export async function getSignedUrl(path: string) {
