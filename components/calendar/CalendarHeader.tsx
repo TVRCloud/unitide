@@ -5,14 +5,7 @@ import TodayButton from "./TodayButton";
 import DateNavigator from "./DateNavigator";
 import { TCalendarView } from "@/types/calender";
 import { Button } from "../ui/button";
-import {
-  CalendarRange,
-  Columns,
-  Grid2x2,
-  Grid3x3,
-  List,
-  Plus,
-} from "lucide-react";
+import { CalendarRange, Columns, Grid2x2, Grid3x3, List } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
