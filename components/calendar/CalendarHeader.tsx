@@ -29,7 +29,7 @@ const CalendarHeader = ({ view, setView }: Props) => {
       >
         <div className="flex items-center gap-3">
           <TodayButton />
-          {/* <DateNavigator view={view} events={events} /> */}
+          <DateNavigator view={view} />
         </div>
 
         <div className="flex flex-col items-center gap-1.5 sm:flex-row sm:justify-between">
