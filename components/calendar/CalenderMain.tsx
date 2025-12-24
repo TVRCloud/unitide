@@ -1,11 +1,15 @@
 "use client";
-import { HeaderSection } from "../ui/header-section";
 import { motion } from "framer-motion";
+import CalendarHeader from "./CalendarHeader";
+import { useState } from "react";
+import { TCalendarView } from "@/types/calender";
 
 const CalenderMain = () => {
+  const [view, setView] = useState<TCalendarView>("month");
+
   return (
     <div className="flex flex-col gap-3">
-      <HeaderSection title="Calendar" />
+      <CalendarHeader view={view} setView={setView} />
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
