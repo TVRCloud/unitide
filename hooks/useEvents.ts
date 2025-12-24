@@ -1,5 +1,12 @@
-import { createEvent } from "@/lib/api-client";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { createEvent, fetchEvents } from "@/lib/api-client";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
+// export const useGetEvents = () => {
+//   return useQuery({
+//     queryKey: ["events"],
+//     queryFn: () => fetchEvents({ skip: 0, search: "" }),
+//   });
+// };
 
 export const useCreateEvent = () => {
   const queryClient = useQueryClient();
