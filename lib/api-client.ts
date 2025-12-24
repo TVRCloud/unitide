@@ -358,6 +358,15 @@ export const sendMessage = async (
   return res.data;
 };
 // ---------------------------
+// ----------EVENTS-----------
+// ---------------------------
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const createEvent = async (data: any) => {
+  const res = await apiClient.post(`/api/events`, data);
+  return res.data;
+};
+
+// ---------------------------
 // ----------UTILS------------
 // ---------------------------
 export async function getSignedUrl(path: string) {
