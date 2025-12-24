@@ -20,16 +20,6 @@ export const eventSchema = z
       hour: z.number().int().min(0).max(23),
       minute: z.number().int().min(0).max(59),
     }),
-
-    color: z.enum([
-      "blue",
-      "green",
-      "red",
-      "yellow",
-      "purple",
-      "orange",
-      "gray",
-    ]),
   })
   .superRefine((data, ctx) => {
     const startDateTime = new Date(data.startDate);
