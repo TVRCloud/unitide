@@ -5,16 +5,17 @@ export const eventSchema = z
     users: z
       .array(z.string())
       .min(1, { message: "At least one user is required" }),
+
     title: z.string().min(1, { message: "Title is required" }),
     description: z.string().min(1, { message: "Description is required" }),
 
-    startDate: z.coerce.date(),
+    startDate: z.date(),
     startTime: z.object({
       hour: z.number().int().min(0).max(23),
       minute: z.number().int().min(0).max(59),
     }),
 
-    endDate: z.coerce.date(),
+    endDate: z.date(),
     endTime: z.object({
       hour: z.number().int().min(0).max(23),
       minute: z.number().int().min(0).max(59),
@@ -40,8 +41,8 @@ export const eventSchema = z
     if (startDateTime >= endDateTime) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "Start date cannot be after end date",
-        path: ["startDate"],
+        message: "Start time must be before end time",
+        path: ["endTime"],
       });
     }
   });
