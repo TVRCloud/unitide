@@ -5,10 +5,8 @@ import { Plus } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-
 import { eventSchema, TEventFormData } from "@/schemas/events";
 import { useInfiniteUsers } from "@/hooks/useUser";
-
 import {
   Dialog,
   DialogContent,
@@ -17,7 +15,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
-
 import {
   Form,
   FormControl,
@@ -26,13 +23,10 @@ import {
   FormLabel,
   FormMessage,
 } from "../ui/form";
-
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 import { Button } from "../ui/button";
-
 import MultiSelect from "../ui/multiselect";
-
 import { DatePicker } from "../ui/date-picker";
 import { TimeField } from "./TimeField";
 
