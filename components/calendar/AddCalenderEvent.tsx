@@ -29,13 +29,17 @@ import { Button } from "../ui/button";
 import MultiSelect from "../ui/multiselect";
 import { DatePicker } from "../ui/date-picker";
 import { TimeField } from "./TimeField";
+import { useCreateEvent } from "@/hooks/useEvents";
+import { toast } from "sonner";
 
 const AddCalendarEvent = () => {
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const { data, isLoading } = useInfiniteUsers(searchQuery);
 
+  const { data, isLoading } = useInfiniteUsers(searchQuery);
   const users = data?.pages.flat() ?? [];
+
+  const addEvent = useCreateEvent();
 
   const form = useForm<TEventFormData>({
     resolver: zodResolver(eventSchema),
@@ -50,10 +54,17 @@ const AddCalendarEvent = () => {
     },
   });
 
-  const onSubmit = (values: TEventFormData) => {
-    console.log(values);
-    setOpen(false);
-    form.reset();
+  const onSubmit = (data: TEventFormData) => {
+    addEvent.mutate(data, {
+      onSuccess: () => {
+        toast.success("Event created successfully");
+        form.reset();
+        setOpen(false);
+      },
+      onError: () => {
+        toast.error("Something went wrong");
+      },
+    });
   };
 
   const onError = (error: any) => {
