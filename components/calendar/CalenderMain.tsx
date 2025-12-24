@@ -3,9 +3,12 @@ import { motion } from "framer-motion";
 import CalendarHeader from "./CalendarHeader";
 import { useState } from "react";
 import { TCalendarView } from "@/types/calender";
+import { useCalendarEvents } from "@/hooks/useCalendarEvents";
 
 const CalenderMain = () => {
   const [view, setView] = useState<TCalendarView>("month");
+
+  const { isLoading } = useCalendarEvents();
 
   return (
     <div className="flex flex-col gap-3">
