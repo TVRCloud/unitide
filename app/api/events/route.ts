@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { authenticateUser } from "@/lib/authenticateUser";
+import { logServerError } from "@/lib/logServerError";
 import connectDB from "@/lib/mongodb";
 import events from "@/models/events";
 import { logActivity } from "@/utils/logger";
@@ -83,19 +84,22 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  let userId: string | undefined;
+
   try {
     await connectDB();
+
     const { user: decoded, errorResponse } = await authenticateUser();
     if (errorResponse) return errorResponse;
 
+    userId = decoded.id.toString();
+
     const body = await request.json();
 
-    const newEvent = await events.create({
-      ...body,
-    });
+    const newEvent = await events.create(body);
 
     await logActivity({
-      userId: decoded.id.toString(),
+      userId: userId || "",
       action: "create",
       entityType: "task",
       entityId: newEvent._id.toString(),
@@ -108,8 +112,16 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json(newEvent, { status: 201 });
-  } catch (error) {
-    console.error("POST /api/events error:", error);
+  } catch (error: unknown) {
+    await logServerError({
+      source: "server",
+      route: "/api/events",
+      method: "POST",
+      message: error instanceof Error ? error.message : "Unknown server error",
+      stack: error instanceof Error ? error.stack : undefined,
+      userId,
+    });
+
     return NextResponse.json(
       { error: "Failed to create event" },
       { status: 500 }
