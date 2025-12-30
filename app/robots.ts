@@ -8,6 +8,6 @@ export default function robots(): MetadataRoute.Robots {
         allow: "/",
       },
     ],
-    sitemap: "https://unitide.vercel.app/sitemap.xml",
+    sitemap: "https://www.unitide.click/sitemap.xml",
   };
 }
