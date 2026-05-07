@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { authenticateUser } from "@/lib/authenticateUser";
+import { requireAuth } from "@/lib/auth-guard";
 import connectDB from "@/lib/mongodb";
 import "@/models/users";
 import teams from "@/models/teams";
@@ -11,7 +11,7 @@ import mongoose from "mongoose";
 export async function GET(request: Request) {
   try {
     await connectDB();
-    const { user, errorResponse } = await authenticateUser([
+    const { user, errorResponse } = await requireAuth([
       "admin",
       "manager",
       "lead",
@@ -101,7 +101,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     await connectDB();
-    const { user: decoded, errorResponse } = await authenticateUser([
+    const { user: decoded, errorResponse } = await requireAuth([
       "admin",
       "manager",
     ]);

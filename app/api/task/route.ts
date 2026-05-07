@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { authenticateUser } from "@/lib/authenticateUser";
+import { requireAuth } from "@/lib/auth-guard";
 import connectDB from "@/lib/mongodb";
 import tasks from "@/models/tasks";
 import { createTaskSchema } from "@/schemas/task";
@@ -9,7 +9,7 @@ import { NextResponse } from "next/server";
 export async function GET(request: Request) {
   try {
     await connectDB();
-    const { user, errorResponse } = await authenticateUser([
+    const { user, errorResponse } = await requireAuth([
       "admin",
       "manager",
       "lead",
@@ -124,7 +124,7 @@ export async function POST(request: Request) {
   try {
     await connectDB();
 
-    const { user, errorResponse } = await authenticateUser([
+    const { user, errorResponse } = await requireAuth([
       "admin",
       "manager",
       "lead",
@@ -164,7 +164,7 @@ export async function POST(request: Request) {
 //   try {
 //     await connectDB();
 
-//     const { user, errorResponse } = await authenticateUser([
+//     const { user, errorResponse } = await requireAuth([
 //       "admin",
 //       "manager",
 //       "lead",
@@ -204,7 +204,7 @@ export async function POST(request: Request) {
 //   try {
 //     await connectDB();
 
-//     const { errorResponse } = await authenticateUser(["admin", "manager"]);
+//     const { errorResponse } = await requireAuth(["admin", "manager"]);
 //     if (errorResponse) return errorResponse;
 
 //     await tasks.findByIdAndDelete(params.id);

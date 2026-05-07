@@ -23,9 +23,9 @@ import {
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LoginFormValues, LoginSchema } from "@/schemas/auth";
-import { loginAction } from "@/app/(auth)/actions/auth";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 
 const LoginMain = () => {
   const [loading, setLoading] = useState(false);
@@ -43,20 +43,19 @@ const LoginMain = () => {
     setLoading(true);
 
     try {
-      const formData = new FormData();
-      formData.append("email", values.email);
-      formData.append("password", values.password);
+      const result = await signIn("credentials", {
+        email: values.email,
+        password: values.password,
+        redirect: false,
+      });
 
-      const res = await loginAction(formData);
-
-      if (!res.success) {
-        toast.error(res.message);
+      if (!result?.ok || result?.error) {
+        toast.error("Invalid email or password");
       } else {
-        toast.success(res.message);
+        toast.success("Login successful");
         router.push("/dashboard");
       }
-    } catch (error) {
-      console.error(error);
+    } catch {
       toast.error("Something went wrong");
     } finally {
       setLoading(false);

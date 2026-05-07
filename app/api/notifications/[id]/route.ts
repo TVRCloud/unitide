@@ -1,4 +1,4 @@
-import { authenticateUser } from "@/lib/authenticateUser";
+import { requireAuth } from "@/lib/auth-guard";
 import connectDB from "@/lib/mongodb";
 import { Notification } from "@/models/notification";
 import mongoose from "mongoose";
@@ -11,7 +11,7 @@ export async function GET(
   try {
     await connectDB();
     const { id } = await context.params;
-    const { errorResponse } = await authenticateUser();
+    const { errorResponse } = await requireAuth();
     if (errorResponse) return errorResponse;
 
     const notification = await Notification.aggregate([

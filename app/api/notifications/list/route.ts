@@ -1,4 +1,4 @@
-import { authenticateUser } from "@/lib/authenticateUser";
+import { requireAuth } from "@/lib/auth-guard";
 import connectDB from "@/lib/mongodb";
 import { Notification } from "@/models/notification";
 import mongoose from "mongoose";
@@ -7,7 +7,7 @@ import { NextResponse } from "next/server";
 export async function GET() {
   try {
     await connectDB();
-    const { user, errorResponse } = await authenticateUser();
+    const { user, errorResponse } = await requireAuth();
     if (errorResponse) return errorResponse;
 
     const isAdmin = user.role === "admin";

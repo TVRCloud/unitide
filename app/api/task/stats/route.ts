@@ -1,4 +1,4 @@
-import { authenticateUser } from "@/lib/authenticateUser";
+import { requireAuth } from "@/lib/auth-guard";
 import connectDB from "@/lib/mongodb";
 import tasks from "@/models/tasks";
 import { NextResponse } from "next/server";
@@ -6,7 +6,7 @@ import { NextResponse } from "next/server";
 export async function GET() {
   try {
     await connectDB();
-    const { errorResponse } = await authenticateUser(["admin", "manager"]);
+    const { errorResponse } = await requireAuth(["admin", "manager"]);
     if (errorResponse) return errorResponse;
 
     const stats = await tasks.aggregate([

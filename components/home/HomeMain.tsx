@@ -31,9 +31,10 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useUser";
-import { logoutAction } from "@/app/(auth)/actions/auth";
 import { toast } from "sonner";
 import { useSignedImage } from "@/hooks/useSignedImage";
+import { signOut } from "next-auth/react";
+import { useQueryClient } from "@tanstack/react-query";
 
 const HomeMain = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -41,6 +42,7 @@ const HomeMain = () => {
   const { scrollYProgress } = useScroll();
   const router = useRouter();
   const { user, isLoading } = useAuth();
+  const queryClient = useQueryClient();
   const { data: url } = useSignedImage(user?.avatar);
 
   const backgroundY = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
@@ -82,7 +84,8 @@ const HomeMain = () => {
   ];
 
   const onLogout = async () => {
-    await logoutAction();
+    await signOut({ redirect: false });
+    queryClient.removeQueries();
     toast.success("Logged out successfully");
     router.push("/login");
   };

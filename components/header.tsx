@@ -20,28 +20,25 @@ import {
   Building2,
 } from "lucide-react";
 import { useTheme } from "next-themes";
-import { logoutAction } from "@/app/(auth)/actions/auth";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useUser";
 import { MobileMenu } from "./MobileMenu";
 import { useQueryClient } from "@tanstack/react-query";
-import { useUserStore } from "@/store/useUserStore";
 import NavNotification from "./NavNotification";
 import { useSignedImage } from "@/hooks/useSignedImage";
+import { signOut } from "next-auth/react";
 
 export function Header() {
   const { setTheme } = useTheme();
   const router = useRouter();
   const { user, isLoading } = useAuth();
   const queryClient = useQueryClient();
-  const { clearUser } = useUserStore();
 
   const { data: url } = useSignedImage(user?.avatar);
 
   const onLogout = async () => {
-    await logoutAction();
-    clearUser();
+    await signOut({ redirect: false });
     queryClient.removeQueries();
     toast.success("Logged out successfully");
     router.push("/login");

@@ -2,12 +2,12 @@
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
 import ActivityLog from "@/models/log";
-import { authenticateUser } from "@/lib/authenticateUser";
+import { requireAuth } from "@/lib/auth-guard";
 
 export async function GET(request: Request) {
   try {
     await connectDB();
-    const { errorResponse } = await authenticateUser(["admin"]);
+    const { errorResponse } = await requireAuth(["admin"]);
     if (errorResponse) return errorResponse;
 
     const { searchParams } = new URL(request.url);

@@ -1,4 +1,4 @@
-import { authenticateUser } from "@/lib/authenticateUser";
+import { requireAuth } from "@/lib/auth-guard";
 import connectDB from "@/lib/mongodb";
 import { NotificationRead } from "@/models/notification";
 import { NextResponse } from "next/server";
@@ -6,7 +6,7 @@ import { NextResponse } from "next/server";
 export async function POST(req: Request) {
   try {
     await connectDB();
-    const { user, errorResponse } = await authenticateUser();
+    const { user, errorResponse } = await requireAuth();
     if (errorResponse) return errorResponse;
 
     const userId = user.id;

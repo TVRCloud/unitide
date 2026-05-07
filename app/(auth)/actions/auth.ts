@@ -2,12 +2,7 @@
 
 import connectDB from "@/lib/mongodb";
 import users from "@/models/users";
-import {
-  clearSession,
-  hashPassword,
-  setSession,
-  verifyPassword,
-} from "@/utils/auth";
+import { hashPassword } from "@/utils/password";
 import { logActivity } from "@/utils/logger";
 
 export async function registerAction(formData: FormData) {
@@ -42,51 +37,5 @@ export async function registerAction(formData: FormData) {
     message: `${user.email} registered`,
   });
 
-  // Set session (saves access + refresh token cookies)
-  await setSession(user);
-
   return { success: true, message: "Account created successfully" };
-}
-
-export async function loginAction(formData: FormData) {
-  try {
-    const email = (formData.get("email") as string)?.toLowerCase();
-    const password = formData.get("password") as string;
-
-    if (!email || !password) {
-      return { message: "Email and password are required" };
-    }
-
-    await connectDB();
-
-    const user = await users.findOne({ email });
-    if (!user) {
-      return { message: "User not found" };
-    }
-
-    const isValid = await verifyPassword(password, user.password.trim());
-    if (!isValid) {
-      return { message: "Invalid password" };
-    }
-
-    // Set session (saves access + refresh token cookies)
-    await setSession(user);
-
-    await logActivity({
-      userId: user._id.toString(),
-      action: "login",
-      entityType: "user",
-      entityId: user._id.toString(),
-      message: `${user.email} logged in`,
-    });
-
-    return { success: true, message: "Login successful" };
-  } catch (error) {
-    console.error("Login error:", error);
-    return { message: "Internal server error" };
-  }
-}
-
-export async function logoutAction() {
-  await clearSession();
 }

@@ -33,6 +33,7 @@ import { SignupFormValues, SignupSchema } from "@/schemas/auth";
 import { registerAction } from "@/app/(auth)/actions/auth";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { signIn } from "next-auth/react";
 
 const SignupMain = () => {
   const [loading, setLoading] = useState(false);
@@ -60,12 +61,24 @@ const SignupMain = () => {
 
       if (!res.success) {
         toast.error(res.message);
-      } else {
+        return;
+      }
+
+      // Immediately sign in after successful registration
+      const result = await signIn("credentials", {
+        email: values.email,
+        password: values.password,
+        redirect: false,
+      });
+
+      if (result?.ok) {
         toast.success(res.message);
         router.push("/");
+      } else {
+        toast.success("Account created. Please sign in.");
+        router.push("/login");
       }
-    } catch (error) {
-      console.error(error);
+    } catch {
       toast.error("Something went wrong");
     } finally {
       setLoading(false);

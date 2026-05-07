@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
 import users from "@/models/users";
-import { authenticateUser } from "@/lib/authenticateUser";
+import { requireAuth } from "@/lib/auth-guard";
 import mongoose from "mongoose";
 import { updateUserSchema } from "@/schemas/user";
 import { logActivity } from "@/utils/logger";
@@ -13,7 +13,7 @@ export async function GET(
   try {
     await connectDB();
     const { id } = await context.params;
-    const { errorResponse } = await authenticateUser(["admin", "manager"]);
+    const { errorResponse } = await requireAuth(["admin", "manager"]);
 
     if (errorResponse) return errorResponse;
     // const user = await users.findById(id).select("-password");
@@ -125,7 +125,7 @@ export async function PATCH(
   try {
     await connectDB();
     const { id } = await context.params;
-    const { user: decoded, errorResponse } = await authenticateUser(["admin"]);
+    const { user: decoded, errorResponse } = await requireAuth(["admin"]);
     if (errorResponse) return errorResponse;
 
     const body = await request.json();

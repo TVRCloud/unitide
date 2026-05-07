@@ -1,4 +1,4 @@
-import { authenticateUser } from "@/lib/authenticateUser";
+import { requireAuth } from "@/lib/auth-guard";
 import connectDB from "@/lib/mongodb";
 import chats from "@/models/chats";
 import users from "@/models/users";
@@ -8,7 +8,7 @@ import { type NextRequest, NextResponse } from "next/server";
 export async function POST(request: NextRequest) {
   try {
     await connectDB();
-    const { user, errorResponse } = await authenticateUser();
+    const { user, errorResponse } = await requireAuth();
     if (errorResponse) return errorResponse;
 
     const body = await request.json();

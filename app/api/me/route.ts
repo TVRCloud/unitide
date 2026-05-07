@@ -2,13 +2,13 @@
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
 import users from "@/models/users";
-import { authenticateUser } from "@/lib/authenticateUser";
+import { requireAuth } from "@/lib/auth-guard";
 import { uploadFile } from "@/lib/supabase";
 
 export async function GET() {
   try {
     await connectDB();
-    const { user: decoded, errorResponse } = await authenticateUser();
+    const { user: decoded, errorResponse } = await requireAuth();
     if (errorResponse) return errorResponse;
 
     const user = await users.findById(decoded.id).select("-password");
@@ -30,7 +30,7 @@ export async function GET() {
 export async function PATCH(request: Request) {
   try {
     await connectDB();
-    const { user: decoded, errorResponse } = await authenticateUser();
+    const { user: decoded, errorResponse } = await requireAuth();
     if (errorResponse) return errorResponse;
 
     const form = await request.formData();
