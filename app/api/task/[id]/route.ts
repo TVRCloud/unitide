@@ -1,4 +1,4 @@
-import { authenticateUser } from "@/lib/authenticateUser";
+import { requireAuth } from "@/lib/auth-guard";
 import connectDB from "@/lib/mongodb";
 import tasks from "@/models/tasks";
 import { updateTaskSchema } from "@/schemas/task";
@@ -12,7 +12,7 @@ export async function GET(
   try {
     await connectDB();
     const { id } = await context.params;
-    const { errorResponse } = await authenticateUser();
+    const { errorResponse } = await requireAuth();
     if (errorResponse) return errorResponse;
 
     const task = await tasks.aggregate([
@@ -218,7 +218,7 @@ export async function PATCH(
   try {
     await connectDB();
     const { id } = await context.params;
-    const { errorResponse } = await authenticateUser([
+    const { errorResponse } = await requireAuth([
       "admin",
       "manager",
       "lead",

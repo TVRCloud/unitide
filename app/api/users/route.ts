@@ -1,15 +1,15 @@
 import { NextResponse } from "next/server";
-import { hashPassword } from "@/utils/auth";
+import { hashPassword } from "@/utils/password";
 import connectDB from "@/lib/mongodb";
 import users from "@/models/users";
 import { SignupSchema } from "@/schemas/auth";
 import { logActivity } from "@/utils/logger";
-import { authenticateUser } from "@/lib/authenticateUser";
+import { requireAuth } from "@/lib/auth-guard";
 
 export async function GET(request: Request) {
   try {
     await connectDB();
-    const { errorResponse } = await authenticateUser(["admin", "manager"]);
+    const { errorResponse } = await requireAuth(["admin", "manager"]);
     if (errorResponse) return errorResponse;
 
     const { searchParams } = new URL(request.url);
@@ -44,7 +44,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     await connectDB();
-    const { user: decoded, errorResponse } = await authenticateUser([
+    const { user: decoded, errorResponse } = await requireAuth([
       "admin",
       "manager",
     ]);

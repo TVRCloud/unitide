@@ -1,13 +1,13 @@
-import { authenticateUser } from "@/lib/authenticateUser";
+import { requireAuth } from "@/lib/auth-guard";
 import connectDB from "@/lib/mongodb";
 import users from "@/models/users";
-import { hashPassword, verifyPassword } from "@/utils/auth";
+import { hashPassword, verifyPassword } from "@/utils/password";
 import { NextResponse } from "next/server";
 
 export async function PATCH(request: Request) {
   try {
     await connectDB();
-    const { user: decoded, errorResponse } = await authenticateUser();
+    const { user: decoded, errorResponse } = await requireAuth();
     if (errorResponse) return errorResponse;
 
     const { oldPassword, newPassword, confirmPassword } = await request.json();
@@ -44,9 +44,7 @@ export async function PATCH(request: Request) {
 
     return NextResponse.json(
       { message: "Password updated successfully" },
-      {
-        status: 200,
-      }
+      { status: 200 }
     );
   } catch (error) {
     console.error("PATCH /api/me/password error:", error);

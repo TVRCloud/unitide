@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
 import ActivityLog from "@/models/log";
-import { authenticateUser } from "@/lib/authenticateUser";
+import { requireAuth } from "@/lib/auth-guard";
 
 export async function GET(
   request: NextRequest,
@@ -10,7 +10,7 @@ export async function GET(
   try {
     await connectDB();
     const { id } = await context.params;
-    const { errorResponse } = await authenticateUser(["admin"]);
+    const { errorResponse } = await requireAuth(["admin"]);
     if (errorResponse) return errorResponse;
 
     const log = await ActivityLog.find({ user: id });

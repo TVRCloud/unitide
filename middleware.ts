@@ -1,11 +1,15 @@
+import { getToken } from "next-auth/jwt";
 import { type NextRequest, NextResponse } from "next/server";
-// import { config as sessionConfig } from "@/lib/config";
-import { canAccessRoute } from "./utils/check-access";
-import { authRoutes, protectedRoutes, publicRoutes } from "./lib/route-list";
-import { verifyRefreshToken } from "./utils/auth";
+import { canAccessRoute } from "@/utils/check-access";
+import { authRoutes, protectedRoutes, publicRoutes } from "@/lib/route-list";
 
-export async function proxy(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
+
+  const token = await getToken({
+    req: request,
+    secret: process.env.NEXTAUTH_SECRET,
+  });
 
   const isProtectedRoute = protectedRoutes.some((route) =>
     path.startsWith(route)
@@ -13,20 +17,15 @@ export async function proxy(request: NextRequest) {
   const isAuthRoute = authRoutes.includes(path);
   const isPublicRoute = publicRoutes.includes(path);
 
-  // const token = request.cookies.get(sessionConfig.session.cookieName)?.value;
-  const token = request.cookies.get("refresh-token")?.value;
-
-  const session = token ? await verifyRefreshToken(token) : null;
-
-  const role = (session?.role as string | undefined)?.toLowerCase() || "guest";
+  const role = (token?.role as string | undefined)?.toLowerCase() ?? "guest";
 
   if (isPublicRoute) return NextResponse.next();
 
-  if (isProtectedRoute && !session) {
+  if (isProtectedRoute && !token) {
     return NextResponse.redirect(new URL("/login", request.nextUrl));
   }
 
-  if (isAuthRoute && session) {
+  if (isAuthRoute && token) {
     if (role === "guest") {
       return NextResponse.redirect(new URL("/", request.nextUrl));
     }
@@ -35,7 +34,6 @@ export async function proxy(request: NextRequest) {
 
   if (isProtectedRoute && token) {
     const hasAccess = canAccessRoute({ path, role });
-
     if (!hasAccess) {
       return NextResponse.redirect(new URL("/forbidden", request.nextUrl));
     }

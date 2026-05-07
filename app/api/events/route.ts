@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { authenticateUser } from "@/lib/authenticateUser";
+import { requireAuth } from "@/lib/auth-guard";
 import connectDB from "@/lib/mongodb";
 import events from "@/models/events";
 import { logActivity } from "@/utils/logger";
@@ -9,7 +9,7 @@ export async function GET(request: Request) {
   try {
     await connectDB();
 
-    const { errorResponse } = await authenticateUser();
+    const { errorResponse } = await requireAuth();
     if (errorResponse) return errorResponse;
 
     const { searchParams } = new URL(request.url);
@@ -85,7 +85,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     await connectDB();
-    const { user: decoded, errorResponse } = await authenticateUser();
+    const { user: decoded, errorResponse } = await requireAuth();
     if (errorResponse) return errorResponse;
 
     const body = await request.json();

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { authenticateUser } from "@/lib/authenticateUser";
+import { requireAuth } from "@/lib/auth-guard";
 import connectDB from "@/lib/mongodb";
 import projects from "@/models/projects";
 import { createProjectSchema } from "@/schemas/project";
@@ -28,7 +28,7 @@ async function generateUniqueColor() {
 export async function GET(request: Request) {
   try {
     await connectDB();
-    const { user, errorResponse } = await authenticateUser([
+    const { user, errorResponse } = await requireAuth([
       "admin",
       "manager",
     ]);
@@ -113,7 +113,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     await connectDB();
-    const { user: decoded, errorResponse } = await authenticateUser([
+    const { user: decoded, errorResponse } = await requireAuth([
       "admin",
       "manager",
     ]);

@@ -2,7 +2,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import mongoose from "mongoose";
 import connectDB from "@/lib/mongodb";
-import { authenticateUser } from "@/lib/authenticateUser";
+import { requireAuth } from "@/lib/auth-guard";
 import chats from "@/models/chats";
 import message from "@/models/message";
 import { sendMessageSchema } from "@/schemas/chats";
@@ -14,7 +14,7 @@ export async function GET(
 ) {
   try {
     await connectDB();
-    const { user, errorResponse } = await authenticateUser();
+    const { user, errorResponse } = await requireAuth();
     if (errorResponse) return errorResponse;
 
     const { id } = await params;
@@ -223,7 +223,7 @@ export async function POST(
 ) {
   try {
     await connectDB();
-    const { user, errorResponse } = await authenticateUser();
+    const { user, errorResponse } = await requireAuth();
     if (errorResponse) return errorResponse;
 
     const { id } = await params;

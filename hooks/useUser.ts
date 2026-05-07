@@ -1,3 +1,4 @@
+import { useSession } from "next-auth/react";
 import {
   changePassword,
   createUser,
@@ -7,7 +8,6 @@ import {
   fetchUsers,
 } from "@/lib/api-client";
 import { TUpdateUserSchema } from "@/schemas/user";
-import { useUserStore } from "@/store/useUserStore";
 import { apiClient } from "@/utils/axios";
 import {
   useInfiniteQuery,
@@ -17,20 +17,22 @@ import {
 } from "@tanstack/react-query";
 
 export function useAuth() {
-  const { user, setUser } = useUserStore();
+  const { status } = useSession();
+  const isAuthenticated = status === "authenticated";
+  const isSessionLoading = status === "loading";
 
-  const { data, isLoading, isError, error, refetch } = useQuery({
+  const { data, isLoading: queryLoading, isError, error, refetch } = useQuery({
     queryKey: ["me"],
-    enabled: !user,
-    // retry: false,
+    enabled: isAuthenticated,
     queryFn: async () => {
       const res = await apiClient.get("/api/me");
-      setUser(res.data);
       return res.data;
     },
   });
 
-  return { user: user ?? data, isLoading, isError, error, refetch };
+  const isLoading = isSessionLoading || (isAuthenticated && queryLoading);
+
+  return { user: data ?? null, isLoading, isError, error, refetch };
 }
 
 export const useEditProfile = () => {

@@ -1,4 +1,4 @@
-import { authenticateUser } from "@/lib/authenticateUser";
+import { requireAuth } from "@/lib/auth-guard";
 import connectDB from "@/lib/mongodb";
 import { NextResponse } from "next/server";
 import userSession from "@/models/session";
@@ -6,7 +6,7 @@ import userSession from "@/models/session";
 export async function GET(request: Request) {
   try {
     await connectDB();
-    const { errorResponse } = await authenticateUser(["admin"]);
+    const { errorResponse } = await requireAuth(["admin"]);
     if (errorResponse) return errorResponse;
 
     await userSession.updateMany(
