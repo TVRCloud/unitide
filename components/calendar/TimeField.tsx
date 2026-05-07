@@ -1,8 +1,6 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { Control } from "react-hook-form";
-
+import { Control, FieldValues, Path } from "react-hook-form";
 import {
   FormField,
   FormItem,
@@ -16,13 +14,17 @@ interface TimeValue {
   minute: number;
 }
 
-interface TimeFieldProps {
-  control: Control<any>;
-  name: "startTime" | "endTime";
+interface TimeFieldProps<T extends FieldValues> {
+  control: Control<T>;
+  name: Path<T>;
   label: string;
 }
 
-export function TimeField({ control, name, label }: TimeFieldProps) {
+export function TimeField<T extends FieldValues>({
+  control,
+  name,
+  label,
+}: TimeFieldProps<T>) {
   return (
     <FormField
       control={control}
@@ -45,11 +47,7 @@ export function TimeField({ control, name, label }: TimeFieldProps) {
               value={timeString}
               onChange={(e) => {
                 const [hour, minute] = e.target.value.split(":").map(Number);
-
-                field.onChange({
-                  hour,
-                  minute,
-                });
+                field.onChange({ hour, minute });
               }}
             />
             <FormMessage />

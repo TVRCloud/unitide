@@ -3,7 +3,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { canAccessRoute } from "@/utils/check-access";
 import { authRoutes, protectedRoutes, publicRoutes } from "@/lib/route-list";
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname;
 
   const token = await getToken({
