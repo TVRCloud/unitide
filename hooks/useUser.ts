@@ -4,8 +4,11 @@ import {
   createUser,
   editProfile,
   editUser,
+  fetchPreferences,
   fetchSingleUser,
   fetchUsers,
+  TUserPreferences,
+  updatePreferences,
 } from "@/lib/api-client";
 import { TUpdateUserSchema } from "@/schemas/user";
 import { apiClient } from "@/utils/axios";
@@ -91,6 +94,24 @@ export const useEditUser = (id: string) => {
     mutationFn: (updatedData: TUpdateUserSchema) => editUser(id, updatedData),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user", id] });
+    },
+  });
+};
+
+export const usePreferences = () => {
+  return useQuery<TUserPreferences>({
+    queryKey: ["preferences"],
+    queryFn: fetchPreferences,
+  });
+};
+
+export const useUpdatePreferences = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: updatePreferences,
+    onSuccess: (data) => {
+      queryClient.setQueryData(["preferences"], data);
     },
   });
 };

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import { useInfiniteTasks } from "@/hooks/useTask";
+import { useInfiniteTasks, useDeleteTask } from "@/hooks/useTask";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { useInView } from "react-intersection-observer";
@@ -17,10 +17,21 @@ import {
   MoreHorizontal,
   Edit,
   Trash2,
-  Eye,
   Flag,
   Timer,
 } from "lucide-react";
+import CreateTask from "./CreateTask";
+import EditTask from "./EditTask";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "../ui/alert-dialog";
 import {
   Card,
   CardContent,
@@ -64,6 +75,10 @@ const TasksUser = () => {
   const router = useRouter();
   const { ref, inView } = useInView();
   const [searchTerm, setSearchTerm] = useState("");
+  const [createOpen, setCreateOpen] = useState(false);
+  const [editingTask, setEditingTask] = useState<any | null>(null);
+  const [deletingTaskId, setDeletingTaskId] = useState<string | null>(null);
+  const deleteTask = useDeleteTask(deletingTaskId ?? "");
   const [filters, setFilters] = useState<TaskFilters>({
     status: "all",
     priority: "all",
@@ -101,10 +116,25 @@ const TasksUser = () => {
 
   return (
     <div className="flex flex-col gap-3">
-      <HeaderSection
-        title="Tasks"
-        subtitle="Manage all tasks in your workspace"
-      />
+      <div className="flex items-start justify-between gap-4">
+        <HeaderSection
+          title="Tasks"
+          subtitle="Manage all tasks in your workspace"
+        />
+        <CreateTask
+          open={createOpen}
+          onOpenChange={setCreateOpen}
+          trigger={
+            <button
+              onClick={() => setCreateOpen(true)}
+              className="bg-primary text-primary-foreground hover:bg-primary/90 h-9 rounded-md px-3 text-sm font-medium inline-flex items-center gap-1.5 whitespace-nowrap shrink-0"
+            >
+              <ListTodo className="h-4 w-4" />
+              New Task
+            </button>
+          }
+        />
+      </div>
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -283,6 +313,7 @@ const TasksUser = () => {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: index * 0.03 }}
+                      onClick={() => router.push(`/tasks/${task._id}`)}
                       className="group p-4 rounded-lg border hover:border-primary/50 hover:shadow-md cursor-pointer transition-all"
                     >
                       <div className="flex items-start gap-3">
@@ -307,15 +338,10 @@ const TasksUser = () => {
                               </p>
                             </div>
 
-                            <div className="flex gap-2  opacity-0 group-hover:opacity-100 transition-all">
-                              <Button
-                                size="icon"
-                                onClick={() => {
-                                  router.push(`/tasks/${task._id}`);
-                                }}
-                              >
-                                <Eye className=" h-4 w-4" />
-                              </Button>
+                            <div
+                              className="flex gap-2 opacity-0 group-hover:opacity-100 transition-all"
+                              onClick={(e) => e.stopPropagation()}
+                            >
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                   <Button
@@ -327,12 +353,17 @@ const TasksUser = () => {
                                   </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
-                                  <DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={() => setEditingTask(task)}
+                                  >
                                     <Edit className="mr-2 h-4 w-4" />
                                     Edit
                                   </DropdownMenuItem>
                                   <DropdownMenuSeparator />
-                                  <DropdownMenuItem className="text-destructive">
+                                  <DropdownMenuItem
+                                    className="text-destructive"
+                                    onClick={() => setDeletingTaskId(task._id)}
+                                  >
                                     <Trash2 className="mr-2 h-4 w-4" />
                                     Delete
                                   </DropdownMenuItem>
@@ -434,6 +465,53 @@ const TasksUser = () => {
           </CardContent>
         </Card>
       </motion.div>
+
+      {/* Controlled EditTask sheet */}
+      {editingTask && (
+        <EditTask
+          defaultValue={{
+            id: editingTask._id,
+            title: editingTask.title,
+            description: editingTask.description ?? "",
+            status: editingTask.status,
+            priority: editingTask.priority,
+            type: editingTask.type,
+            dueDate: editingTask.dueDate ?? "",
+            tags: editingTask.tags ?? [],
+          }}
+          open={!!editingTask}
+          onOpenChange={(o) => !o && setEditingTask(null)}
+        />
+      )}
+
+      {/* Delete confirmation */}
+      <AlertDialog
+        open={!!deletingTaskId}
+        onOpenChange={(o) => !o && setDeletingTaskId(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete task?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => {
+                deleteTask.mutate(undefined, {
+                  onSuccess: () => setDeletingTaskId(null),
+                });
+              }}
+              disabled={deleteTask.isPending}
+            >
+              {deleteTask.isPending ? "Deleting…" : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

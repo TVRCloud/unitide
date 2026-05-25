@@ -1,7 +1,12 @@
 import { getToken } from "next-auth/jwt";
 import { type NextRequest, NextResponse } from "next/server";
 import { canAccessRoute } from "@/utils/check-access";
-import { authRoutes, protectedRoutes, publicRoutes } from "@/lib/route-list";
+import {
+  authRoutes,
+  protectedRoutes,
+  publicRoutes,
+  resetPasswordRoutePrefix,
+} from "@/lib/route-list";
 
 export async function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname;
@@ -20,6 +25,7 @@ export async function proxy(request: NextRequest) {
   const role = (token?.role as string | undefined)?.toLowerCase() ?? "guest";
 
   if (isPublicRoute) return NextResponse.next();
+  if (path.startsWith(resetPasswordRoutePrefix)) return NextResponse.next();
 
   if (isProtectedRoute && !token) {
     return NextResponse.redirect(new URL("/login", request.nextUrl));

@@ -14,6 +14,15 @@ const UserSchema = new Schema(
     isActive: { type: Boolean, default: true },
     isOnline: { type: Boolean, default: false },
     lastSeen: { type: Date, default: Date.now },
+    preferences: {
+      showProfile: { type: Boolean, default: true },
+      activityLogs: { type: Boolean, default: true },
+      emailNotifications: { type: Boolean, default: true },
+      pushNotifications: { type: Boolean, default: true },
+      hideOnlineStatus: { type: Boolean, default: false },
+    },
+    passwordResetToken: { type: String },
+    passwordResetExpires: { type: Date },
   },
   {
     timestamps: true,

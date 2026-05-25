@@ -1,6 +1,7 @@
 import { requireAuth } from "@/lib/auth-guard";
 import connectDB from "@/lib/mongodb";
 import projects from "@/models/projects";
+import { logActivity } from "@/utils/logger";
 import mongoose from "mongoose";
 import { NextResponse } from "next/server";
 
@@ -88,67 +89,36 @@ export async function GET(
   }
 }
 
-// export async function DELETE(
-//   request: NextRequest,
-//   { params }: { params: Promise<{ chatId: string }> }
-// ) {
-//   try {
-//     await connectDB();
-//     const { user, errorResponse } = await requireAuth();
-//     if (errorResponse) return errorResponse;
+export async function DELETE(
+  _request: Request,
+  context: { params: Promise<{ id: string }> }
+) {
+  try {
+    await connectDB();
+    const { id } = await context.params;
+    const { user, errorResponse } = await requireAuth(["admin", "manager"]);
+    if (errorResponse) return errorResponse;
 
-//     const { chatId } = await params;
-//     const userId = user.id;
+    const project = await projects.findByIdAndDelete(id);
 
-//     const chat = await chats.findOne({
-//       _id: chatId,
-//       participants: userId,
-//     });
+    if (!project) {
+      return NextResponse.json({ error: "Project not found" }, { status: 404 });
+    }
 
-//     if (!chat) {
-//       return NextResponse.json(
-//         {
-//           success: false,
-//           error: "Chat not found",
-//         },
-//         { status: 404 }
-//       );
-//     }
+    await logActivity({
+      userId: user.id,
+      action: "delete",
+      entityType: "project",
+      entityId: id,
+      message: `Deleted project "${project.name}"`,
+    });
 
-//     // For group chats, only creator or admin can delete
-//     if (chat.type === "group") {
-//       const isAdmin = chat.admins.some(
-//         (adminId: string) => adminId.toString() === userId
-//       );
-//       if (!isAdmin && chat.createdBy.toString() !== userId) {
-//         return NextResponse.json(
-//           {
-//             success: false,
-//             error: "Only admins can delete group chats",
-//           },
-//           { status: 403 }
-//         );
-//       }
-//     }
-
-//     // Delete all messages in the chat
-//     await Message.deleteMany({ chatId });
-
-//     // Delete the chat
-//     await Chat.findByIdAndDelete(chatId);
-
-//     return NextResponse.json<ApiResponse>({
-//       success: true,
-//       message: "Chat deleted successfully",
-//     });
-//   } catch (error) {
-//     console.error("[Chat DELETE] Error:", error);
-//     return NextResponse.json<ApiResponse>(
-//       {
-//         success: false,
-//         error: "Internal server error",
-//       },
-//       { status: 500 }
-//     );
-//   }
-// }
+    return NextResponse.json({ success: true }, { status: 200 });
+  } catch (error) {
+    console.error("DELETE /api/projects/[id] error:", error);
+    return NextResponse.json(
+      { error: "Failed to delete project" },
+      { status: 500 }
+    );
+  }
+}

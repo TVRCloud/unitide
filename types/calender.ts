@@ -18,13 +18,18 @@ export interface IUser {
 }
 
 export interface IEvent {
-  id: number;
+  id: string | number;
   startDate: string;
   endDate: string;
   title: string;
   color: TEventColor;
   description: string;
   user: string[];
+  isTask?: boolean;
+  // Fields present when event comes from the API (populated)
+  startTime?: { hour: number; minute: number };
+  endTime?: { hour: number; minute: number };
+  users?: { _id: string; name: string; email?: string }[];
 }
 
 export interface ICalendarCell {

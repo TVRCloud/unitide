@@ -2,7 +2,7 @@
 "use client";
 
 import { Plus } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { eventSchema, TEventFormData } from "@/schemas/events";
@@ -53,6 +53,34 @@ const AddCalendarEvent = () => {
       endTime: { hour: 10, minute: 0 },
     },
   });
+
+  const { watch, setValue } = form;
+  const [watchedStartDate, watchedStartTime] = watch(["startDate", "startTime"]);
+
+  // Auto-enforce end >= start
+  useEffect(() => {
+    const endDate = form.getValues("endDate");
+    if (watchedStartDate && endDate && watchedStartDate > endDate) {
+      setValue("endDate", watchedStartDate);
+    }
+  }, [watchedStartDate]);  // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (!watchedStartTime) return;
+    const endDate = form.getValues("endDate");
+    const startDate = form.getValues("startDate");
+    const sameDay =
+      startDate && endDate && startDate.toDateString() === endDate.toDateString();
+    if (sameDay) {
+      const endTime = form.getValues("endTime");
+      const startTotalMins = watchedStartTime.hour * 60 + watchedStartTime.minute;
+      const endTotalMins = endTime.hour * 60 + endTime.minute;
+      if (endTotalMins <= startTotalMins) {
+        const newHour = (watchedStartTime.hour + 1) % 24;
+        setValue("endTime", { hour: newHour, minute: watchedStartTime.minute });
+      }
+    }
+  }, [watchedStartTime]);  // eslint-disable-line react-hooks/exhaustive-deps
 
   const onSubmit = (data: TEventFormData) => {
     addEvent.mutate(data, {

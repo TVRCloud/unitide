@@ -13,11 +13,17 @@ export const protectedRoutes = [
   "/settings/app",
   "/settings/logs",
   "/settings/session",
+  "/tags",
   "/tasks",
   "/tasks/[id]",
   "/tasks/all",
   "/teams",
   "/teams/[id]",
+  "/reports",
+  "/reports/timesheet",
+  "/settings/workspace",
 ];
 export const authRoutes = ["/login", "/register"];
-export const publicRoutes = ["/"];
+export const publicRoutes = ["/", "/forgot-password"];
+
+export const resetPasswordRoutePrefix = "/reset-password";
