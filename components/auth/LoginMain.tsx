@@ -24,12 +24,10 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LoginFormValues, LoginSchema } from "@/schemas/auth";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 
 const LoginMain = () => {
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(LoginSchema),
@@ -53,7 +51,7 @@ const LoginMain = () => {
         toast.error("Invalid email or password");
       } else {
         toast.success("Login successful");
-        router.push("/dashboard");
+        window.location.href = "/dashboard";
       }
     } catch {
       toast.error("Something went wrong");
