@@ -7,7 +7,7 @@ type Props = {
 };
 
 const LayoutWrap = ({ children, className }: Props) => {
-  return <div className={(cn(className), "p-4")}>{children}</div>;
+  return <div className={cn("p-4", className)}>{children}</div>;
 };
 
 export default LayoutWrap;

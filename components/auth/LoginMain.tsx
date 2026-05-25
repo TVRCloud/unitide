@@ -157,7 +157,7 @@ const LoginMain = () => {
                 <div className="flex items-center justify-end">
                   <motion.a
                     whileHover={{ scale: 1.05 }}
-                    href="#"
+                    href="/forgot-password"
                     className="text-sm text-primary hover:text-primary/80 transition-colors font-medium"
                   >
                     Forgot password?

@@ -57,6 +57,26 @@ export const changePassword = async (data: {
   return res.data;
 };
 
+export type TUserPreferences = {
+  showProfile: boolean;
+  activityLogs: boolean;
+  emailNotifications: boolean;
+  pushNotifications: boolean;
+  hideOnlineStatus: boolean;
+};
+
+export const fetchPreferences = async (): Promise<TUserPreferences> => {
+  const res = await apiClient.get(`/api/me/preferences`);
+  return res.data;
+};
+
+export const updatePreferences = async (
+  data: Partial<TUserPreferences>
+): Promise<TUserPreferences> => {
+  const res = await apiClient.patch(`/api/me/preferences`, data);
+  return res.data;
+};
+
 export const createUser = async (data: {
   name: string;
   email: string;
@@ -118,15 +138,19 @@ export const createProject = async (data: {
 export const fetchProjects = async ({
   skip,
   search,
+  status,
 }: {
   skip: number;
   search: string;
+  status?: string;
 }) => {
   const params = new URLSearchParams({
     skip: String(skip),
     limit: "20",
     search,
   });
+
+  if (status) params.append("status", status);
 
   const res = await apiClient.get(`/api/projects?${params.toString()}`);
   return res.data;
@@ -203,6 +227,11 @@ export const fetchSessions = async ({
   });
 
   const res = await apiClient.get(`/api/session?${params.toString()}`);
+  return res.data;
+};
+
+export const terminateSession = async (id: string) => {
+  const res = await apiClient.delete(`/api/session/${id}`);
   return res.data;
 };
 
@@ -293,6 +322,63 @@ export const editAssignees = async (id: string, data: string[]) => {
 };
 export const fetchTaskStats = async () => {
   const res = await apiClient.get(`/api/task/stats`);
+  return res.data;
+};
+
+export const deleteTask = async (id: string) => {
+  const res = await apiClient.delete(`/api/task/${id}`);
+  return res.data;
+};
+
+export const deleteProject = async (id: string) => {
+  const res = await apiClient.delete(`/api/projects/${id}`);
+  return res.data;
+};
+
+// ---------------------------
+// ----------TAGS-------------
+// ---------------------------
+export const fetchTaskTags = async (): Promise<{ tag: string; count: number }[]> => {
+  const res = await apiClient.get(`/api/task/tags`);
+  return res.data;
+};
+
+export const renameTaskTag = async (from: string, to: string) => {
+  const res = await apiClient.patch(`/api/task/tags`, { from, to });
+  return res.data;
+};
+
+export const deleteTaskTag = async (tag: string) => {
+  const res = await apiClient.delete(`/api/task/tags?tag=${encodeURIComponent(tag)}`);
+  return res.data;
+};
+
+// ---------------------------
+// --------TIMELOGS-----------
+// ---------------------------
+export const fetchTimelogs = async (params: {
+  dateFrom?: string;
+  dateTo?: string;
+  userId?: string;
+}) => {
+  const query = new URLSearchParams();
+  if (params.dateFrom) query.set("dateFrom", params.dateFrom);
+  if (params.dateTo) query.set("dateTo", params.dateTo);
+  if (params.userId) query.set("userId", params.userId);
+  const res = await apiClient.get(`/api/task/timelogs?${query.toString()}`);
+  return res.data;
+};
+
+// ---------------------------
+// --------WORKSPACE----------
+// ---------------------------
+export const fetchWorkspace = async () => {
+  const res = await apiClient.get(`/api/workspace`);
+  return res.data;
+};
+
+export const updateWorkspace = async (data: Record<string, unknown>) => {
+  const res = await apiClient.patch(`/api/workspace`, data);
   return res.data;
 };
 
@@ -387,6 +473,16 @@ export const fetchEvents = async ({
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const createEvent = async (data: any) => {
   const res = await apiClient.post(`/api/events`, data);
+  return res.data;
+};
+
+export const updateEvent = async (id: string, data: any) => {
+  const res = await apiClient.patch(`/api/events/${id}`, data);
+  return res.data;
+};
+
+export const deleteEvent = async (id: string) => {
+  const res = await apiClient.delete(`/api/events/${id}`);
   return res.data;
 };
 

@@ -2,6 +2,7 @@ import { requireAuth } from "@/lib/auth-guard";
 import connectDB from "@/lib/mongodb";
 import tasks from "@/models/tasks";
 import { updateTaskSchema } from "@/schemas/task";
+import { logActivity } from "@/utils/logger";
 import mongoose from "mongoose";
 import { NextResponse } from "next/server";
 
@@ -245,6 +246,44 @@ export async function PATCH(
     console.error("PATCH /api/task/[id] error:", error);
     return NextResponse.json(
       { error: "Failed to update task" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(
+  _request: Request,
+  context: { params: Promise<{ id: string }> }
+) {
+  try {
+    await connectDB();
+    const { id } = await context.params;
+    const { user, errorResponse } = await requireAuth(["admin", "manager"]);
+    if (errorResponse) return errorResponse;
+
+    const task = await tasks.findByIdAndUpdate(
+      id,
+      { isDeleted: true },
+      { new: true }
+    );
+
+    if (!task) {
+      return NextResponse.json({ error: "Task not found" }, { status: 404 });
+    }
+
+    await logActivity({
+      userId: user.id,
+      action: "delete",
+      entityType: "task",
+      entityId: id,
+      message: `Deleted task "${task.title}"`,
+    });
+
+    return NextResponse.json({ success: true }, { status: 200 });
+  } catch (error) {
+    console.error("DELETE /api/task/[id] error:", error);
+    return NextResponse.json(
+      { error: "Failed to delete task" },
       { status: 500 }
     );
   }

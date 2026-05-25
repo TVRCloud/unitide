@@ -39,12 +39,13 @@ export async function GET(request: Request) {
     const skip = parseInt(searchParams.get("skip") || "0");
     const limit = parseInt(searchParams.get("limit") || "10");
     const search = searchParams.get("search") || "";
+    const status = searchParams.get("status") || "";
 
     const userObjectId = new mongoose.Types.ObjectId(user.id);
 
-    const searchMatch = search
-      ? { name: { $regex: search, $options: "i" } }
-      : {};
+    const searchMatch: Record<string, unknown> = {};
+    if (search) searchMatch.name = { $regex: search, $options: "i" };
+    if (status) searchMatch.status = status;
 
     const pipeline: any[] = [
       { $match: searchMatch },

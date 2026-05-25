@@ -6,7 +6,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { Bell, Shield, User, Download } from "lucide-react";
-import InstallButton from "@/components/InstallButton"; // import your install button
+import InstallButton from "@/components/InstallButton";
+import { usePreferences, useUpdatePreferences } from "@/hooks/useUser";
+import { TUserPreferences } from "@/lib/api-client";
+import { Skeleton } from "@/components/ui/skeleton";
+import { toast } from "sonner";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 15 },
@@ -14,6 +18,21 @@ const fadeUp = {
 };
 
 const Settings: React.FC = () => {
+  const { data: prefs, isLoading } = usePreferences();
+  const { mutate: updatePref } = useUpdatePreferences();
+
+  const toggle = (key: keyof TUserPreferences) => {
+    if (!prefs) return;
+    updatePref(
+      { [key]: !prefs[key] },
+      {
+        onError: () => toast.error("Failed to save preference"),
+      }
+    );
+  };
+
+  const checked = (key: keyof TUserPreferences) => prefs?.[key] ?? false;
+
   return (
     <div className="p-6 space-y-8">
       <motion.div
@@ -45,12 +64,26 @@ const Settings: React.FC = () => {
             <CardContent className="space-y-3">
               <div className="flex items-center justify-between">
                 <span>Show profile publicly</span>
-                <Switch />
+                {isLoading ? (
+                  <Skeleton className="h-5 w-9 rounded-full" />
+                ) : (
+                  <Switch
+                    checked={checked("showProfile")}
+                    onCheckedChange={() => toggle("showProfile")}
+                  />
+                )}
               </div>
               <Separator />
               <div className="flex items-center justify-between">
                 <span>Enable activity logs</span>
-                <Switch />
+                {isLoading ? (
+                  <Skeleton className="h-5 w-9 rounded-full" />
+                ) : (
+                  <Switch
+                    checked={checked("activityLogs")}
+                    onCheckedChange={() => toggle("activityLogs")}
+                  />
+                )}
               </div>
             </CardContent>
           </Card>
@@ -71,12 +104,26 @@ const Settings: React.FC = () => {
             <CardContent className="space-y-3">
               <div className="flex items-center justify-between">
                 <span>Email Notifications</span>
-                <Switch />
+                {isLoading ? (
+                  <Skeleton className="h-5 w-9 rounded-full" />
+                ) : (
+                  <Switch
+                    checked={checked("emailNotifications")}
+                    onCheckedChange={() => toggle("emailNotifications")}
+                  />
+                )}
               </div>
               <Separator />
               <div className="flex items-center justify-between">
                 <span>Push Notifications</span>
-                <Switch />
+                {isLoading ? (
+                  <Skeleton className="h-5 w-9 rounded-full" />
+                ) : (
+                  <Switch
+                    checked={checked("pushNotifications")}
+                    onCheckedChange={() => toggle("pushNotifications")}
+                  />
+                )}
               </div>
             </CardContent>
           </Card>
@@ -96,20 +143,22 @@ const Settings: React.FC = () => {
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="flex items-center justify-between">
-                <span>Two-Factor Authentication</span>
-                <Switch />
-              </div>
-              <Separator />
-              <div className="flex items-center justify-between">
                 <span>Hide Online Status</span>
-                <Switch />
+                {isLoading ? (
+                  <Skeleton className="h-5 w-9 rounded-full" />
+                ) : (
+                  <Switch
+                    checked={checked("hideOnlineStatus")}
+                    onCheckedChange={() => toggle("hideOnlineStatus")}
+                  />
+                )}
               </div>
             </CardContent>
           </Card>
         </motion.div>
       </div>
 
-      {/* Download / Install Section */}
+      {/* Install Section */}
       <motion.div
         initial="hidden"
         animate="visible"

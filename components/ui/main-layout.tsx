@@ -1,5 +1,6 @@
 import AdvanceSidebar from "../AdvanceSidebar";
 import { Header } from "../header";
+import SessionGuard from "../session/SessionGuard";
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -8,8 +9,11 @@ interface MainLayoutProps {
 const MainLayout = ({ children }: MainLayoutProps) => {
   return (
     <AdvanceSidebar>
+      <SessionGuard />
       <Header />
-      {children}
+      <div className="flex-1 min-h-0 overflow-y-auto">
+        {children}
+      </div>
     </AdvanceSidebar>
   );
 };

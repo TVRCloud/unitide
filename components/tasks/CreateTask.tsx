@@ -1,4 +1,10 @@
-import { PlusIcon } from "lucide-react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+"use client";
+import { useState } from "react";
+import { PlusIcon, X } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { createTaskSchema, TCreateTaskSchema } from "@/schemas/task";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Dialog,
   DialogContent,
@@ -7,9 +13,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
-import { useForm } from "react-hook-form";
-import { createTaskSchema, TCreateTaskSchema } from "@/schemas/task";
-import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Form,
   FormControl,
@@ -28,37 +31,66 @@ import {
   SelectValue,
 } from "../ui/select";
 import { Button } from "../ui/button";
+import { Badge } from "../ui/badge";
+import { DatePicker } from "../ui/date-picker";
 import { useCreateTask } from "@/hooks/useTask";
+import { useInfiniteProjects } from "@/hooks/useProjects";
 import { toast } from "sonner";
 
 type Props = {
-  projectId: string;
-  open: boolean;
-  setOpen: (open: boolean) => void;
+  projectId?: string;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  trigger?: React.ReactNode;
 };
 
-const CreateTask = ({ projectId, open, setOpen }: Props) => {
+const CreateTask = ({ projectId, open: controlledOpen, onOpenChange, trigger }: Props) => {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const [tagInput, setTagInput] = useState("");
   const addTask = useCreateTask();
+
+  const { data: projectPages } = useInfiniteProjects("", undefined);
+  const projects = projectPages?.pages.flat() ?? [];
+
+  const isControlled = controlledOpen !== undefined;
+  const open = isControlled ? controlledOpen : internalOpen;
+  const setOpen = isControlled
+    ? (v: boolean) => onOpenChange?.(v)
+    : setInternalOpen;
 
   const form = useForm<TCreateTaskSchema>({
     resolver: zodResolver(createTaskSchema),
     defaultValues: {
       title: "",
       description: "",
-      project: projectId,
+      project: projectId ?? "",
       status: "todo",
       priority: "medium",
       type: "task",
       tags: [],
       assignedTo: [],
-      startDate: new Date().toISOString(),
     },
   });
+
+  const tags: string[] = form.watch("tags") ?? [];
+
+  const addTag = (raw: string) => {
+    const parts = raw.split(/[,\s]+/).map((t) => t.trim()).filter(Boolean);
+    const current = form.getValues("tags") ?? [];
+    const next = [...new Set([...current, ...parts])];
+    form.setValue("tags", next);
+    setTagInput("");
+  };
+
+  const removeTag = (tag: string) => {
+    form.setValue("tags", (form.getValues("tags") ?? []).filter((t) => t !== tag));
+  };
 
   const onSubmit = (values: TCreateTaskSchema) => {
     addTask.mutate(values, {
       onSuccess: () => {
         form.reset();
+        setTagInput("");
         setOpen(false);
         toast.success("Task created successfully");
       },
@@ -68,22 +100,54 @@ const CreateTask = ({ projectId, open, setOpen }: Props) => {
     });
   };
 
+  const defaultTrigger = (
+    <Button size="sm">
+      <PlusIcon className="h-4 w-4 mr-1" />
+      Add Task
+    </Button>
+  );
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger className="bg-primary text-primary-foreground hover:bg-primary/90 h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5 cursor-pointer inline-flex items-center justify-center whitespace-nowrap text-sm font-medium">
-        <PlusIcon className="h-4 w-4" />
-        Add Task
+      <DialogTrigger asChild>
+        {trigger !== undefined ? (trigger as any) : defaultTrigger}
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Create Task</DialogTitle>
-          <DialogDescription>
-            Create a new task for this project
-          </DialogDescription>
+          <DialogDescription>Add a new task to the workspace</DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            {/* Project selector — only shown when no projectId prop */}
+            {!projectId && (
+              <FormField
+                control={form.control}
+                name="project"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Project</FormLabel>
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a project" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {projects.map((p: any) => (
+                          <SelectItem key={p._id} value={p._id}>
+                            {p.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+
             <FormField
               control={form.control}
               name="title"
@@ -91,7 +155,7 @@ const CreateTask = ({ projectId, open, setOpen }: Props) => {
                 <FormItem>
                   <FormLabel>Title</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter task title" {...field} />
+                    <Input placeholder="Task title" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -105,12 +169,63 @@ const CreateTask = ({ projectId, open, setOpen }: Props) => {
                 <FormItem>
                   <FormLabel>Description</FormLabel>
                   <FormControl>
-                    <Textarea placeholder="Enter task description" {...field} />
+                    <Textarea placeholder="Describe the task…" rows={3} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
+
+            <div className="grid grid-cols-2 gap-3">
+              <FormField
+                control={form.control}
+                name="status"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Status</FormLabel>
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="todo">To Do</SelectItem>
+                        <SelectItem value="in-progress">In Progress</SelectItem>
+                        <SelectItem value="review">Review</SelectItem>
+                        <SelectItem value="completed">Completed</SelectItem>
+                        <SelectItem value="blocked">Blocked</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="priority"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Priority</FormLabel>
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="low">Low</SelectItem>
+                        <SelectItem value="medium">Medium</SelectItem>
+                        <SelectItem value="high">High</SelectItem>
+                        <SelectItem value="urgent">Urgent</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             <FormField
               control={form.control}
@@ -118,13 +233,10 @@ const CreateTask = ({ projectId, open, setOpen }: Props) => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Type</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
+                  <Select value={field.value} onValueChange={field.onChange}>
                     <FormControl>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select type" />
+                      <SelectTrigger>
+                        <SelectValue />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -139,12 +251,83 @@ const CreateTask = ({ projectId, open, setOpen }: Props) => {
               )}
             />
 
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={addTask.isPending}
-            >
-              Create Task
+            <div className="grid grid-cols-2 gap-3">
+              <FormField
+                control={form.control}
+                name="startDate"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Start Date</FormLabel>
+                    <FormControl>
+                      <DatePicker
+                        value={field.value ? new Date(field.value) : undefined}
+                        onChange={(d) =>
+                          field.onChange(d ? d.toISOString() : undefined)
+                        }
+                        placeholder="Pick start date"
+                        clearable
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="dueDate"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Due Date</FormLabel>
+                    <FormControl>
+                      <DatePicker
+                        value={field.value ? new Date(field.value) : undefined}
+                        onChange={(d) =>
+                          field.onChange(d ? d.toISOString() : undefined)
+                        }
+                        placeholder="Pick due date"
+                        clearable
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            {/* Tags */}
+            <FormItem>
+              <FormLabel>Tags</FormLabel>
+              <div className="flex flex-wrap gap-1.5 mb-1.5">
+                {tags.map((tag) => (
+                  <Badge key={tag} variant="secondary" className="gap-1 text-xs pr-1">
+                    {tag}
+                    <button
+                      type="button"
+                      onClick={() => removeTag(tag)}
+                      className="hover:text-destructive ml-0.5"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </Badge>
+                ))}
+              </div>
+              <Input
+                value={tagInput}
+                onChange={(e) => setTagInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === ",") {
+                    e.preventDefault();
+                    if (tagInput.trim()) addTag(tagInput);
+                  }
+                }}
+                onBlur={() => { if (tagInput.trim()) addTag(tagInput); }}
+                placeholder="Type a tag, press Enter or comma to add"
+              />
+            </FormItem>
+
+            <Button type="submit" className="w-full" disabled={addTask.isPending}>
+              {addTask.isPending ? "Creating…" : "Create Task"}
             </Button>
           </form>
         </Form>

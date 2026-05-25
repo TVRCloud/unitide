@@ -11,7 +11,6 @@ import {
   Globe,
   Wifi,
   MoreVertical,
-  Eye,
   LogOut,
   Clock,
   Calendar,
@@ -30,7 +29,7 @@ import { Input } from "../ui/input";
 import { useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
 import { Separator } from "../ui/separator";
-import { useInfiniteSessions } from "@/hooks/useSession";
+import { useInfiniteSessions, useTerminateSession } from "@/hooks/useSession";
 import { Badge } from "../ui/badge";
 import {
   DropdownMenu,
@@ -40,8 +39,18 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { Dialog, DialogTrigger } from "../ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "../ui/alert-dialog";
 import { DateTime } from "luxon";
+import { toast } from "sonner";
 
 type Session = {
   _id: string;
@@ -111,7 +120,9 @@ const getTimeRemaining = (expiresAt: string) => {
 
 const SessionMain = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [terminatingId, setTerminatingId] = useState<string | null>(null);
   const { ref, inView } = useInView();
+  const terminate = useTerminateSession();
 
   const {
     data,
@@ -129,6 +140,19 @@ const SessionMain = () => {
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const sessions: Session[] = data?.pages.flat() || [];
+
+  const handleTerminate = (id: string) => {
+    terminate.mutate(id, {
+      onSuccess: () => {
+        toast.success("Session terminated");
+        setTerminatingId(null);
+      },
+      onError: () => {
+        toast.error("Failed to terminate session");
+        setTerminatingId(null);
+      },
+    });
+  };
 
   return (
     <div className="flex flex-col gap-3">
@@ -237,7 +261,6 @@ const SessionMain = () => {
                                 </p>
 
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-                                  {/* Device + OS */}
                                   <div className="flex items-center gap-2">
                                     <DeviceIcon className="w-4 h-4 text-muted-foreground" />
                                     <span className="text-muted-foreground">
@@ -245,7 +268,6 @@ const SessionMain = () => {
                                     </span>
                                   </div>
 
-                                  {/* Browser (Restored) */}
                                   <div className="flex items-center gap-2">
                                     <Globe className="w-4 h-4 text-muted-foreground" />
                                     <span className="text-muted-foreground">
@@ -253,7 +275,6 @@ const SessionMain = () => {
                                     </span>
                                   </div>
 
-                                  {/* IP */}
                                   <div className="flex items-center gap-2">
                                     <Wifi className="w-4 h-4 text-muted-foreground" />
                                     <span className="text-muted-foreground font-mono text-xs">
@@ -263,35 +284,38 @@ const SessionMain = () => {
                                 </div>
                               </div>
 
-                              <Dialog>
-                                <DropdownMenu>
-                                  <DropdownMenuTrigger asChild>
-                                    <Button
-                                      variant="ghost"
-                                      size="icon"
-                                      className="opacity-0 group-hover:opacity-100 transition-opacity"
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="opacity-0 group-hover:opacity-100 transition-opacity"
+                                  >
+                                    <MoreVertical className="w-4 h-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                  <DropdownMenuSeparator />
+                                  {session.isActive && (
+                                    <DropdownMenuItem
+                                      className="text-destructive"
+                                      onClick={() =>
+                                        setTerminatingId(session._id)
+                                      }
                                     >
-                                      <MoreVertical className="w-4 h-4" />
-                                    </Button>
-                                  </DropdownMenuTrigger>
-                                  <DropdownMenuContent align="end">
-                                    <DropdownMenuLabel>
-                                      Actions
-                                    </DropdownMenuLabel>
-                                    <DropdownMenuSeparator />
-                                    <DialogTrigger asChild>
-                                      <DropdownMenuItem>
-                                        <Eye className="w-4 h-4 mr-2" />
-                                        View Details
-                                      </DropdownMenuItem>
-                                    </DialogTrigger>
-                                    <DropdownMenuItem className="text-destructive">
                                       <LogOut className="w-4 h-4 mr-2" />
                                       Terminate Session
                                     </DropdownMenuItem>
-                                  </DropdownMenuContent>
-                                </DropdownMenu>
-                              </Dialog>
+                                  )}
+                                  {!session.isActive && (
+                                    <DropdownMenuItem disabled>
+                                      <XCircle className="w-4 h-4 mr-2" />
+                                      Already terminated
+                                    </DropdownMenuItem>
+                                  )}
+                                </DropdownMenuContent>
+                              </DropdownMenu>
                             </div>
                             <Separator className="my-3" />
 
@@ -310,7 +334,6 @@ const SessionMain = () => {
                                 />
                                 <span className="flex items-center gap-1">
                                   <Calendar className="w-3 h-3" />
-
                                   {getTimeRemaining(session.expiresAt)}
                                 </span>
                               </div>
@@ -339,6 +362,32 @@ const SessionMain = () => {
           </CardContent>
         </Card>
       </motion.div>
+
+      {/* Terminate confirmation dialog */}
+      <AlertDialog
+        open={!!terminatingId}
+        onOpenChange={(open) => !open && setTerminatingId(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Terminate Session?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will immediately invalidate the session token. The user will
+              be signed out on their next request.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => terminatingId && handleTerminate(terminatingId)}
+              disabled={terminate.isPending}
+            >
+              {terminate.isPending ? "Terminating…" : "Terminate"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

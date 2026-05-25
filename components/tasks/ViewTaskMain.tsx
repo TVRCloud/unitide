@@ -13,9 +13,9 @@ import {
   FileText,
   Download,
 } from "lucide-react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { priorityMap, statusMap, typeMap } from "@/utils/task";
-import { useViewTask } from "@/hooks/useTask";
+import { useDeleteTask, useViewTask } from "@/hooks/useTask";
 import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
 import {
@@ -25,6 +25,18 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "../ui/alert-dialog";
+import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Avatar, AvatarFallback } from "../ui/avatar";
@@ -35,7 +47,9 @@ import TaskAssignees from "./TaskAssignees";
 
 export default function ViewTaskPage() {
   const params = useParams<{ id: string }>();
+  const router = useRouter();
   const { data, isLoading } = useViewTask(params.id);
+  const { mutate: deleteTask, isPending: isDeleting } = useDeleteTask(params.id);
 
   if (isLoading) {
     return <div>Loading Task Data...</div>;
@@ -140,10 +154,44 @@ export default function ViewTaskPage() {
 
                 <DropdownMenuSeparator />
 
-                <DropdownMenuItem className="text-destructive">
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  Delete
-                </DropdownMenuItem>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <DropdownMenuItem
+                      className="text-destructive"
+                      onSelect={(e) => e.preventDefault()}
+                    >
+                      <Trash2 className="mr-2 h-4 w-4" />
+                      Delete
+                    </DropdownMenuItem>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Delete Task</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Are you sure you want to delete &quot;{data.title}&quot;?
+                        This action cannot be undone.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        onClick={() =>
+                          deleteTask(undefined, {
+                            onSuccess: () => {
+                              toast.success("Task deleted");
+                              router.push("/tasks");
+                            },
+                            onError: () => toast.error("Failed to delete task"),
+                          })
+                        }
+                        disabled={isDeleting}
+                      >
+                        Delete
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>

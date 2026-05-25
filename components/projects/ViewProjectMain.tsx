@@ -15,7 +15,7 @@ import {
   Trash2,
   Users,
 } from "lucide-react";
-import { useViewProject } from "@/hooks/useProjects";
+import { useDeleteProject, useViewProject } from "@/hooks/useProjects";
 import { cn } from "@/lib/utils";
 import { Badge } from "../ui/badge";
 import { getPriorityConfig, getStatusConfig } from "@/utils/project";
@@ -41,6 +41,19 @@ import { DateTime } from "luxon";
 import { Separator } from "../ui/separator";
 import CreateTask from "../tasks/CreateTask";
 import { useState } from "react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "../ui/alert-dialog";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { SignedAvatar } from "../ui/signed-avatar";
 
 const milestones = [
@@ -85,7 +98,9 @@ const activities = [
 const ViewProjectMain = () => {
   const [open, setOpen] = useState(false);
   const params = useParams<{ id: string }>();
+  const router = useRouter();
   const { data, isLoading } = useViewProject(params.id);
+  const { mutate: deleteProject, isPending: isDeleting } = useDeleteProject(params.id);
 
   if (isLoading) {
     return <div>Loading Project Data...</div>;
@@ -161,7 +176,7 @@ const ViewProjectMain = () => {
             </motion.div>
           </div>
           <div className="flex items-center gap-2 self-start md:self-auto">
-            <CreateTask projectId={data._id} open={open} setOpen={setOpen} />
+            <CreateTask projectId={data._id} open={open} onOpenChange={setOpen} />
 
             <Button variant="outline" size="sm" className="gap-2">
               <Edit className="h-4 w-4" />
@@ -183,10 +198,46 @@ const ViewProjectMain = () => {
                   Archive
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-destructive">
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  Delete
-                </DropdownMenuItem>
+
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <DropdownMenuItem
+                      className="text-destructive"
+                      onSelect={(e) => e.preventDefault()}
+                    >
+                      <Trash2 className="mr-2 h-4 w-4" />
+                      Delete
+                    </DropdownMenuItem>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Delete Project</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Are you sure you want to delete &quot;{data.name}&quot;?
+                        This action cannot be undone.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        onClick={() =>
+                          deleteProject(undefined, {
+                            onSuccess: () => {
+                              toast.success("Project deleted");
+                              router.push("/projects");
+                            },
+                            onError: () =>
+                              toast.error("Failed to delete project"),
+                          })
+                        }
+                        disabled={isDeleting}
+                      >
+                        Delete
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>

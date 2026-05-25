@@ -1,5 +1,6 @@
 import {
   createTask,
+  deleteTask,
   editAssignees,
   editTask,
   fetchSingleTask,
@@ -86,5 +87,16 @@ export const useViewTaskStats = () => {
   return useQuery({
     queryKey: ["task-stats"],
     queryFn: () => fetchTaskStats(),
+  });
+};
+
+export const useDeleteTask = (id: string) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () => deleteTask(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["all-tasks"] });
+      queryClient.invalidateQueries({ queryKey: ["task-stats"] });
+    },
   });
 };

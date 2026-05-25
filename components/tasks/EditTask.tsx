@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Edit } from "lucide-react";
+"use client";
 import { useState } from "react";
+import { Edit, X } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -12,10 +13,16 @@ import {
 import { useForm } from "react-hook-form";
 import { TUpdateTaskSchema, updateTaskSchema } from "@/schemas/task";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Form, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "../ui/form";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
-
 import {
   Select,
   SelectContent,
@@ -23,6 +30,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Badge } from "../ui/badge";
+import { DatePicker } from "../ui/date-picker";
 import { useEditTask } from "@/hooks/useTask";
 import { toast } from "sonner";
 import { Button } from "../ui/button";
@@ -30,11 +39,20 @@ import { TaskBasicDetails } from "@/types/task";
 
 type Props = {
   defaultValue: TaskBasicDetails;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 };
 
-const EditTask = ({ defaultValue }: Props) => {
-  const [open, setOpen] = useState(false);
+const EditTask = ({ defaultValue, open: controlledOpen, onOpenChange }: Props) => {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const [tagInput, setTagInput] = useState("");
   const editTask = useEditTask(defaultValue.id);
+
+  const isControlled = controlledOpen !== undefined;
+  const open = isControlled ? controlledOpen : internalOpen;
+  const setOpen = isControlled
+    ? (v: boolean) => onOpenChange?.(v)
+    : setInternalOpen;
 
   const form = useForm<TUpdateTaskSchema>({
     resolver: zodResolver(updateTaskSchema),
@@ -45,9 +63,22 @@ const EditTask = ({ defaultValue }: Props) => {
       priority: defaultValue.priority,
       type: defaultValue.type,
       dueDate: defaultValue.dueDate,
-      tags: defaultValue.tags,
+      tags: defaultValue.tags ?? [],
     },
   });
+
+  const tags: string[] = form.watch("tags") ?? [];
+
+  const addTag = (raw: string) => {
+    const parts = raw.split(/[,\s]+/).map((t) => t.trim()).filter(Boolean);
+    const current = form.getValues("tags") ?? [];
+    form.setValue("tags", [...new Set([...current, ...parts])]);
+    setTagInput("");
+  };
+
+  const removeTag = (tag: string) => {
+    form.setValue("tags", (form.getValues("tags") ?? []).filter((t) => t !== tag));
+  };
 
   const onSubmit = (data: any) => {
     editTask.mutate(data, {
@@ -61,161 +92,197 @@ const EditTask = ({ defaultValue }: Props) => {
     });
   };
 
-  const onError = (error: any) => {
-    console.error(error);
-  };
+  const content = (
+    <SheetContent className="overflow-y-auto min-w-[30%]">
+      <SheetHeader>
+        <SheetTitle>Edit Task</SheetTitle>
+        <SheetDescription>Update task details</SheetDescription>
+      </SheetHeader>
 
-  return (
-    <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger className="inline-flex items-center justify-center bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-medium transition-all h-9 rounded-md gap-1.5 px-3 hover:cursor-pointer">
-        <Edit className="w-4 h-4" />
-      </SheetTrigger>
-
-      <SheetContent className="overflow-y-auto min-w-[30%]">
-        <SheetHeader>
-          <SheetTitle>Edit Task</SheetTitle>
-          <SheetDescription>Update task details</SheetDescription>
-        </SheetHeader>
-
-        <div className="mt-1 px-4">
-          <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(onSubmit, onError)}
-              className="space-y-4"
-            >
-              <FormField
-                control={form.control}
-                name="title"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Title</FormLabel>
+      <div className="mt-4 px-4">
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="title"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Title</FormLabel>
+                  <FormControl>
                     <Input {...field} />
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Description</FormLabel>
-                    <Textarea {...field} />
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description</FormLabel>
+                  <FormControl>
+                    <Textarea {...field} rows={3} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-              {/* STATUS SELECT */}
-              <FormField
-                control={form.control}
-                name="status"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Status</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
+            <FormField
+              control={form.control}
+              name="status"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Status</FormLabel>
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select Status" />
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="todo">To-do</SelectItem>
-                        <SelectItem value="in-progress">In Progress</SelectItem>
-                        <SelectItem value="review">Review</SelectItem>
-                        <SelectItem value="completed">Completed</SelectItem>
-                        <SelectItem value="blocked">Blocked</SelectItem>
-                        <SelectItem value="cancelled">Cancelled</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="todo">To Do</SelectItem>
+                      <SelectItem value="in-progress">In Progress</SelectItem>
+                      <SelectItem value="review">Review</SelectItem>
+                      <SelectItem value="completed">Completed</SelectItem>
+                      <SelectItem value="blocked">Blocked</SelectItem>
+                      <SelectItem value="cancelled">Cancelled</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-              {/* PRIORITY SELECT */}
-              <FormField
-                control={form.control}
-                name="priority"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Priority</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
+            <FormField
+              control={form.control}
+              name="priority"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Priority</FormLabel>
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select Priority" />
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="low">Low</SelectItem>
-                        <SelectItem value="medium">Medium</SelectItem>
-                        <SelectItem value="high">High</SelectItem>
-                        <SelectItem value="urgent">Urgent</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="low">Low</SelectItem>
+                      <SelectItem value="medium">Medium</SelectItem>
+                      <SelectItem value="high">High</SelectItem>
+                      <SelectItem value="urgent">Urgent</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-              {/* TYPE SELECT */}
-              <FormField
-                control={form.control}
-                name="type"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Type</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
+            <FormField
+              control={form.control}
+              name="type"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Type</FormLabel>
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select Type" />
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="task">Task</SelectItem>
-                        <SelectItem value="bug">Bug</SelectItem>
-                        <SelectItem value="story">Story</SelectItem>
-                        <SelectItem value="feature">Feature</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="task">Task</SelectItem>
+                      <SelectItem value="bug">Bug</SelectItem>
+                      <SelectItem value="story">Story</SelectItem>
+                      <SelectItem value="feature">Feature</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-              <FormField
-                control={form.control}
-                name="dueDate"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Due Date</FormLabel>
-                    <Input {...field} />
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            <FormField
+              control={form.control}
+              name="dueDate"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Due Date</FormLabel>
+                  <FormControl>
+                    <DatePicker
+                      value={field.value ? new Date(field.value) : undefined}
+                      onChange={(d) =>
+                        field.onChange(d ? d.toISOString() : undefined)
+                      }
+                      placeholder="Pick due date"
+                      clearable
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-              <FormField
-                control={form.control}
-                name="tags"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Tags</FormLabel>
-                    <Input {...field} />
-                    <FormMessage />
-                  </FormItem>
-                )}
+            {/* Tags */}
+            <FormItem>
+              <FormLabel>Tags</FormLabel>
+              <div className="flex flex-wrap gap-1.5 mb-1.5">
+                {tags.map((tag) => (
+                  <Badge key={tag} variant="secondary" className="gap-1 text-xs pr-1">
+                    {tag}
+                    <button
+                      type="button"
+                      onClick={() => removeTag(tag)}
+                      className="hover:text-destructive ml-0.5"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </Badge>
+                ))}
+              </div>
+              <Input
+                value={tagInput}
+                onChange={(e) => setTagInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === ",") {
+                    e.preventDefault();
+                    if (tagInput.trim()) addTag(tagInput);
+                  }
+                }}
+                onBlur={() => { if (tagInput.trim()) addTag(tagInput); }}
+                placeholder="Type a tag, press Enter to add"
               />
+            </FormItem>
 
-              <Button type="submit">Save</Button>
-            </form>
-          </Form>
-        </div>
-      </SheetContent>
+            <Button type="submit" disabled={editTask.isPending}>
+              {editTask.isPending ? "Saving…" : "Save Changes"}
+            </Button>
+          </form>
+        </Form>
+      </div>
+    </SheetContent>
+  );
+
+  // Controlled mode — no trigger rendered
+  if (isControlled) {
+    return (
+      <Sheet open={open} onOpenChange={setOpen}>
+        {content}
+      </Sheet>
+    );
+  }
+
+  // Uncontrolled mode — renders the Edit trigger button
+  return (
+    <Sheet open={open} onOpenChange={setOpen}>
+      <SheetTrigger asChild>
+        <Button size="sm" variant="outline">
+          <Edit className="w-4 h-4" />
+        </Button>
+      </SheetTrigger>
+      {content}
     </Sheet>
   );
 };
